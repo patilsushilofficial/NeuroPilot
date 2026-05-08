@@ -1,0 +1,76 @@
+import React, { useEffect } from 'react';
+import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
+import { useAppTheme } from '../../hooks/useAppTheme';
+import { borderRadius } from '../../theme/spacing';
+
+interface ProgressBarProps {
+  progress: number; // 0.0 to 1.0
+  color?: string;
+  backgroundColor?: string;
+  height?: number;
+  style?: StyleProp<ViewStyle>;
+  animated?: boolean;
+  rounded?: boolean;
+  striped?: boolean;
+}
+
+export const ProgressBar: React.FC<ProgressBarProps> = ({
+  progress,
+  color,
+  backgroundColor,
+  height = 8,
+  style,
+  animated = true,
+  rounded = true,
+}) => {
+  const theme = useAppTheme();
+  const barColor = color ?? theme.colors.primary;
+  const bgColor = backgroundColor ?? theme.colors.border;
+
+  const clampedProgress = Math.min(1, Math.max(0, progress));
+  const width = useSharedValue(clampedProgress);
+
+  useEffect(() => {
+    if (animated) {
+      width.value = withTiming(clampedProgress, {
+        duration: 600,
+        easing: Easing.out(Easing.cubic),
+      });
+    } else {
+      width.value = clampedProgress;
+    }
+  }, [clampedProgress, animated]);
+
+  const animatedFill = useAnimatedStyle(() => ({
+    width: `${width.value * 100}%`,
+  }));
+
+  return (
+    <View
+      style={[
+        {
+          height,
+          backgroundColor: bgColor,
+          borderRadius: rounded ? borderRadius.full : 0,
+          overflow: 'hidden',
+        },
+        style,
+      ]}
+      accessible
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min: 0, max: 100, now: Math.round(clampedProgress * 100) }}
+    >
+      <Animated.View
+        style={[
+          {
+            height: '100%',
+            backgroundColor: barColor,
+            borderRadius: rounded ? borderRadius.full : 0,
+          },
+          animatedFill,
+        ]}
+      />
+    </View>
+  );
+};
