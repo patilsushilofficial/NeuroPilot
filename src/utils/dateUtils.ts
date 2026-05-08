@@ -100,3 +100,17 @@ export const getLevelTitle = (level: number): string => {
   if (level < 50) return 'Expert';
   return 'Neuro Legend';
 };
+/**
+ * Get today's date as YYYY-MM-DD string.
+ */
+export const getTodayStr = (): string => format(new Date(), 'yyyy-MM-dd');
+
+/**
+ * Format a date as the all-caps banner shown above the home greeting,
+ * e.g. "SATURDAY, MAY 9". Pulled out of `HomeScreen` so the locale and
+ * casing decisions live in one tested place.
+ */
+export const formatHomeHeaderDate = (date: Date = new Date()): string =>
+  date
+    .toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+    .toUpperCase();

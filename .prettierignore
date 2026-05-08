@@ -1,0 +1,8 @@
+node_modules
+.expo
+coverage
+android
+ios
+build-output.txt
+package-lock.json
+*.log

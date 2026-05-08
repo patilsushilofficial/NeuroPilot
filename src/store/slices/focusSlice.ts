@@ -1,6 +1,7 @@
 import { StateCreator } from 'zustand';
 import { ActiveFocusState, FocusPhase, FocusSession } from '../../types';
 import { DEFAULT_PRESET_ID, getPresetById, XP_REWARDS } from '../../constants/focusPresets';
+import { triggerImmediateFocusAlert } from '../../utils/notifications';
 
 let sessionIdCounter = Date.now();
 const newId = () => `focus_${++sessionIdCounter}_${Math.random().toString(36).slice(2, 7)}`;
@@ -43,18 +44,17 @@ const defaultActive = (): ActiveFocusState => {
   };
 };
 
-const getPhaseSeconds = (preset: ReturnType<typeof getPresetById>, phase: FocusPhase, completedPomodoros: number): number => {
-  if (phase === 'focus') return preset.focusMinutes * 60;
-  if (phase === 'long_break' && completedPomodoros % preset.sessionsBeforeLongBreak === 0) {
-    return preset.longBreakMinutes * 60;
-  }
-  return phase === 'long_break' ? preset.longBreakMinutes * 60 : preset.shortBreakMinutes * 60;
-};
-
-export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (set, get) => ({
+export const getInitialFocusState = (): Pick<
+  FocusSlice,
+  'focusSessions' | 'active' | 'shieldActive'
+> => ({
   focusSessions: [],
   active: defaultActive(),
   shieldActive: false,
+});
+
+export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (set, get) => ({
+  ...getInitialFocusState(),
 
   toggleShield: (active) => set({ shieldActive: active }),
 
@@ -118,6 +118,15 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
     // Phase completed
     const preset = getPresetById(active.presetId);
     let xpEarned = 0;
+
+    // Trigger notification if enabled
+    const state = get() as any;
+    if (state.settings?.notificationsEnabled) {
+      const message = active.phase === 'focus'
+        ? 'Great job! Focus session completed. Time for a break.'
+        : 'Break is over. Ready to dive back in?';
+      triggerImmediateFocusAlert(message);
+    }
 
     if (active.phase === 'focus') {
       // Award XP for focus minutes

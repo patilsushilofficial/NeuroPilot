@@ -1,172 +1,90 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useHaptics } from '../../hooks/useHaptics';
-import { useAppStore } from '../../store';
-import { Task, TaskPriority, TaskStatus } from '../../types';
+import { useTasksScreen } from '../../hooks/useTasksScreen';
 import { TaskCard } from '../../components/tasks/TaskCard';
 import { QuickCapture } from '../../components/tasks/QuickCapture';
 import { EmptyState } from '../../components/common/EmptyState';
-import { Badge } from '../../components/common/Badge';
-import { spacing } from '../../theme/spacing';
-
-type FilterTab = 'all' | 'today' | 'completed';
-
-const FILTER_TABS: Array<{ key: FilterTab; label: string; emoji: string }> = [
-  { key: 'all', label: 'All', emoji: '📋' },
-  { key: 'today', label: 'Today', emoji: '📅' },
-  { key: 'completed', label: 'Done', emoji: '✅' },
-];
+import { Theme } from '../../theme';
+import { borderRadius, spacing } from '../../theme/spacing';
+import { avatarSizes, borderWidths, iconSizes } from '../../theme/tokens';
+import { fontWeights } from '../../theme/typography';
+import { TASK_FILTER_TABS } from '../../constants/tasksUi';
 
 export const TasksScreen: React.FC = () => {
   const theme = useAppTheme();
-  const haptics = useHaptics();
-  const navigation = useNavigation<any>();
-
-  const [filter, setFilter] = useState<FilterTab>('all');
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const {
-    tasks,
-    addTask,
-    completeTask,
-    deleteTask,
-    addXP,
-    recordTaskComplete,
-    getTodaysTasks,
-  } = useAppStore();
-
-  const filteredTasks = useMemo(() => {
-    if (filter === 'today') return getTodaysTasks();
-    if (filter === 'completed') return tasks.filter((t) => t.status === 'completed');
-    return tasks.filter((t) => t.status !== 'completed');
-  }, [tasks, filter, getTodaysTasks]);
-
-  // Sort: high priority → medium → low, then by date
-  const sortedTasks = useMemo(() => {
-    const priorityOrder: Record<TaskPriority, number> = { high: 0, medium: 1, low: 2 };
-    return [...filteredTasks].sort((a, b) => {
-      if (a.status === 'completed' && b.status !== 'completed') return 1;
-      if (b.status === 'completed' && a.status !== 'completed') return -1;
-      return priorityOrder[a.priority] - priorityOrder[b.priority];
-    });
-  }, [filteredTasks]);
-
-  const handleComplete = useCallback(
-    (id: string) => {
-      const xp = completeTask(id);
-      if (xp > 0) {
-        addXP(xp);
-        recordTaskComplete();
-        haptics.success();
-      }
-    },
-    [completeTask, addXP, recordTaskComplete, haptics]
-  );
-
-  const handleDelete = useCallback(
-    (id: string) => {
-      Alert.alert('Delete Task', 'Are you sure you want to delete this task?', [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            haptics.warning();
-            deleteTask(id);
-          },
-        },
-      ]);
-    },
-    [deleteTask, haptics]
-  );
-
-  const handleQuickCapture = useCallback(
-    (title: string, priority?: 'high' | 'medium' | 'low') => {
-      addTask({ title, priority: priority ?? 'medium', tags: [] });
-      haptics.light();
-    },
-    [addTask, haptics]
-  );
-
-  const pendingCount = tasks.filter((t) => t.status !== 'completed').length;
-  const overdueCount = useAppStore((s) => s.getOverdueTasks().length);
+    filter,
+    selectFilter,
+    sortedTasks,
+    pendingCount,
+    overdueCount,
+    handleComplete,
+    handleDelete,
+    handleQuickCapture,
+    openAddTask,
+    openTaskDetail,
+  } = useTasksScreen();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {/* Header */}
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={[theme.text.h2, { color: theme.colors.textPrimary }]}>Tasks</Text>
-          <Text style={[theme.text.bodySmall, { color: theme.colors.textSecondary }]}>
+          <Text style={[theme.text.h2, styles.title]}>Tasks</Text>
+          <Text style={[theme.text.bodySmall, styles.subtitle]}>
             {pendingCount} pending
             {overdueCount > 0 && (
-              <Text style={{ color: theme.colors.error }}> · {overdueCount} overdue</Text>
+              <Text style={styles.overdueText}> · {overdueCount} overdue</Text>
             )}
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate('AddTask')}
-          style={[styles.addButton, { backgroundColor: theme.colors.primary }]}
+          onPress={openAddTask}
+          style={styles.addButton}
           accessible
           accessibilityRole="button"
           accessibilityLabel="Add new task"
         >
-          <Text style={{ color: 'white', fontSize: 22, fontWeight: '600' }}>+</Text>
+          <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Filter Tabs */}
       <View style={styles.filterRow}>
-        {FILTER_TABS.map((tab) => (
-          <TouchableOpacity
-            key={tab.key}
-            onPress={() => {
-              haptics.light();
-              setFilter(tab.key);
-            }}
-            style={[
-              styles.filterTab,
-              {
-                backgroundColor:
-                  filter === tab.key ? theme.colors.primaryContainer : 'transparent',
-                borderColor: filter === tab.key ? theme.colors.primary : theme.colors.border,
-              },
-            ]}
-            accessible
-            accessibilityRole="tab"
-            accessibilityState={{ selected: filter === tab.key }}
-          >
-            <Text style={{ fontSize: 14 }}>{tab.emoji}</Text>
-            <Text
+        {TASK_FILTER_TABS.map((tab) => {
+          const selected = filter === tab.key;
+          return (
+            <TouchableOpacity
+              key={tab.key}
+              onPress={() => selectFilter(tab.key)}
               style={[
-                theme.text.labelMedium,
-                {
-                  color:
-                    filter === tab.key ? theme.colors.primaryLight : theme.colors.textSecondary,
-                },
+                styles.filterTab,
+                selected ? styles.filterTabActive : styles.filterTabInactive,
               ]}
+              accessible
+              accessibilityRole="tab"
+              accessibilityState={{ selected }}
             >
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text style={styles.filterEmoji}>{tab.emoji}</Text>
+              <Text
+                style={[
+                  theme.text.labelMedium,
+                  selected ? styles.filterLabelActive : styles.filterLabelInactive,
+                ]}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
-      {/* Quick Capture */}
       <View style={styles.captureWrapper}>
         <QuickCapture onCapture={handleQuickCapture} />
       </View>
 
-      {/* Task List */}
       <FlatList
         data={sortedTasks}
         keyExtractor={(item) => item.id}
@@ -176,7 +94,7 @@ export const TasksScreen: React.FC = () => {
           <TaskCard
             task={item}
             onComplete={handleComplete}
-            onPress={(id) => navigation.navigate('AddTask', { taskId: id })}
+            onPress={openTaskDetail}
             onLongPress={handleDelete}
           />
         )}
@@ -190,9 +108,7 @@ export const TasksScreen: React.FC = () => {
                 : 'Your task list is empty. Capture a thought above — it takes 10 seconds.'
             }
             actionLabel={filter !== 'completed' ? 'Add a Task' : undefined}
-            onAction={
-              filter !== 'completed' ? () => navigation.navigate('AddTask') : undefined
-            }
+            onAction={filter !== 'completed' ? openAddTask : undefined}
           />
         }
       />
@@ -200,44 +116,68 @@ export const TasksScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing[2],
-    paddingTop: spacing[1],
-    paddingBottom: spacing[0.5],
-  },
-  addButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  filterRow: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing[2],
-    gap: spacing[0.5],
-    marginBottom: spacing[1],
-  },
-  filterTab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: spacing[1.5],
-    paddingVertical: 8,
-    borderRadius: 24,
-    borderWidth: 1,
-  },
-  captureWrapper: {
-    paddingHorizontal: spacing[2],
-    marginBottom: spacing[1],
-  },
-  listContent: {
-    paddingHorizontal: spacing[2],
-    paddingBottom: spacing[10],
-  },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing['2xs'],
+    },
+    title: { color: theme.colors.textPrimary },
+    subtitle: { color: theme.colors.textSecondary },
+    overdueText: { color: theme.colors.error },
+    addButton: {
+      width: avatarSizes.md,
+      height: avatarSizes.md,
+      borderRadius: avatarSizes.md / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.primary,
+    },
+    addButtonText: {
+      color: 'white',
+      fontSize: iconSizes.xl,
+      fontWeight: fontWeights.semibold,
+    },
+    filterRow: {
+      flexDirection: 'row',
+      paddingHorizontal: spacing.md,
+      gap: spacing['2xs'],
+      marginBottom: spacing.xs,
+    },
+    filterTab: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing['3xs'],
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius['2xl'],
+      borderWidth: borderWidths.thin,
+    },
+    filterTabActive: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderColor: theme.colors.primary,
+    },
+    filterTabInactive: {
+      backgroundColor: 'transparent',
+      borderColor: theme.colors.border,
+    },
+    filterEmoji: { fontSize: iconSizes.sm },
+    filterLabelActive: { color: theme.colors.primaryLight },
+    filterLabelInactive: { color: theme.colors.textSecondary },
+    captureWrapper: {
+      paddingHorizontal: spacing.md,
+      marginBottom: spacing.xs,
+    },
+    listContent: {
+      paddingHorizontal: spacing.md,
+      paddingBottom: spacing['8xl'],
+    },
+  });

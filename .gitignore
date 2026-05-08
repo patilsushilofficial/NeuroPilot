@@ -14,3 +14,4 @@ ios/
 google-service-account.json
 .env
 .env.local
+coverage/

@@ -6,7 +6,8 @@ import { moderateScale } from '../utils/responsive';
  * Optimized for ADHD readability:
  * - Large, scannable headers (clear hierarchy reduces cognitive load)
  * - Generous line heights (prevent visual cramping)
- * - System fonts (no font-loading jank)
+ * - Lexend font (proven to improve reading proficiency, especially for
+ *   readers with dyslexia / attention difficulties)
  */
 
 export const fontSizes = {
@@ -29,6 +30,22 @@ export const fontWeights = {
   extrabold: '800' as TextStyle['fontWeight'],
 } as const;
 
+/**
+ * Lexend variants — each weight is shipped as a separately-named TTF.
+ * Using an explicit family per weight avoids Android's automatic
+ * weight synthesis (which produces blurry/distorted glyphs).
+ */
+export const fontFamilies = {
+  regular: 'Lexend_400Regular',
+  medium: 'Lexend_500Medium',
+  semibold: 'Lexend_600SemiBold',
+  bold: 'Lexend_700Bold',
+  extrabold: 'Lexend_800ExtraBold',
+} as const;
+
+/** Default font family for any `<Text>` that doesn't specify its own. */
+export const defaultFontFamily = fontFamilies.regular;
+
 export const lineHeights = {
   tight: 1.2,
   normal: 1.5,
@@ -49,6 +66,7 @@ export const letterSpacings = {
 export const textStyles = {
   // Display
   displayLarge: {
+    fontFamily: fontFamilies.extrabold,
     fontSize: fontSizes['4xl'],
     fontWeight: fontWeights.extrabold,
     lineHeight: fontSizes['4xl'] * lineHeights.tight,
@@ -56,6 +74,7 @@ export const textStyles = {
   } as TextStyle,
 
   displayMedium: {
+    fontFamily: fontFamilies.bold,
     fontSize: fontSizes['3xl'],
     fontWeight: fontWeights.bold,
     lineHeight: fontSizes['3xl'] * lineHeights.tight,
@@ -64,6 +83,7 @@ export const textStyles = {
 
   // Headings
   h1: {
+    fontFamily: fontFamilies.bold,
     fontSize: fontSizes['2xl'],
     fontWeight: fontWeights.bold,
     lineHeight: fontSizes['2xl'] * lineHeights.tight,
@@ -71,6 +91,7 @@ export const textStyles = {
   } as TextStyle,
 
   h2: {
+    fontFamily: fontFamilies.bold,
     fontSize: fontSizes.xl,
     fontWeight: fontWeights.bold,
     lineHeight: fontSizes.xl * lineHeights.normal,
@@ -78,6 +99,7 @@ export const textStyles = {
   } as TextStyle,
 
   h3: {
+    fontFamily: fontFamilies.semibold,
     fontSize: fontSizes.lg,
     fontWeight: fontWeights.semibold,
     lineHeight: fontSizes.lg * lineHeights.normal,
@@ -85,6 +107,7 @@ export const textStyles = {
   } as TextStyle,
 
   h4: {
+    fontFamily: fontFamilies.semibold,
     fontSize: fontSizes.md,
     fontWeight: fontWeights.semibold,
     lineHeight: fontSizes.md * lineHeights.normal,
@@ -93,6 +116,7 @@ export const textStyles = {
 
   // Body
   bodyLarge: {
+    fontFamily: fontFamilies.regular,
     fontSize: fontSizes.md,
     fontWeight: fontWeights.regular,
     lineHeight: fontSizes.md * lineHeights.relaxed,
@@ -100,6 +124,7 @@ export const textStyles = {
   } as TextStyle,
 
   bodyMedium: {
+    fontFamily: fontFamilies.regular,
     fontSize: fontSizes.base,
     fontWeight: fontWeights.regular,
     lineHeight: fontSizes.base * lineHeights.relaxed,
@@ -107,6 +132,7 @@ export const textStyles = {
   } as TextStyle,
 
   bodySmall: {
+    fontFamily: fontFamilies.regular,
     fontSize: fontSizes.sm,
     fontWeight: fontWeights.regular,
     lineHeight: fontSizes.sm * lineHeights.relaxed,
@@ -115,6 +141,7 @@ export const textStyles = {
 
   // Labels
   labelLarge: {
+    fontFamily: fontFamilies.semibold,
     fontSize: fontSizes.base,
     fontWeight: fontWeights.semibold,
     lineHeight: fontSizes.base * lineHeights.normal,
@@ -122,6 +149,7 @@ export const textStyles = {
   } as TextStyle,
 
   labelMedium: {
+    fontFamily: fontFamilies.semibold,
     fontSize: fontSizes.sm,
     fontWeight: fontWeights.semibold,
     lineHeight: fontSizes.sm * lineHeights.normal,
@@ -129,6 +157,7 @@ export const textStyles = {
   } as TextStyle,
 
   labelSmall: {
+    fontFamily: fontFamilies.semibold,
     fontSize: fontSizes.xs,
     fontWeight: fontWeights.semibold,
     lineHeight: fontSizes.xs * lineHeights.normal,
@@ -138,6 +167,7 @@ export const textStyles = {
 
   // Special
   timerDisplay: {
+    fontFamily: fontFamilies.extrabold,
     fontSize: moderateScale(72),
     fontWeight: fontWeights.extrabold,
     lineHeight: moderateScale(72) * lineHeights.tight,
@@ -145,6 +175,7 @@ export const textStyles = {
   } as TextStyle,
 
   xpDisplay: {
+    fontFamily: fontFamilies.extrabold,
     fontSize: fontSizes['2xl'],
     fontWeight: fontWeights.extrabold,
     lineHeight: fontSizes['2xl'] * lineHeights.tight,

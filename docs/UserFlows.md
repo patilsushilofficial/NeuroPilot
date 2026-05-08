@@ -43,7 +43,7 @@ graph TD
     A[User enters Task Title] -->|Tap Save| B(tasksSlice: addTask)
     B -->|1. Generate ID & XP| C(TaskService: createTask)
     C -->|2. Queue Sync Action| D(SyncService)
-    D -->|3. Save to Queue| E[(AsyncStorage)]
+    D -->|3. Save to Queue| E[(MMKV)]
     
     B -->|4. Update State| F[Zustand Store]
     F -->|5. Re-render| G[UI: Task Appears Instantly]

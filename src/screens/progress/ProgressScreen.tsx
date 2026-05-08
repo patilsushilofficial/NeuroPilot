@@ -1,188 +1,117 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Rect, G } from 'react-native-svg';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useAppStore, selectStats } from '../../store';
+import { useProgressScreen } from '../../hooks/useProgressScreen';
 import { Card } from '../../components/common/Card';
 import { ProgressBar } from '../../components/common/ProgressBar';
 import { Badge } from '../../components/common/Badge';
-import { ACHIEVEMENTS } from '../../constants/achievements';
-import {
-  getLevelTitle,
-  formatFocusTime,
-  getWeekDayLabels,
-} from '../../utils/dateUtils';
-import {
-  getXPProgressInLevel,
-  getLevelThreshold,
-  getXPToNextLevel,
-} from '../../constants/focusPresets';
+import { WeeklyBarChart } from '../../components/progress/WeeklyBarChart';
+import { getLevelTitle, formatFocusTime } from '../../utils/dateUtils';
+import { Theme } from '../../theme';
 import { spacing, borderRadius } from '../../theme/spacing';
-
-/** Mini bar chart for weekly data */
-const WeeklyBarChart: React.FC<{
-  data: number[];
-  color: string;
-  label: string;
-  height?: number;
-}> = ({ data, color, label, height = 80 }) => {
-  const theme = useAppTheme();
-  const days = getWeekDayLabels();
-  const max = Math.max(...data, 1);
-  const barWidth = 28;
-  const gap = 8;
-  const chartWidth = data.length * (barWidth + gap);
-
-  return (
-    <View>
-      <Text style={[theme.text.labelSmall, { color: theme.colors.textTertiary, marginBottom: 8 }]}>
-        {label.toUpperCase()}
-      </Text>
-      <Svg width={chartWidth} height={height + 20}>
-        <G>
-          {data.map((val, i) => {
-            const barH = (val / max) * height;
-            const x = i * (barWidth + gap);
-            const y = height - barH;
-            return (
-              <G key={i}>
-                <Rect
-                  x={x}
-                  y={0}
-                  width={barWidth}
-                  height={height}
-                  rx={6}
-                  fill={theme.colors.border}
-                />
-                <Rect
-                  x={x}
-                  y={y}
-                  width={barWidth}
-                  height={Math.max(barH, 2)}
-                  rx={6}
-                  fill={color}
-                  opacity={0.85}
-                />
-              </G>
-            );
-          })}
-        </G>
-      </Svg>
-      <View style={styles.dayLabels}>
-        {days.map((d, i) => (
-          <Text key={i} style={[styles.dayLabel, { color: theme.colors.textTertiary, width: barWidth + gap }]}>
-            {d}
-          </Text>
-        ))}
-      </View>
-    </View>
-  );
-};
+import {
+  avatarSizes,
+  borderWidths,
+  iconSizes,
+  opacity as opacityTokens,
+} from '../../theme/tokens';
 
 export const ProgressScreen: React.FC = () => {
   const theme = useAppTheme();
-  const stats = useAppStore(selectStats);
-  const profile = useAppStore((s) => s.profile);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const {
+    profile,
+    stats,
+    xpProgress,
+    xpInLevel,
+    xpForLevel,
+    unlockedAchievements,
+    lockedAchievements,
+  } = useProgressScreen();
 
-  const xpProgress = getXPProgressInLevel(stats.totalXP);
-  const xpInLevel = stats.totalXP - getLevelThreshold(stats.level);
-  const xpForLevel = getLevelThreshold(stats.level + 1) - getLevelThreshold(stats.level);
-
-  const unlockedAchievements = useMemo(
-    () => ACHIEVEMENTS.filter((a) => stats.unlockedAchievements.includes(a.id)),
-    [stats.unlockedAchievements]
-  );
-
-  const lockedAchievements = useMemo(
-    () => ACHIEVEMENTS.filter((a) => !stats.unlockedAchievements.includes(a.id) && !a.secret),
-    [stats.unlockedAchievements]
-  );
+  const statTiles: Array<{
+    emoji: string;
+    value: string | number;
+    label: string;
+    tone: TextStyle;
+  }> = [
+    { emoji: '✅', value: stats.tasksCompleted, label: 'Tasks Done', tone: styles.statSuccess },
+    { emoji: '🔥', value: stats.habitsCompleted, label: 'Habits Done', tone: styles.statStreak },
+    { emoji: '⏱️', value: formatFocusTime(stats.focusMinutes), label: 'Focus Time', tone: styles.statPrimary },
+    { emoji: '🏅', value: stats.longestStreak, label: 'Best Streak', tone: styles.statWarning },
+    { emoji: '⚡', value: stats.totalXP.toLocaleString(), label: 'Total XP', tone: styles.statPrimaryLight },
+    { emoji: '🏆', value: unlockedAchievements.length, label: 'Achievements', tone: styles.statSecondary },
+  ];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Header */}
         <View style={styles.profileHeader}>
-          <View style={[styles.avatarLarge, { backgroundColor: theme.colors.primaryContainer }]}>
-            <Text style={{ fontSize: 40 }}>{profile?.avatar ?? '🧠'}</Text>
+          <View style={styles.avatarLarge}>
+            <Text style={styles.avatarEmoji}>{profile?.avatar ?? '🧠'}</Text>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={[theme.text.h2, { color: theme.colors.textPrimary }]}>
-              {profile?.name ?? 'Pilot'}
-            </Text>
-            <Text style={[theme.text.bodySmall, { color: theme.colors.textSecondary }]}>
+            <Text style={[theme.text.h2, styles.profileName]}>{profile?.name ?? 'Pilot'}</Text>
+            <Text style={[theme.text.bodySmall, styles.profileSubtitle]}>
               Level {stats.level} · {getLevelTitle(stats.level)}
             </Text>
             {stats.currentStreak > 0 && (
-              <Text style={[theme.text.bodySmall, { color: theme.colors.streakFire }]}>
+              <Text style={[theme.text.bodySmall, styles.profileStreak]}>
                 🔥 {stats.currentStreak}-day streak
               </Text>
             )}
           </View>
         </View>
 
-        {/* XP Progress */}
         <Card>
           <View style={styles.xpHeader}>
-            <Text style={[theme.text.labelSmall, { color: theme.colors.textTertiary }]}>
+            <Text style={[theme.text.labelSmall, styles.subtleLabel]}>
               LEVEL {stats.level} PROGRESS
             </Text>
-            <Text style={[theme.text.labelMedium, { color: theme.colors.primary }]}>
+            <Text style={[theme.text.labelMedium, styles.xpHeaderValue]}>
               {xpInLevel.toLocaleString()} / {xpForLevel.toLocaleString()} XP
             </Text>
           </View>
-          <ProgressBar progress={xpProgress} color={theme.colors.primary} height={10} style={{ marginVertical: 8 }} />
-          <Text style={[theme.text.bodySmall, { color: theme.colors.textSecondary }]}>
+          <ProgressBar progress={xpProgress} color={theme.colors.primary} style={styles.xpBar} />
+          <Text style={[theme.text.bodySmall, styles.xpFooter]}>
             🚀 {stats.xpToNextLevel.toLocaleString()} XP to Level {stats.level + 1}
           </Text>
         </Card>
 
-        {/* Stats Grid */}
         <View style={styles.statsGrid}>
-          {[
-            { emoji: '✅', value: stats.tasksCompleted, label: 'Tasks Done', color: theme.colors.success },
-            { emoji: '🔥', value: stats.habitsCompleted, label: 'Habits Done', color: theme.colors.streakFire },
-            { emoji: '⏱️', value: formatFocusTime(stats.focusMinutes), label: 'Focus Time', color: theme.colors.primary },
-            { emoji: '🏅', value: stats.longestStreak, label: 'Best Streak', color: theme.colors.warning },
-            { emoji: '⚡', value: stats.totalXP.toLocaleString(), label: 'Total XP', color: theme.colors.primaryLight },
-            { emoji: '🏆', value: unlockedAchievements.length, label: 'Achievements', color: theme.colors.secondary },
-          ].map((stat) => (
+          {statTiles.map((stat) => (
             <Card key={stat.label} style={styles.statCard} elevated>
-              <Text style={{ fontSize: 22 }}>{stat.emoji}</Text>
-              <Text style={[theme.text.h3, { color: stat.color }]}>{stat.value}</Text>
-              <Text style={[theme.text.labelSmall, { color: theme.colors.textTertiary }]}>
+              <Text style={styles.statEmoji}>{stat.emoji}</Text>
+              <Text style={[theme.text.h3, stat.tone]}>{stat.value}</Text>
+              <Text style={[theme.text.labelSmall, styles.subtleLabel]}>
                 {stat.label.toUpperCase()}
               </Text>
             </Card>
           ))}
         </View>
 
-        {/* Weekly Charts */}
         <Card>
-          <Text style={[theme.text.h4, { color: theme.colors.textPrimary, marginBottom: spacing[1.5] }]}>
-            This Week
-          </Text>
+          <Text style={[theme.text.h4, styles.cardHeading]}>This Week</Text>
           <WeeklyBarChart data={stats.weeklyXP} color={theme.colors.primary} label="XP Earned" />
-          <View style={{ height: spacing[2] }} />
+          <View style={styles.chartGap} />
           <WeeklyBarChart data={stats.weeklyTasks} color={theme.colors.success} label="Tasks Completed" />
         </Card>
 
-        {/* Achievements */}
         {unlockedAchievements.length > 0 && (
           <View>
-            <Text style={[theme.text.h4, { color: theme.colors.textPrimary, marginBottom: spacing[1] }]}>
+            <Text style={[theme.text.h4, styles.sectionHeading]}>
               🏆 Unlocked ({unlockedAchievements.length})
             </Text>
             <View style={styles.achievementGrid}>
               {unlockedAchievements.map((achievement) => (
                 <Card key={achievement.id} style={styles.achievementCard} elevated>
                   <Text style={styles.achievementEmoji}>{achievement.emoji}</Text>
-                  <Text style={[theme.text.labelMedium, { color: theme.colors.textPrimary, textAlign: 'center' }]}>
+                  <Text style={[theme.text.labelMedium, styles.centerText, styles.textPrimary]}>
                     {achievement.title}
                   </Text>
-                  <Text style={[theme.text.bodySmall, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
+                  <Text style={[theme.text.bodySmall, styles.centerText, styles.textTertiary]}>
                     {achievement.description}
                   </Text>
                   <Badge label={`+${achievement.xpReward} XP`} variant="primary" />
@@ -192,24 +121,22 @@ export const ProgressScreen: React.FC = () => {
           </View>
         )}
 
-        {/* Locked Achievements */}
         {lockedAchievements.length > 0 && (
           <View>
-            <Text style={[theme.text.h4, { color: theme.colors.textPrimary, marginBottom: spacing[1] }]}>
+            <Text style={[theme.text.h4, styles.sectionHeading]}>
               🔒 Coming Up ({lockedAchievements.length})
             </Text>
             <View style={styles.lockedList}>
               {lockedAchievements.slice(0, 6).map((achievement) => (
-                <View
-                  key={achievement.id}
-                  style={[styles.lockedItem, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}
-                >
-                  <Text style={[styles.achievementEmoji, { opacity: 0.3 }]}>{achievement.emoji}</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[theme.text.labelMedium, { color: theme.colors.textTertiary }]}>
+                <View key={achievement.id} style={styles.lockedItem}>
+                  <Text style={[styles.achievementEmoji, styles.lockedEmoji]}>
+                    {achievement.emoji}
+                  </Text>
+                  <View style={styles.lockedTextWrap}>
+                    <Text style={[theme.text.labelMedium, styles.textTertiary]}>
                       {achievement.title}
                     </Text>
-                    <Text style={[theme.text.bodySmall, { color: theme.colors.textDisabled }]}>
+                    <Text style={[theme.text.bodySmall, styles.textDisabled]}>
                       {achievement.description}
                     </Text>
                   </View>
@@ -224,77 +151,101 @@ export const ProgressScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  content: {
-    padding: spacing[2],
-    gap: spacing[2],
-    paddingBottom: spacing[8],
-  },
-  profileHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[2],
-  },
-  avatarLarge: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileInfo: {
-    gap: 4,
-  },
-  xpHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing[1],
-  },
-  statCard: {
-    width: '30%',
-    alignItems: 'center',
-    gap: 4,
-    flexGrow: 1,
-    paddingVertical: spacing[1.5],
-  },
-  achievementGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing[1],
-  },
-  achievementCard: {
-    width: '47%',
-    alignItems: 'center',
-    gap: 6,
-    flexGrow: 1,
-  },
-  achievementEmoji: {
-    fontSize: 32,
-  },
-  lockedList: {
-    gap: spacing[0.5],
-  },
-  lockedItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[1],
-    padding: spacing[1.5],
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-  },
-  dayLabels: {
-    flexDirection: 'row',
-    marginTop: 4,
-  },
-  dayLabel: {
-    fontSize: 10,
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      padding: spacing.md,
+      gap: spacing.md,
+      paddingBottom: spacing['7xl'],
+    },
+    profileHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    avatarLarge: {
+      width: avatarSizes.xl,
+      height: avatarSizes.xl,
+      borderRadius: avatarSizes.xl / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.primaryContainer,
+    },
+    avatarEmoji: { fontSize: iconSizes['4xl'] },
+    profileInfo: {
+      gap: spacing['3xs'],
+    },
+    profileName: { color: theme.colors.textPrimary },
+    profileSubtitle: { color: theme.colors.textSecondary },
+    profileStreak: { color: theme.colors.streakFire },
+    xpHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    subtleLabel: { color: theme.colors.textTertiary },
+    xpHeaderValue: { color: theme.colors.primary },
+    xpBar: { marginVertical: spacing.xs },
+    xpFooter: { color: theme.colors.textSecondary },
+    cardHeading: {
+      color: theme.colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    sectionHeading: {
+      color: theme.colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    statsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
+    },
+    statCard: {
+      width: '30%',
+      alignItems: 'center',
+      gap: spacing['3xs'],
+      flexGrow: 1,
+      paddingVertical: spacing.sm,
+    },
+    statEmoji: { fontSize: iconSizes.xl },
+    statSuccess: { color: theme.colors.success },
+    statStreak: { color: theme.colors.streakFire },
+    statPrimary: { color: theme.colors.primary },
+    statPrimaryLight: { color: theme.colors.primaryLight },
+    statWarning: { color: theme.colors.warning },
+    statSecondary: { color: theme.colors.secondary },
+    achievementGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
+    },
+    achievementCard: {
+      width: '47%',
+      alignItems: 'center',
+      gap: spacing['2xs'],
+      flexGrow: 1,
+    },
+    achievementEmoji: { fontSize: iconSizes['3xl'] },
+    centerText: { textAlign: 'center' },
+    textPrimary: { color: theme.colors.textPrimary },
+    textTertiary: { color: theme.colors.textTertiary },
+    textDisabled: { color: theme.colors.textDisabled },
+    lockedList: { gap: spacing['2xs'] },
+    lockedItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      padding: spacing.sm,
+      borderRadius: borderRadius.lg,
+      borderWidth: borderWidths.thin,
+      backgroundColor: theme.colors.card,
+      borderColor: theme.colors.border,
+    },
+    lockedEmoji: { opacity: opacityTokens.disabled },
+    lockedTextWrap: { flex: 1 },
+    chartGap: { height: spacing.md },
+  });

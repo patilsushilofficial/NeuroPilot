@@ -1,15 +1,22 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
-import Animated, {
-  useSharedValue,
-  useAnimatedProps,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useAppTheme } from '../../hooks/useAppTheme';
+import { useCircularProgressAnimation } from '../../hooks/useCircularProgressAnimation';
 import { formatTimerDisplay } from '../../utils/dateUtils';
+import { computeCircleGeometry } from '../../utils/svgGeometry';
 import { FocusPhase } from '../../types';
+import { Theme } from '../../theme';
+import { fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
+import { iconSizes } from '../../theme/tokens';
+import { spacing } from '../../theme/spacing';
+import { moderateScale } from '../../utils/responsive';
+import {
+  FOCUS_PHASE_EMOJIS,
+  FOCUS_PHASE_LABELS,
+  getFocusPhaseColor,
+} from '../../constants/focus';
 
 interface CircularTimerProps {
   secondsRemaining: number;
@@ -21,76 +28,59 @@ interface CircularTimerProps {
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const PHASE_LABELS: Record<FocusPhase, string> = {
-  focus: 'FOCUS',
-  short_break: 'SHORT BREAK',
-  long_break: 'LONG BREAK',
-};
-
-const PHASE_EMOJIS: Record<FocusPhase, string> = {
-  focus: '🧠',
-  short_break: '☕',
-  long_break: '🌿',
-};
+const DEFAULT_SIZE = moderateScale(260);
+const STROKE_WIDTH = moderateScale(10);
 
 export const CircularTimer: React.FC<CircularTimerProps> = ({
   secondsRemaining,
   totalSeconds,
   phase,
   isRunning,
-  size = 260,
+  size = DEFAULT_SIZE,
 }) => {
   const theme = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
-  const strokeWidth = 10;
-  const radius = (size - strokeWidth * 2) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const cx = size / 2;
-  const cy = size / 2;
+  const { radius, circumference, cx, cy } = useMemo(
+    () => computeCircleGeometry(size, STROKE_WIDTH),
+    [size]
+  );
 
-  const progress = totalSeconds > 0 ? secondsRemaining / totalSeconds : 1;
-  const strokeDashoffset = useSharedValue(circumference * (1 - progress));
+  const sizeStyle = useMemo<ViewStyle>(
+    () => ({ width: size, height: size }),
+    [size]
+  );
 
-  useEffect(() => {
-    strokeDashoffset.value = withTiming(circumference * (1 - progress), {
-      duration: isRunning ? 1000 : 300,
-      easing: Easing.linear,
-    });
-  }, [progress, isRunning]);
+  const phaseColor = getFocusPhaseColor(phase, theme);
+  const phaseLabelStyle = styles[PHASE_LABEL_KEYS[phase]];
 
-  const animatedProps = useAnimatedProps(() => ({
-    strokeDashoffset: strokeDashoffset.value,
-  }));
+  const { animatedProps } = useCircularProgressAnimation({
+    secondsRemaining,
+    totalSeconds,
+    isRunning,
+    circumference,
+  });
 
-  const phaseColor =
-    phase === 'focus'
-      ? theme.colors.primary
-      : phase === 'short_break'
-      ? theme.colors.secondary
-      : theme.colors.successContainer;
-
-  const trackColor = theme.colors.border;
+  const isPaused = !isRunning && secondsRemaining < totalSeconds;
 
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
+    <View style={[styles.container, sizeStyle]}>
       <Svg width={size} height={size}>
-        {/* Background track */}
         <Circle
           cx={cx}
           cy={cy}
           r={radius}
-          stroke={trackColor}
-          strokeWidth={strokeWidth}
+          stroke={theme.colors.border}
+          strokeWidth={STROKE_WIDTH}
           fill="none"
         />
-        {/* Progress arc — starts from top (rotate -90deg) */}
         <G rotation="-90" origin={`${cx}, ${cy}`}>
           <AnimatedCircle
             cx={cx}
             cy={cy}
             r={radius}
             stroke={phaseColor}
-            strokeWidth={strokeWidth}
+            strokeWidth={STROKE_WIDTH}
             fill="none"
             strokeDasharray={circumference}
             animatedProps={animatedProps}
@@ -99,58 +89,68 @@ export const CircularTimer: React.FC<CircularTimerProps> = ({
         </G>
       </Svg>
 
-      {/* Center content */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <View style={styles.centerContent}>
-          <Text style={styles.phaseEmoji}>{PHASE_EMOJIS[phase]}</Text>
-          <Text style={[styles.timerText, { color: theme.colors.textPrimary }]}>
-            {formatTimerDisplay(secondsRemaining)}
-          </Text>
-          <Text style={[styles.phaseLabel, { color: phaseColor }]}>
-            {PHASE_LABELS[phase]}
-          </Text>
-          {!isRunning && secondsRemaining < (totalSeconds) && (
-            <Text style={[styles.pausedLabel, { color: theme.colors.textTertiary }]}>
-              PAUSED
-            </Text>
-          )}
+          <Text style={styles.phaseEmoji}>{FOCUS_PHASE_EMOJIS[phase]}</Text>
+          <Text style={styles.timerText}>{formatTimerDisplay(secondsRemaining)}</Text>
+          <Text style={[styles.phaseLabel, phaseLabelStyle]}>{FOCUS_PHASE_LABELS[phase]}</Text>
+          {isPaused && <Text style={styles.pausedLabel}>PAUSED</Text>}
         </View>
       </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  phaseEmoji: {
-    fontSize: 32,
-    marginBottom: 4,
-  },
-  timerText: {
-    fontSize: 56,
-    fontWeight: '800',
-    letterSpacing: -2,
-    lineHeight: 64,
-  },
-  phaseLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 2,
-    marginTop: 4,
-  },
-  pausedLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    letterSpacing: 1.5,
-    marginTop: 4,
-  },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      position: 'relative',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    centerContent: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    phaseEmoji: {
+      fontSize: iconSizes['3xl'],
+      marginBottom: spacing['2xs'],
+    },
+    timerText: {
+      fontSize: moderateScale(56),
+      fontWeight: fontWeights.extrabold,
+      letterSpacing: letterSpacings.tighter * 4,
+      lineHeight: moderateScale(64),
+      color: theme.colors.textPrimary,
+    },
+    phaseLabel: {
+      fontSize: fontSizes.xs,
+      fontWeight: fontWeights.bold,
+      letterSpacing: letterSpacings.widest,
+      marginTop: spacing['2xs'],
+    },
+    pausedLabel: {
+      fontSize: fontSizes.xs,
+      fontWeight: fontWeights.semibold,
+      letterSpacing: letterSpacings.widest,
+      marginTop: spacing['2xs'],
+      color: theme.colors.textTertiary,
+    },
+    phaseLabelPrimary: { color: theme.colors.primary },
+    phaseLabelSecondary: { color: theme.colors.secondary },
+    phaseLabelSuccess: { color: theme.colors.successContainer },
+  });
+
+/**
+ * Maps each focus phase to the correct phase-label style key. Resolved
+ * once at module scope so consumers stay free of template-literal style
+ * lookups.
+ */
+const PHASE_LABEL_KEYS: Record<FocusPhase, PhaseLabelKey> = {
+  focus: 'phaseLabelPrimary',
+  short_break: 'phaseLabelSecondary',
+  long_break: 'phaseLabelSuccess',
+};
+
+type PhaseLabelKey = 'phaseLabelPrimary' | 'phaseLabelSecondary' | 'phaseLabelSuccess';

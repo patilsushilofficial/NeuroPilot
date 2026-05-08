@@ -7,7 +7,7 @@
 
 ## Overview
 
-NeuroPilot is a production-ready React Native (Expo) app for ADHD management, designed by applying neurobiological research into every UX and engineering decision. It works completely offline — all data is stored on the device using AsyncStorage.
+NeuroPilot is a production-ready React Native (Expo) app for ADHD management, designed by applying neurobiological research into every UX and engineering decision. It works completely offline — all data is stored on the device using MMKV (synchronous, JSI-backed key/value storage).
 
 **Target:** Adults & Children (mode-selectable during onboarding)  
 **Platform:** Android (Play Store) & iOS  
@@ -38,7 +38,7 @@ NeuroPilot is a production-ready React Native (Expo) app for ADHD management, de
 React Native 0.74    → Cross-platform native performance
 Expo SDK 51          → Managed workflow, easy EAS builds
 TypeScript           → Strict typing throughout
-Zustand + Persist    → Lightweight state with AsyncStorage
+Zustand + Persist    → Lightweight state with MMKV (react-native-mmkv)
 React Navigation 6   → Native stack + custom bottom tabs
 react-native-svg     → Circular timer, progress charts
 expo-haptics         → Multi-sensory task completion feedback
@@ -180,7 +180,7 @@ This app was engineered against the research paper's specifications:
 
 Every byte of data lives on the device:
 
-- **State:** Zustand with AsyncStorage persistence
+- **State:** Zustand with MMKV persistence
 - **Notifications:** expo-notifications (local scheduling, no server)
 - **No network calls:** Zero API requests, zero analytics, zero tracking
 - **No auth required:** Optional profile, no email/password

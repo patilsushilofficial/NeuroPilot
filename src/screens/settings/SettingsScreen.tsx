@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,17 +6,20 @@ import {
   ScrollView,
   Switch,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useHaptics } from '../../hooks/useHaptics';
-import { useAppStore } from '../../store';
+import { useSettings } from '../../hooks/useSettings';
 import { Card } from '../../components/common/Card';
-import { spacing, borderRadius } from '../../theme/spacing';
-import { ThemePreference } from '../../types';
+import { Theme } from '../../theme';
+import { spacing } from '../../theme/spacing';
+import { avatarSizes, borderWidths, iconSizes } from '../../theme/tokens';
+import { fontWeights } from '../../theme/typography';
+import { moderateScale } from '../../utils/responsive';
+
+const ROW_EMOJI_WIDTH = moderateScale(28);
 
 interface SettingsRowProps {
   emoji: string;
@@ -40,6 +43,7 @@ const SettingsRow: React.FC<SettingsRowProps> = ({
   danger = false,
 }) => {
   const theme = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const haptics = useHaptics();
 
   return (
@@ -52,40 +56,35 @@ const SettingsRow: React.FC<SettingsRowProps> = ({
       accessibilityState={onToggle ? { checked: value } : undefined}
       accessibilityLabel={label}
     >
-      <Text style={{ fontSize: 20, width: 28 }}>{emoji}</Text>
+      <Text style={styles.rowEmoji}>{emoji}</Text>
       <View style={styles.rowContent}>
         <Text
           style={[
             theme.text.bodyMedium,
-            {
-              color: danger ? theme.colors.error : theme.colors.textPrimary,
-              fontWeight: '500',
-            },
+            styles.rowLabel,
+            danger ? styles.rowLabelDanger : styles.rowLabelDefault,
           ]}
         >
           {label}
         </Text>
         {description && (
-          <Text style={[theme.text.bodySmall, { color: theme.colors.textTertiary }]}>
-            {description}
-          </Text>
+          <Text style={[theme.text.bodySmall, styles.rowDescription]}>{description}</Text>
         )}
       </View>
       {onToggle !== undefined ? (
         <Switch
+          testID={`switch-${label}`}
           value={value}
           onValueChange={(v) => {
             haptics.light();
             onToggle(v);
           }}
-          trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+          trackColor={styles.switchTrackColors}
           thumbColor="white"
           accessible
         />
       ) : (
-        <Text style={[theme.text.bodySmall, { color: theme.colors.textTertiary }]}>
-          {rightText ?? '›'}
-        </Text>
+        <Text style={[theme.text.bodySmall, styles.rowChevron]}>{rightText ?? '›'}</Text>
       )}
     </TouchableOpacity>
   );
@@ -93,84 +92,46 @@ const SettingsRow: React.FC<SettingsRowProps> = ({
 
 const SectionHeader: React.FC<{ title: string }> = ({ title }) => {
   const theme = useAppTheme();
-  return (
-    <Text style={[theme.text.labelSmall, { color: theme.colors.textTertiary, paddingHorizontal: spacing[0.5], paddingTop: spacing[1] }]}>
-      {title}
-    </Text>
-  );
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  return <Text style={[theme.text.labelSmall, styles.sectionHeader]}>{title}</Text>;
 };
 
 export const SettingsScreen: React.FC = () => {
   const theme = useAppTheme();
-  const haptics = useHaptics();
-  const navigation = useNavigation<any>();
-  const { settings, updateSettings, toggleTheme, toggleHaptics, profile } = useAppStore();
-
-  const THEME_OPTIONS: Array<{ key: ThemePreference; label: string }> = [
-    { key: 'dark', label: 'Dark (Recommended)' },
-    { key: 'light', label: 'Light' },
-    { key: 'system', label: 'Follow System' },
-  ];
-
-  const handleThemeChange = useCallback(() => {
-    Alert.alert(
-      'App Theme',
-      'Choose your preferred theme',
-      THEME_OPTIONS.map((opt) => ({
-        text: opt.label + (settings.theme === opt.key ? ' ✓' : ''),
-        onPress: () => {
-          haptics.light();
-          updateSettings({ theme: opt.key });
-        },
-      }))
-    );
-  }, [settings.theme, updateSettings, haptics]);
-
-  const handleResetData = useCallback(() => {
-    Alert.alert(
-      '⚠️ Reset All Data',
-      'This will permanently delete all tasks, habits, focus sessions, and progress. This cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Reset Everything',
-          style: 'destructive',
-          onPress: () => {
-            haptics.warning();
-            // In production you'd call a store reset action here
-            Alert.alert('Data Reset', 'Please restart the app to complete the reset.');
-          },
-        },
-      ]
-    );
-  }, [haptics]);
-
-  const themeLabel = THEME_OPTIONS.find((t) => t.key === settings.theme)?.label ?? 'Dark';
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const {
+    settings,
+    profile,
+    themeLabel,
+    handleThemeChange,
+    handleResetData,
+    handleRateApp,
+    toggleHaptics,
+    updateSettings,
+    navigation,
+  } = useSettings();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={[theme.text.h2, { color: theme.colors.textPrimary }]}>Settings</Text>
+        <Text style={[theme.text.h2, styles.screenTitle]}>Settings</Text>
 
-        {/* Profile */}
         <View>
           <SectionHeader title="PROFILE" />
           <Card>
             <View style={styles.profileRow}>
-              <View style={[styles.avatarCircle, { backgroundColor: theme.colors.primaryContainer }]}>
-                <Text style={{ fontSize: 28 }}>{profile?.avatar ?? '🧠'}</Text>
+              <View style={styles.avatarCircle}>
+                <Text style={styles.avatarEmoji}>{profile?.avatar ?? '🧠'}</Text>
               </View>
               <View>
-                <Text style={[theme.text.h4, { color: theme.colors.textPrimary }]}>
-                  {profile?.name ?? 'Pilot'}
-                </Text>
-                <Text style={[theme.text.bodySmall, { color: theme.colors.textSecondary }]}>
+                <Text style={[theme.text.h4, styles.profileName]}>{profile?.name ?? 'Pilot'}</Text>
+                <Text style={[theme.text.bodySmall, styles.profileMode]}>
                   {profile?.mode === 'child' ? '👶 Child Mode' : '💼 Adult Mode'}
                 </Text>
               </View>
             </View>
           </Card>
-          <Card noPadding style={{ marginTop: spacing[1] }}>
+          <Card noPadding style={styles.cardSpaced}>
             <SettingsRow
               emoji="✏️"
               label="Edit Profile"
@@ -180,7 +141,6 @@ export const SettingsScreen: React.FC = () => {
           </Card>
         </View>
 
-        {/* Appearance */}
         <View>
           <SectionHeader title="APPEARANCE" />
           <Card noPadding>
@@ -194,7 +154,6 @@ export const SettingsScreen: React.FC = () => {
           </Card>
         </View>
 
-        {/* Accessibility */}
         <View>
           <SectionHeader title="ACCESSIBILITY" />
           <Card noPadding>
@@ -205,7 +164,7 @@ export const SettingsScreen: React.FC = () => {
               value={settings.hapticsEnabled}
               onToggle={() => toggleHaptics()}
             />
-            <View style={[styles.divider, { backgroundColor: theme.colors.divider }]} />
+            <View style={styles.divider} />
             <SettingsRow
               emoji="🏃"
               label="Reduced Motion"
@@ -213,7 +172,7 @@ export const SettingsScreen: React.FC = () => {
               value={settings.reducedMotion}
               onToggle={(v) => updateSettings({ reducedMotion: v })}
             />
-            <View style={[styles.divider, { backgroundColor: theme.colors.divider }]} />
+            <View style={styles.divider} />
             <SettingsRow
               emoji="💬"
               label="Motivational Quotes"
@@ -224,7 +183,6 @@ export const SettingsScreen: React.FC = () => {
           </Card>
         </View>
 
-        {/* Notifications */}
         <View>
           <SectionHeader title="NOTIFICATIONS" />
           <Card noPadding>
@@ -238,19 +196,26 @@ export const SettingsScreen: React.FC = () => {
           </Card>
         </View>
 
-        {/* About */}
         <View>
           <SectionHeader title="ABOUT" />
           <Card noPadding>
             <SettingsRow emoji="🧠" label="NeuroPilot" description="v1.0.0 · Built for ADHD brains" rightText="💜" />
-            <View style={[styles.divider, { backgroundColor: theme.colors.divider }]} />
-            <SettingsRow emoji="🔒" label="Privacy" description="All data stored on your device only. No internet required." rightText="100% Offline" />
-            <View style={[styles.divider, { backgroundColor: theme.colors.divider }]} />
-            <SettingsRow emoji="🌟" label="Rate on Play Store" onPress={() => Alert.alert('Thank You!', 'Tap the rating when the Play Store page opens.')} />
+            <View style={styles.divider} />
+            <SettingsRow
+              emoji="🔒"
+              label="Privacy"
+              description="All data stored on your device only. No internet required."
+              rightText="100% Offline"
+            />
+            <View style={styles.divider} />
+            <SettingsRow
+              emoji="🌟"
+              label="Rate on Play Store"
+              onPress={handleRateApp}
+            />
           </Card>
         </View>
 
-        {/* Danger Zone */}
         <View>
           <SectionHeader title="DANGER ZONE" />
           <Card noPadding>
@@ -264,7 +229,7 @@ export const SettingsScreen: React.FC = () => {
           </Card>
         </View>
 
-        <Text style={[theme.text.bodySmall, { color: theme.colors.textDisabled, textAlign: 'center' }]}>
+        <Text style={[theme.text.bodySmall, styles.footerText]}>
           Made with 💜 for neurodivergent minds.{'\n'}
           All data lives on your device. No servers. No tracking.
         </Text>
@@ -273,38 +238,76 @@ export const SettingsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  content: {
-    padding: spacing[2],
-    gap: spacing[1.5],
-    paddingBottom: spacing[8],
-  },
-  profileRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[1.5],
-  },
-  avatarCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing[1.5],
-    paddingVertical: spacing[1.5],
-    gap: spacing[1],
-  },
-  rowContent: {
-    flex: 1,
-    gap: 2,
-  },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: spacing[5],
-  },
-});
+const makeStyles = (theme: Theme) => {
+  // Switch's `trackColor` is a typed object literal, not a style key. We
+  // pre-allocate it once per theme so JSX can reference it like any other
+  // stylesheet entry without rebuilding it on every render.
+  const switchTrackColors = { false: theme.colors.border, true: theme.colors.primary };
+
+  return Object.assign(
+    StyleSheet.create({
+      container: {
+        flex: 1,
+        backgroundColor: theme.colors.background,
+      },
+      content: {
+        padding: spacing.md,
+        gap: spacing.sm,
+        paddingBottom: spacing['7xl'],
+      },
+      screenTitle: { color: theme.colors.textPrimary },
+      sectionHeader: {
+        color: theme.colors.textTertiary,
+        paddingHorizontal: spacing['2xs'],
+        paddingTop: spacing.xs,
+      },
+      profileRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing.sm,
+      },
+      avatarCircle: {
+        width: avatarSizes.lg,
+        height: avatarSizes.lg,
+        borderRadius: avatarSizes.lg / 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: theme.colors.primaryContainer,
+      },
+      avatarEmoji: { fontSize: iconSizes['2xl'] },
+      profileName: { color: theme.colors.textPrimary },
+      profileMode: { color: theme.colors.textSecondary },
+      cardSpaced: { marginTop: spacing.xs },
+      row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: spacing.sm,
+        paddingVertical: spacing.sm,
+        gap: spacing.xs,
+      },
+      rowEmoji: {
+        fontSize: iconSizes.lg,
+        width: ROW_EMOJI_WIDTH,
+      },
+      rowContent: {
+        flex: 1,
+        gap: spacing['3xs'],
+      },
+      rowLabel: { fontWeight: fontWeights.medium },
+      rowLabelDefault: { color: theme.colors.textPrimary },
+      rowLabelDanger: { color: theme.colors.error },
+      rowDescription: { color: theme.colors.textTertiary },
+      rowChevron: { color: theme.colors.textTertiary },
+      divider: {
+        height: borderWidths.hairline,
+        marginLeft: spacing['4xl'],
+        backgroundColor: theme.colors.divider,
+      },
+      footerText: {
+        color: theme.colors.textDisabled,
+        textAlign: 'center',
+      },
+    }),
+    { switchTrackColors }
+  );
+};

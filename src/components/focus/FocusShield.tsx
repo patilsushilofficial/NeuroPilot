@@ -1,27 +1,23 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withRepeat,
-  withSequence,
-  withTiming,
-  cancelAnimation,
-  Easing,
-} from 'react-native-reanimated';
+import React, { useMemo } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useHaptics } from '../../hooks/useHaptics';
-import { focusShieldService } from '../../services/FocusShieldService';
+import { useFocusShieldActions } from '../../hooks/useFocusShieldActions';
+import { useFocusShieldAnimation } from '../../hooks/useFocusShieldAnimation';
+import {
+  FOCUS_SHIELD_ACTIVE_COLOR,
+  FOCUS_SHIELD_BG_ACTIVE,
+} from '../../constants/focusShield';
+import { Theme } from '../../theme';
 import { spacing, borderRadius } from '../../theme/spacing';
-import { moderateScale } from '../../utils/responsive';
+import {
+  borderWidths,
+  controlSizes,
+  iconSizes,
+  opacity,
+} from '../../theme/tokens';
+import { fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
 
 interface FocusShieldProps {
   isActive: boolean;
@@ -30,123 +26,32 @@ interface FocusShieldProps {
 
 export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) => {
   const theme = useAppTheme();
-  const haptics = useHaptics();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { requestToggle, openDNDSettings } = useFocusShieldActions({ isActive, onToggle });
+  const { glowAnimStyle, shieldAnimStyle, thumbAnimStyle, pressShield } =
+    useFocusShieldAnimation({ isActive });
 
-  // Pulse animation for the shield glow when active
-  const glowScale = useSharedValue(1);
-  const glowOpacity = useSharedValue(0);
-  const shieldScale = useSharedValue(1);
-
-  useEffect(() => {
-    if (isActive) {
-      glowOpacity.value = withTiming(1, { duration: 400 });
-      glowScale.value = withRepeat(
-        withSequence(
-          withTiming(1.15, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) })
-        ),
-        -1,
-        false
-      );
-    } else {
-      cancelAnimation(glowScale);
-      glowScale.value = withSpring(1);
-      glowOpacity.value = withTiming(0, { duration: 300 });
-    }
-  }, [isActive]);
-
-  const glowAnimStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: glowScale.value }],
-    opacity: glowOpacity.value,
-  }));
-
-  const shieldAnimStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: shieldScale.value }],
-  }));
-
-  const handleToggle = async () => {
-    haptics.heavy();
-    shieldScale.value = withSpring(0.9, { damping: 8 }, () => {
-      shieldScale.value = withSpring(1);
-    });
-
-    if (!isActive) {
-      Alert.alert(
-        '🛡️ Activate Focus Shield?',
-        'This will:\n\n• Silence all NeuroPilot notifications\n• Open your system Do Not Disturb settings so you can block all calls and alerts\n\nYour phone will be distraction-free for your entire session.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Activate Shield',
-            onPress: async () => {
-              haptics.achievement();
-              onToggle(true);
-              await focusShieldService.activate();
-            },
-          },
-        ]
-      );
-    } else {
-      Alert.alert(
-        '🛡️ Deactivate Focus Shield?',
-        'All notifications will be restored. Remember to manually turn off Do Not Disturb if you enabled it.',
-        [
-          { text: 'Keep Shield On', style: 'cancel' },
-          {
-            text: 'Deactivate',
-            style: 'destructive',
-            onPress: async () => {
-              haptics.medium();
-              onToggle(false);
-              await focusShieldService.deactivate();
-            },
-          },
-        ]
-      );
-    }
+  const handlePress = () => {
+    pressShield();
+    requestToggle();
   };
-
-  const openDNDSettings = async () => {
-    haptics.light();
-    await focusShieldService.openDNDSettings();
-  };
-
-  const activeColor = '#2A9DB5';
-  const inactiveColor = theme.colors.border;
 
   return (
     <View style={styles.container}>
-      {/* Section label */}
-      <Text style={[styles.label, { color: theme.colors.textTertiary }]}>FOCUS SHIELD</Text>
+      <Text style={styles.label}>FOCUS SHIELD</Text>
 
       <TouchableOpacity
-        onPress={handleToggle}
-        activeOpacity={0.9}
+        onPress={handlePress}
+        activeOpacity={opacity.hover}
         accessible
         accessibilityRole="switch"
         accessibilityState={{ checked: isActive }}
         accessibilityLabel="Focus Shield — blocks all distractions"
       >
-        <View
-          style={[
-            styles.card,
-            {
-              backgroundColor: isActive
-                ? 'rgba(42, 157, 181, 0.12)'
-                : theme.colors.card,
-              borderColor: isActive ? activeColor : inactiveColor,
-            },
-          ]}
-        >
+        <View style={[styles.card, isActive ? styles.cardActive : styles.cardInactive]}>
           {/* Pulsing glow ring behind shield icon */}
           <View style={styles.iconWrapper}>
-            <Animated.View
-              style={[
-                styles.glowRing,
-                { borderColor: activeColor },
-                glowAnimStyle,
-              ]}
-            />
+            <Animated.View style={[styles.glowRing, glowAnimStyle]} />
             <Animated.View style={shieldAnimStyle}>
               <Text style={styles.shieldEmoji}>{isActive ? '🛡️' : '🔓'}</Text>
             </Animated.View>
@@ -154,10 +59,10 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
 
           {/* Text content */}
           <View style={styles.textBlock}>
-            <Text style={[styles.title, { color: theme.colors.textPrimary }]}>
+            <Text style={styles.title}>
               {isActive ? 'Shield Active' : 'Focus Shield'}
             </Text>
-            <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
+            <Text style={styles.description}>
               {isActive
                 ? 'All notifications silenced. Stay in the zone.'
                 : 'Block all calls, alerts, and distractions'}
@@ -166,17 +71,9 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
 
           {/* Toggle pill */}
           <View
-            style={[
-              styles.togglePill,
-              { backgroundColor: isActive ? activeColor : theme.colors.border },
-            ]}
+            style={[styles.togglePill, isActive ? styles.togglePillOn : styles.togglePillOff]}
           >
-            <View
-              style={[
-                styles.toggleThumb,
-                { transform: [{ translateX: isActive ? moderateScale(14) : 0 }] },
-              ]}
-            />
+            <Animated.View style={[styles.toggleThumb, thumbAnimStyle]} />
           </View>
         </View>
       </TouchableOpacity>
@@ -185,93 +82,113 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
       {isActive && (
         <TouchableOpacity
           onPress={openDNDSettings}
-          style={[styles.dndLink, { borderColor: theme.colors.border }]}
+          style={styles.dndLink}
           accessibilityRole="button"
           accessibilityLabel="Open Do Not Disturb settings"
         >
-          <Text style={{ fontSize: moderateScale(13) }}>📵</Text>
-          <Text style={[styles.dndText, { color: activeColor }]}>
-            Open Do Not Disturb settings
-          </Text>
-          <Text style={{ color: theme.colors.textTertiary, fontSize: moderateScale(13) }}>›</Text>
+          <Text style={styles.dndIcon}>📵</Text>
+          <Text style={styles.dndText}>Open Do Not Disturb settings</Text>
+          <Text style={styles.dndChevron}>›</Text>
         </TouchableOpacity>
       )}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    gap: spacing[0.5],
-  },
-  label: {
-    fontSize: moderateScale(11),
-    fontWeight: '700',
-    letterSpacing: 1.5,
-    paddingHorizontal: spacing[0.5],
-  },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[1.5],
-    padding: spacing[1.5],
-    borderRadius: borderRadius.xl,
-    borderWidth: 1.5,
-  },
-  iconWrapper: {
-    width: moderateScale(52),
-    height: moderateScale(52),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  glowRing: {
-    position: 'absolute',
-    width: moderateScale(52),
-    height: moderateScale(52),
-    borderRadius: moderateScale(26),
-    borderWidth: 1.5,
-  },
-  shieldEmoji: {
-    fontSize: moderateScale(30),
-  },
-  textBlock: {
-    flex: 1,
-    gap: 3,
-  },
-  title: {
-    fontSize: moderateScale(15),
-    fontWeight: '700',
-  },
-  description: {
-    fontSize: moderateScale(12),
-    lineHeight: moderateScale(17),
-  },
-  togglePill: {
-    width: moderateScale(40),
-    height: moderateScale(24),
-    borderRadius: moderateScale(12),
-    padding: moderateScale(3),
-    justifyContent: 'center',
-  },
-  toggleThumb: {
-    width: moderateScale(18),
-    height: moderateScale(18),
-    borderRadius: moderateScale(9),
-    backgroundColor: '#FFFFFF',
-  },
-  dndLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[1],
-    paddingVertical: spacing[1],
-    paddingHorizontal: spacing[1.5],
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    marginTop: spacing[0.5],
-  },
-  dndText: {
-    flex: 1,
-    fontSize: moderateScale(13),
-    fontWeight: '600',
-  },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      gap: spacing['2xs'],
+    },
+    label: {
+      fontSize: fontSizes.xs,
+      fontWeight: fontWeights.bold,
+      letterSpacing: letterSpacings.widest,
+      paddingHorizontal: spacing['2xs'],
+      color: theme.colors.textTertiary,
+    },
+    card: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      padding: spacing.sm,
+      borderRadius: borderRadius.xl,
+      borderWidth: borderWidths.base,
+    },
+    cardActive: {
+      backgroundColor: FOCUS_SHIELD_BG_ACTIVE,
+      borderColor: FOCUS_SHIELD_ACTIVE_COLOR,
+    },
+    cardInactive: {
+      backgroundColor: theme.colors.card,
+      borderColor: theme.colors.border,
+    },
+    iconWrapper: {
+      width: controlSizes.shieldIcon,
+      height: controlSizes.shieldIcon,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    glowRing: {
+      position: 'absolute',
+      width: controlSizes.shieldIcon,
+      height: controlSizes.shieldIcon,
+      borderRadius: controlSizes.shieldIcon / 2,
+      borderWidth: borderWidths.base,
+      borderColor: FOCUS_SHIELD_ACTIVE_COLOR,
+    },
+    shieldEmoji: {
+      fontSize: iconSizes['3xl'],
+    },
+    textBlock: {
+      flex: 1,
+      gap: spacing['3xs'],
+    },
+    title: {
+      fontSize: fontSizes.base,
+      fontWeight: fontWeights.bold,
+      color: theme.colors.textPrimary,
+    },
+    description: {
+      fontSize: fontSizes.sm,
+      lineHeight: fontSizes.sm * 1.4,
+      color: theme.colors.textSecondary,
+    },
+    togglePill: {
+      width: controlSizes.toggleWidth,
+      height: controlSizes.toggleHeight,
+      borderRadius: controlSizes.toggleHeight / 2,
+      padding: spacing['2xs'] - 1,
+      justifyContent: 'center',
+    },
+    togglePillOn: { backgroundColor: FOCUS_SHIELD_ACTIVE_COLOR },
+    togglePillOff: { backgroundColor: theme.colors.border },
+    toggleThumb: {
+      width: controlSizes.toggleThumb,
+      height: controlSizes.toggleThumb,
+      borderRadius: controlSizes.toggleThumb / 2,
+      backgroundColor: '#FFFFFF',
+    },
+    dndLink: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      borderRadius: borderRadius.lg,
+      borderWidth: borderWidths.thin,
+      borderColor: theme.colors.border,
+      marginTop: spacing['2xs'],
+    },
+    dndIcon: { fontSize: iconSizes.sm },
+    dndText: {
+      flex: 1,
+      fontSize: fontSizes.sm,
+      fontWeight: fontWeights.semibold,
+      color: FOCUS_SHIELD_ACTIVE_COLOR,
+    },
+    dndChevron: {
+      color: theme.colors.textTertiary,
+      fontSize: iconSizes.sm,
+    },
+  });

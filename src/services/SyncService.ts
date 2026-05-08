@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { storage } from './storage';
 import { api } from './api';
 
 export interface SyncAction {
@@ -10,10 +10,28 @@ export interface SyncAction {
 
 const QUEUE_KEY = '@neuropilot_sync_queue';
 
+const readQueue = (): SyncAction[] => {
+  const raw = storage.getString(QUEUE_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as SyncAction[]) : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeQueue = (queue: SyncAction[]): void => {
+  storage.set(QUEUE_KEY, JSON.stringify(queue));
+};
+
 /**
  * Offline-First Sync Service.
  * Queues actions locally and processes them in the background.
  * This guarantees the UI never hangs waiting for a network request.
+ *
+ * Storage is backed by MMKV (synchronous), but the public API is kept
+ * async so consumers stay agnostic to the underlying storage engine.
  */
 class SyncService {
   private isSyncing = false;
@@ -25,11 +43,9 @@ class SyncService {
       timestamp: Date.now(),
     };
 
-    const currentQueueStr = await AsyncStorage.getItem(QUEUE_KEY);
-    const queue: SyncAction[] = currentQueueStr ? JSON.parse(currentQueueStr) : [];
-    
+    const queue = readQueue();
     queue.push(newAction);
-    await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+    writeQueue(queue);
 
     // Optimistically try to sync right away (in the background)
     this.processQueue();
@@ -40,14 +56,11 @@ class SyncService {
     this.isSyncing = true;
 
     try {
-      const currentQueueStr = await AsyncStorage.getItem(QUEUE_KEY);
-      if (!currentQueueStr) return;
-
-      const queue: SyncAction[] = JSON.parse(currentQueueStr);
+      const queue = readQueue();
       if (queue.length === 0) return;
 
       // NOTE: In a production app, you would verify internet connection via NetInfo here
-      
+
       const remainingQueue = [...queue];
 
       for (const action of queue) {
@@ -74,12 +87,12 @@ class SyncService {
 
         if (success) {
           // Remove from remaining queue since it was successfully sent to the server
-          const index = remainingQueue.findIndex(a => a.id === action.id);
+          const index = remainingQueue.findIndex((a) => a.id === action.id);
           if (index > -1) remainingQueue.splice(index, 1);
         }
       }
 
-      await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(remainingQueue));
+      writeQueue(remainingQueue);
     } finally {
       this.isSyncing = false;
     }

@@ -1,11 +1,11 @@
 import { StateCreator } from 'zustand';
 import { Habit, HabitCategory, HabitFrequency, HabitCompletion } from '../../types';
 import { format } from 'date-fns';
+import { scheduleHabitReminder, cancelNotification } from '../../utils/notifications';
+import { getTodayStr } from '../../utils/dateUtils';
 
 let habitIdCounter = Date.now();
 const newId = () => `habit_${++habitIdCounter}_${Math.random().toString(36).slice(2, 7)}`;
-
-const today = () => format(new Date(), 'yyyy-MM-dd');
 
 export interface HabitsSlice {
   habits: Habit[];
@@ -31,7 +31,7 @@ const calculateStreak = (completions: HabitCompletion[]): number => {
     .sort()
     .reverse(); // most recent first
 
-  const todayStr = today();
+  const todayStr = getTodayStr();
   const yesterday = format(new Date(Date.now() - 86400000), 'yyyy-MM-dd');
 
   // Streak must include today or yesterday
@@ -53,8 +53,12 @@ const calculateStreak = (completions: HabitCompletion[]): number => {
   return streak;
 };
 
-export const createHabitsSlice: StateCreator<HabitsSlice, [], [], HabitsSlice> = (set, get) => ({
+export const initialHabitsState: Pick<HabitsSlice, 'habits'> = {
   habits: [],
+};
+
+export const createHabitsSlice: StateCreator<HabitsSlice, [], [], HabitsSlice> = (set, get) => ({
+  ...initialHabitsState,
 
   addHabit: (payload) => {
     const id = newId();
@@ -76,22 +80,58 @@ export const createHabitsSlice: StateCreator<HabitsSlice, [], [], HabitsSlice> =
       archived: false,
     };
     set((s) => ({ habits: [...s.habits, habit] }));
+
+    // Schedule Notification if enabled
+    const state = get() as any;
+    if (state.settings?.notificationsEnabled && payload.reminderTime) {
+      scheduleHabitReminder(id, payload.title, payload.emoji, payload.reminderTime).then((notifId) => {
+        if (notifId) {
+          get().updateHabit(id, { notificationId: notifId });
+        }
+      });
+    }
+
     return id;
   },
 
   updateHabit: (id, updates) => {
+    const habit = get().habits.find((h) => h.id === id);
+    const state = get() as any;
+
+    // If reminder time is changing, reschedule notification
+    if (updates.reminderTime && habit && state.settings?.notificationsEnabled) {
+      if (habit.notificationId) {
+        cancelNotification(habit.notificationId);
+      }
+      scheduleHabitReminder(id, updates.title || habit.title, updates.emoji || habit.emoji, updates.reminderTime).then((notifId) => {
+        if (notifId) {
+          set((s) => ({
+            habits: s.habits.map((h) => (h.id === id ? { ...h, notificationId: notifId } : h)),
+          }));
+        }
+      });
+    }
+
     set((s) => ({
       habits: s.habits.map((h) => (h.id === id ? { ...h, ...updates } : h)),
     }));
   },
 
   deleteHabit: (id) => {
+    const habit = get().habits.find((h) => h.id === id);
+    if (habit?.notificationId) {
+      cancelNotification(habit.notificationId);
+    }
     set((s) => ({ habits: s.habits.filter((h) => h.id !== id) }));
   },
 
   archiveHabit: (id) => {
+    const habit = get().habits.find((h) => h.id === id);
+    if (habit?.notificationId) {
+      cancelNotification(habit.notificationId);
+    }
     set((s) => ({
-      habits: s.habits.map((h) => (h.id === id ? { ...h, archived: true } : h)),
+      habits: s.habits.map((h) => (h.id === id ? { ...h, archived: true, notificationId: undefined } : h)),
     }));
   },
 
@@ -99,7 +139,7 @@ export const createHabitsSlice: StateCreator<HabitsSlice, [], [], HabitsSlice> =
     const habit = get().habits.find((h) => h.id === id);
     if (!habit) return 0;
 
-    const todayStr = today();
+    const todayStr = getTodayStr();
     const alreadyDone = habit.completions.some((c) => c.date === todayStr);
     if (alreadyDone) return 0;
 
@@ -124,7 +164,7 @@ export const createHabitsSlice: StateCreator<HabitsSlice, [], [], HabitsSlice> =
   },
 
   uncompleteHabit: (id) => {
-    const todayStr = today();
+    const todayStr = getTodayStr();
     set((s) => ({
       habits: s.habits.map((h) => {
         if (h.id !== id) return h;
@@ -138,7 +178,7 @@ export const createHabitsSlice: StateCreator<HabitsSlice, [], [], HabitsSlice> =
   isHabitCompletedToday: (id) => {
     const habit = get().habits.find((h) => h.id === id);
     if (!habit) return false;
-    return habit.completions.some((c) => c.date === today());
+    return habit.completions.some((c) => c.date === getTodayStr());
   },
 
   getTodaysHabits: () => {

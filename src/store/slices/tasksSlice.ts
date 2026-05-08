@@ -1,6 +1,8 @@
 import { StateCreator } from 'zustand';
 import { Task, TaskPriority, TaskStatus, SubTask } from '../../types';
 import { taskService } from '../../services/TaskService';
+import { scheduleTaskReminder, cancelNotification } from '../../utils/notifications';
+import { AppStore } from '../index'; // May cause circular dep if not careful, let's use any if needed, but let's try importing AppStore or just using state as any.
 
 export interface TasksSlice {
   tasks: Task[];
@@ -23,8 +25,12 @@ export interface TasksSlice {
   getPendingTasks: () => Task[];
 }
 
-export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (set, get) => ({
+export const initialTasksState: Pick<TasksSlice, 'tasks'> = {
   tasks: [],
+};
+
+export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (set, get) => ({
+  ...initialTasksState,
 
   addTask: (payload) => {
     // 1. Service handles complex generation (IDs, defaults, XP mapping) and queues the background sync.
@@ -32,10 +38,38 @@ export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (s
 
     // 2. Zustand handles the immediate UI update (Optimistic Update)
     set((s) => ({ tasks: [task, ...s.tasks] }));
+
+    // 3. Schedule Notification if enabled
+    const state = get() as any;
+    if (state.settings?.notificationsEnabled && task.dueDate) {
+      scheduleTaskReminder(task.id, task.title, new Date(task.dueDate)).then((notifId) => {
+        if (notifId) {
+          get().updateTask(task.id, { notificationId: notifId });
+        }
+      });
+    }
+
     return task.id;
   },
 
   updateTask: (id, updates) => {
+    const task = get().tasks.find((t) => t.id === id);
+    
+    // If due date is changing, reschedule notification
+    const state = get() as any;
+    if (updates.dueDate && task && state.settings?.notificationsEnabled) {
+      if (task.notificationId) {
+        cancelNotification(task.notificationId);
+      }
+      scheduleTaskReminder(id, updates.title || task.title, new Date(updates.dueDate)).then((notifId) => {
+        if (notifId) {
+          set((s) => ({
+            tasks: s.tasks.map((t) => t.id === id ? { ...t, notificationId: notifId } : t),
+          }));
+        }
+      });
+    }
+
     // 1. Service handles sending to backend in the background
     taskService.updateTask(id, updates);
 
@@ -48,6 +82,11 @@ export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (s
   },
 
   deleteTask: (id) => {
+    const task = get().tasks.find((t) => t.id === id);
+    if (task?.notificationId) {
+      cancelNotification(task.notificationId);
+    }
+
     // 1. Queue deletion
     taskService.deleteTask(id);
 
@@ -59,13 +98,17 @@ export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (s
     const task = get().tasks.find((t) => t.id === id);
     if (!task || task.status === 'completed') return 0;
 
+    if (task.notificationId) {
+      cancelNotification(task.notificationId);
+    }
+
     // Background sync
     taskService.updateTask(id, { status: 'completed', completedAt: Date.now() });
 
     set((s) => ({
       tasks: s.tasks.map((t) =>
         t.id === id
-          ? { ...t, status: 'completed', completedAt: Date.now(), updatedAt: Date.now() }
+          ? { ...t, status: 'completed', completedAt: Date.now(), updatedAt: Date.now(), notificationId: undefined }
           : t
       ),
     }));

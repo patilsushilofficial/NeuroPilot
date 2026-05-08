@@ -52,6 +52,50 @@ class TaskService {
   generateSubtaskId(): string {
     return generateId('sub');
   }
+
+  /**
+   * Convert raw subtask titles (as captured by an edit form) into fully
+   * realised `SubTask` records, dropping empty rows. Used when the form
+   * issues an `updateTask` call and needs the canonical structured shape.
+   */
+  normalizeSubtasksForUpdate(titles: readonly string[]): SubTask[] {
+    return titles
+      .map((title) => title.trim())
+      .filter((title) => title.length > 0)
+      .map((title) => ({
+        id: this.generateSubtaskId(),
+        title,
+        completed: false,
+      }));
+  }
+
+  /**
+   * Same as `normalizeSubtasksForUpdate`, but returns the lighter shape
+   * accepted by `createTask`, which fills in IDs server-side (or rather,
+   * service-side) when constructing the new task.
+   */
+  normalizeSubtasksForCreate(titles: readonly string[]): Pick<SubTask, 'title'>[] {
+    return titles
+      .map((title) => title.trim())
+      .filter((title) => title.length > 0)
+      .map((title) => ({ title }));
+  }
+
+  /**
+   * Compute the {completed, total, ratio} progress numbers for a task's
+   * subtasks. Returns `ratio: 0` when there are no subtasks so callers can
+   * safely feed it into a width or progress bar without dividing by zero.
+   */
+  getSubtaskProgress(subtasks: readonly SubTask[]): {
+    completed: number;
+    total: number;
+    ratio: number;
+  } {
+    const total = subtasks.length;
+    const completed = subtasks.filter((s) => s.completed).length;
+    const ratio = total > 0 ? completed / total : 0;
+    return { completed, total, ratio };
+  }
 }
 
 export const taskService = new TaskService();

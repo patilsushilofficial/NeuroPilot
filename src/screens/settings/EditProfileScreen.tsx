@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,90 +6,72 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
+  ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
-import { useNavigation } from '@react-navigation/native';
+import Animated from 'react-native-reanimated';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useHaptics } from '../../hooks/useHaptics';
-import { useAppStore } from '../../store';
+import { useEditProfileScreen } from '../../hooks/useEditProfileScreen';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
+import { PROFILE_AVATARS, USER_MODE_OPTIONS } from '../../constants/profile';
+import { Theme } from '../../theme';
 import { spacing, borderRadius, shadows } from '../../theme/spacing';
+import { avatarSizes, borderWidths, iconSizes } from '../../theme/tokens';
+import { fontSizes, fontWeights } from '../../theme/typography';
 import { moderateScale } from '../../utils/responsive';
-import { UserMode } from '../../types';
 
-const AVATARS = ['🧠', '🚀', '⚡', '🎯', '🌊', '🦋', '🔥', '✨', '🎮', '🌟', '🦁', '🐬', '🦅', '🌈', '💎'];
+const CHECK_BADGE_SIZE = moderateScale(18);
+const AVATAR_CHIP_SIZE = moderateScale(52);
 
 export const EditProfileScreen: React.FC = () => {
   const theme = useAppTheme();
-  const haptics = useHaptics();
-  const navigation = useNavigation<any>();
-  const { profile, updateProfile, updateSettings } = useAppStore();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const {
+    name,
+    avatar,
+    mode,
+    isSaving,
+    canSave,
+    avatarAnimStyle,
+    setName,
+    handleSelectAvatar,
+    handleSelectMode,
+    handleSave,
+    handleCancel,
+  } = useEditProfileScreen();
 
-  const [name, setName] = useState(profile?.name ?? '');
-  const [avatar, setAvatar] = useState(profile?.avatar ?? '🧠');
-  const [mode, setMode] = useState<UserMode>(profile?.mode ?? 'adult');
-  const [isSaving, setIsSaving] = useState(false);
-
-  const scale = useSharedValue(1);
-  const avatarAnimStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-
-  const handleSelectAvatar = (a: string) => {
-    haptics.light();
-    setAvatar(a);
-    scale.value = withSpring(1.3, { damping: 8 }, () => {
-      scale.value = withSpring(1);
-    });
-  };
-
-  const handleSave = useCallback(() => {
-    if (!name.trim()) {
-      Alert.alert('Name required', 'Please enter a name to continue.');
-      return;
-    }
-    haptics.achievement();
-    setIsSaving(true);
-
-    updateProfile({ name: name.trim(), avatar, mode });
-    updateSettings({ userMode: mode });
-
-    setTimeout(() => {
-      setIsSaving(false);
-      navigation.goBack();
-    }, 400);
-  }, [name, avatar, mode, updateProfile, updateSettings, haptics, navigation]);
+  // Theme-derived glow shared by the hero avatar and the selected mode card.
+  const previewGlowStyle = useMemo<ViewStyle>(
+    () => shadows.glow(theme.colors.primary),
+    [theme]
+  );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={handleCancel}
           style={styles.backBtn}
           accessibilityLabel="Go back"
           accessibilityRole="button"
         >
-          <Text style={[theme.text.bodyLarge, { color: theme.colors.primary }]}>‹ Back</Text>
+          <Text style={[theme.text.bodyLarge, styles.backText]}>‹ Back</Text>
         </TouchableOpacity>
-        <Text style={[theme.text.h4, { color: theme.colors.textPrimary }]}>Edit Profile</Text>
+        <Text style={[theme.text.h4, styles.headerTitle]}>Edit Profile</Text>
         <TouchableOpacity
           onPress={handleSave}
           style={styles.saveBtn}
-          disabled={isSaving || !name.trim()}
+          disabled={isSaving}
           accessibilityLabel="Save profile"
           accessibilityRole="button"
         >
           <Text
             style={[
               theme.text.bodyLarge,
-              { color: !name.trim() ? theme.colors.textTertiary : theme.colors.primary, fontWeight: '700' },
+              styles.saveText,
+              canSave ? styles.saveTextEnabled : styles.saveTextDisabled,
             ]}
           >
             {isSaving ? '...' : 'Save'}
@@ -102,39 +84,27 @@ export const EditProfileScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Avatar Preview */}
         <View style={styles.avatarPreviewSection}>
           <Animated.View
-            style={[
-              styles.avatarPreviewCircle,
-              { backgroundColor: theme.colors.primaryContainer, borderColor: theme.colors.primary, ...shadows.glow(theme.colors.primary) },
-              avatarAnimStyle,
-            ]}
+            style={[styles.avatarPreviewCircle, previewGlowStyle, avatarAnimStyle]}
           >
             <Text style={styles.avatarPreviewEmoji}>{avatar}</Text>
           </Animated.View>
-          <Text style={[theme.text.h3, { color: theme.colors.textPrimary, marginTop: spacing[1] }]}>
+          <Text style={[theme.text.h3, styles.previewName]}>
             {name.trim() || 'Your Name'}
           </Text>
-          <Text style={[theme.text.bodySmall, { color: theme.colors.textTertiary }]}>
+          <Text style={[theme.text.bodySmall, styles.previewMode]}>
             {mode === 'child' ? '👶 Child Mode' : '💼 Adult Mode'}
           </Text>
         </View>
 
-        {/* Name Field */}
         <View style={styles.section}>
-          <Text style={[theme.text.labelSmall, { color: theme.colors.primary, marginBottom: spacing[1] }]}>
-            DISPLAY NAME
-          </Text>
+          <Text style={[theme.text.labelSmall, styles.sectionHeader]}>DISPLAY NAME</Text>
           <Card noPadding>
             <TextInput
               style={[
                 styles.nameInput,
-                {
-                  color: theme.colors.textPrimary,
-                  borderColor: name ? theme.colors.primary : theme.colors.border,
-                  backgroundColor: theme.colors.card,
-                },
+                name ? styles.nameInputActive : styles.nameInputInactive,
               ]}
               value={name}
               onChangeText={setName}
@@ -147,47 +117,34 @@ export const EditProfileScreen: React.FC = () => {
               maxLength={30}
             />
           </Card>
-          <Text style={[theme.text.labelSmall, { color: theme.colors.textTertiary, marginTop: spacing[0.5], textAlign: 'right' }]}>
-            {name.length}/30
-          </Text>
+          <Text style={[theme.text.labelSmall, styles.charCount]}>{name.length}/30</Text>
         </View>
 
-        {/* Mode Selector */}
         <View style={styles.section}>
-          <Text style={[theme.text.labelSmall, { color: theme.colors.primary, marginBottom: spacing[1] }]}>
-            APP MODE
-          </Text>
+          <Text style={[theme.text.labelSmall, styles.sectionHeader]}>APP MODE</Text>
           <View style={styles.modeRow}>
-            {([
-              { key: 'adult' as UserMode, emoji: '💼', label: 'Adult', desc: 'Professional & focused' },
-              { key: 'child' as UserMode, emoji: '🌈', label: 'Child', desc: 'Fun & encouraging' },
-            ] as const).map((opt) => {
+            {USER_MODE_OPTIONS.map((opt) => {
               const isSelected = mode === opt.key;
               return (
                 <TouchableOpacity
                   key={opt.key}
-                  onPress={() => { haptics.medium(); setMode(opt.key); }}
+                  onPress={() => handleSelectMode(opt.key)}
                   style={[
                     styles.modeCard,
-                    {
-                      backgroundColor: isSelected ? theme.colors.primaryContainer : theme.colors.card,
-                      borderColor: isSelected ? theme.colors.primary : theme.colors.border,
-                      ...(isSelected ? shadows.glow(theme.colors.primary) : {}),
-                    },
+                    isSelected ? styles.modeCardActive : styles.modeCardInactive,
+                    isSelected && previewGlowStyle,
                   ]}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: isSelected }}
                 >
-                  <Text style={{ fontSize: moderateScale(32) }}>{opt.emoji}</Text>
-                  <Text style={[theme.text.h4, { color: theme.colors.textPrimary, marginTop: spacing[0.5] }]}>
-                    {opt.label}
-                  </Text>
-                  <Text style={[theme.text.bodySmall, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                    {opt.desc}
+                  <Text style={styles.modeEmoji}>{opt.emoji}</Text>
+                  <Text style={[theme.text.h4, styles.modeLabel]}>{opt.label}</Text>
+                  <Text style={[theme.text.bodySmall, styles.modeDesc]}>
+                    {opt.shortDescription}
                   </Text>
                   {isSelected && (
-                    <View style={[styles.checkBadge, { backgroundColor: theme.colors.primary }]}>
-                      <Text style={{ color: '#FFF', fontSize: moderateScale(10), fontWeight: '700' }}>✓</Text>
+                    <View style={styles.checkBadge}>
+                      <Text style={styles.checkBadgeText}>✓</Text>
                     </View>
                   )}
                 </TouchableOpacity>
@@ -196,14 +153,11 @@ export const EditProfileScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Avatar Picker */}
         <View style={styles.section}>
-          <Text style={[theme.text.labelSmall, { color: theme.colors.primary, marginBottom: spacing[1] }]}>
-            CHOOSE AVATAR
-          </Text>
+          <Text style={[theme.text.labelSmall, styles.sectionHeader]}>CHOOSE AVATAR</Text>
           <Card>
             <View style={styles.avatarGrid}>
-              {AVATARS.map((a) => {
+              {PROFILE_AVATARS.map((a) => {
                 const isSelected = avatar === a;
                 return (
                   <TouchableOpacity
@@ -211,15 +165,11 @@ export const EditProfileScreen: React.FC = () => {
                     onPress={() => handleSelectAvatar(a)}
                     style={[
                       styles.avatarChip,
-                      {
-                        backgroundColor: isSelected ? theme.colors.primaryContainer : theme.colors.surface,
-                        borderColor: isSelected ? theme.colors.primary : theme.colors.border,
-                        borderWidth: isSelected ? 2 : 1,
-                      },
+                      isSelected ? styles.avatarChipActive : styles.avatarChipInactive,
                     ]}
                     accessibilityLabel={`Select avatar ${a}`}
                   >
-                    <Text style={{ fontSize: moderateScale(24) }}>{a}</Text>
+                    <Text style={styles.avatarChipText}>{a}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -227,18 +177,17 @@ export const EditProfileScreen: React.FC = () => {
           </Card>
         </View>
 
-        {/* Save Button */}
         <Button
           label={isSaving ? 'Saving…' : 'Save Changes'}
           onPress={handleSave}
           variant="primary"
           size="lg"
           fullWidth
-          disabled={isSaving || !name.trim()}
-          style={{ marginTop: spacing[1] }}
+          disabled={isSaving || !canSave}
+          style={styles.bottomSaveBtn}
         />
 
-        <Text style={[theme.text.bodySmall, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
+        <Text style={[theme.text.bodySmall, styles.footerNote]}>
           Changes are saved locally on your device
         </Text>
       </ScrollView>
@@ -246,89 +195,152 @@ export const EditProfileScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing[2],
-    paddingVertical: spacing[1.5],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  backBtn: {
-    minWidth: moderateScale(60),
-  },
-  saveBtn: {
-    minWidth: moderateScale(60),
-    alignItems: 'flex-end',
-  },
-  content: {
-    padding: spacing[2],
-    gap: spacing[2],
-    paddingBottom: spacing[6],
-  },
-  avatarPreviewSection: {
-    alignItems: 'center',
-    paddingVertical: spacing[2],
-    gap: spacing[0.5],
-  },
-  avatarPreviewCircle: {
-    width: moderateScale(96),
-    height: moderateScale(96),
-    borderRadius: moderateScale(48),
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarPreviewEmoji: {
-    fontSize: moderateScale(52),
-  },
-  section: {
-    gap: 0,
-  },
-  nameInput: {
-    borderWidth: 1.5,
-    borderRadius: borderRadius.lg,
-    paddingHorizontal: spacing[2],
-    paddingVertical: spacing[1.5],
-    fontSize: moderateScale(17),
-    fontWeight: '500',
-  },
-  modeRow: {
-    flexDirection: 'row',
-    gap: spacing[1.5],
-  },
-  modeCard: {
-    flex: 1,
-    borderRadius: borderRadius.xl,
-    borderWidth: 1.5,
-    padding: spacing[1.5],
-    alignItems: 'center',
-    gap: moderateScale(4),
-    position: 'relative',
-  },
-  checkBadge: {
-    position: 'absolute',
-    top: moderateScale(8),
-    right: moderateScale(8),
-    width: moderateScale(18),
-    height: moderateScale(18),
-    borderRadius: moderateScale(9),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing[1],
-    justifyContent: 'center',
-  },
-  avatarChip: {
-    width: moderateScale(52),
-    height: moderateScale(52),
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderBottomWidth: borderWidths.hairline,
+      borderBottomColor: theme.colors.border,
+    },
+    backBtn: { minWidth: moderateScale(60) },
+    backText: { color: theme.colors.primary },
+    headerTitle: { color: theme.colors.textPrimary },
+    saveBtn: {
+      minWidth: moderateScale(60),
+      alignItems: 'flex-end',
+    },
+    saveText: { fontWeight: fontWeights.bold },
+    saveTextEnabled: { color: theme.colors.primary },
+    saveTextDisabled: { color: theme.colors.textTertiary },
+    content: {
+      padding: spacing.md,
+      gap: spacing.md,
+      paddingBottom: spacing['5xl'],
+    },
+    avatarPreviewSection: {
+      alignItems: 'center',
+      paddingVertical: spacing.md,
+      gap: spacing['2xs'],
+    },
+    avatarPreviewCircle: {
+      width: avatarSizes['2xl'],
+      height: avatarSizes['2xl'],
+      borderRadius: avatarSizes['2xl'] / 2,
+      borderWidth: borderWidths.thick,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.primaryContainer,
+      borderColor: theme.colors.primary,
+    },
+    avatarPreviewEmoji: { fontSize: iconSizes['6xl'] },
+    previewName: {
+      color: theme.colors.textPrimary,
+      marginTop: spacing.xs,
+    },
+    previewMode: { color: theme.colors.textTertiary },
+    section: { gap: 0 },
+    sectionHeader: {
+      color: theme.colors.primary,
+      marginBottom: spacing.xs,
+    },
+    nameInput: {
+      borderWidth: borderWidths.base,
+      borderRadius: borderRadius.lg,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      fontSize: fontSizes.md,
+      fontWeight: fontWeights.medium,
+      color: theme.colors.textPrimary,
+      backgroundColor: theme.colors.card,
+    },
+    nameInputActive: { borderColor: theme.colors.primary },
+    nameInputInactive: { borderColor: theme.colors.border },
+    charCount: {
+      color: theme.colors.textTertiary,
+      marginTop: spacing['2xs'],
+      textAlign: 'right',
+    },
+    modeRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    modeCard: {
+      flex: 1,
+      borderRadius: borderRadius.xl,
+      borderWidth: borderWidths.base,
+      padding: spacing.sm,
+      alignItems: 'center',
+      gap: spacing['3xs'],
+      position: 'relative',
+    },
+    modeCardActive: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderColor: theme.colors.primary,
+    },
+    modeCardInactive: {
+      backgroundColor: theme.colors.card,
+      borderColor: theme.colors.border,
+    },
+    modeEmoji: { fontSize: iconSizes['3xl'] },
+    modeLabel: {
+      color: theme.colors.textPrimary,
+      marginTop: spacing['2xs'],
+    },
+    modeDesc: {
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+    checkBadge: {
+      position: 'absolute',
+      top: spacing.xs,
+      right: spacing.xs,
+      width: CHECK_BADGE_SIZE,
+      height: CHECK_BADGE_SIZE,
+      borderRadius: CHECK_BADGE_SIZE / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.primary,
+    },
+    checkBadgeText: {
+      color: '#FFF',
+      fontSize: fontSizes.xs,
+      fontWeight: fontWeights.bold,
+    },
+    avatarGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
+      justifyContent: 'center',
+    },
+    avatarChip: {
+      width: AVATAR_CHIP_SIZE,
+      height: AVATAR_CHIP_SIZE,
+      borderRadius: borderRadius.lg,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    avatarChipActive: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderColor: theme.colors.primary,
+      borderWidth: borderWidths.thick,
+    },
+    avatarChipInactive: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderWidth: borderWidths.thin,
+    },
+    avatarChipText: { fontSize: iconSizes.xl },
+    bottomSaveBtn: { marginTop: spacing.xs },
+    footerNote: {
+      color: theme.colors.textTertiary,
+      textAlign: 'center',
+    },
+  });

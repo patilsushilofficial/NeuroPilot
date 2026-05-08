@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,190 +8,206 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  Alert,
+  ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useHaptics } from '../../hooks/useHaptics';
-import { useAppStore } from '../../store';
+import { useAddHabitScreen } from '../../hooks/useAddHabitScreen';
 import { Button } from '../../components/common/Button';
-import { HabitCategory, HabitFrequency } from '../../types';
+import {
+  HABIT_EMOJIS,
+  HABIT_COLORS,
+  HABIT_CATEGORIES,
+  HABIT_FREQUENCY_OPTIONS,
+} from '../../constants/habitForm';
+import { withAlpha } from '../../utils/color';
+import { Theme } from '../../theme';
 import { spacing, borderRadius } from '../../theme/spacing';
-
-const HABIT_EMOJIS = ['💪', '🧘', '📚', '🏃', '💧', '🌿', '🎯', '✍️', '🧹', '🛌', '🥗', '🎮', '🎵', '🌅', '🙏'];
-const HABIT_COLORS = ['#7B6CF6', '#4ECDC4', '#FF6B6B', '#FFD43B', '#51CF66', '#FF8C42', '#A9DEF9', '#E27396'];
-
-const CATEGORIES: Array<{ key: HabitCategory; emoji: string; label: string }> = [
-  { key: 'health', emoji: '💊', label: 'Health' },
-  { key: 'focus', emoji: '🎯', label: 'Focus' },
-  { key: 'movement', emoji: '🏃', label: 'Movement' },
-  { key: 'mindfulness', emoji: '🧘', label: 'Mindfulness' },
-  { key: 'sleep', emoji: '🛌', label: 'Sleep' },
-  { key: 'social', emoji: '👥', label: 'Social' },
-  { key: 'routine', emoji: '📋', label: 'Routine' },
-  { key: 'custom', emoji: '⭐', label: 'Custom' },
-];
-
-const FREQUENCY_OPTIONS: Array<{ key: HabitFrequency; label: string; desc: string }> = [
-  { key: 'daily', label: 'Every Day', desc: 'Daily' },
-  { key: 'weekdays', label: 'Weekdays', desc: 'Mon–Fri' },
-  { key: 'weekends', label: 'Weekends', desc: 'Sat–Sun' },
-];
+import { borderWidths, controlSizes, iconSizes } from '../../theme/tokens';
+import { fontSizes, fontWeights } from '../../theme/typography';
 
 export const AddHabitScreen: React.FC = () => {
   const theme = useAppTheme();
-  const haptics = useHaptics();
-  const navigation = useNavigation();
-  const route = useRoute<any>();
-  const editHabitId = route.params?.habitId;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const {
+    title,
+    emoji,
+    category,
+    frequency,
+    color,
+    isEditing,
+    canSave,
+    setTitle,
+    handleSelectEmoji,
+    handleSelectColor,
+    handleSelectCategory,
+    handleSelectFrequency,
+    handleSave,
+    handleArchive,
+    handleCancel,
+  } = useAddHabitScreen();
 
-  const { addHabit, updateHabit, archiveHabit, getHabitById } = useAppStore();
-  const existingHabit = editHabitId ? getHabitById(editHabitId) : undefined;
-
-  const [title, setTitle] = useState(existingHabit?.title ?? '');
-  const [emoji, setEmoji] = useState(existingHabit?.emoji ?? '💪');
-  const [category, setCategory] = useState<HabitCategory>(existingHabit?.category ?? 'routine');
-  const [frequency, setFrequency] = useState<HabitFrequency>(existingHabit?.frequency ?? 'daily');
-  const [color, setColor] = useState(existingHabit?.color ?? HABIT_COLORS[0]);
-  const [reminderTime, setReminderTime] = useState(existingHabit?.reminderTime ?? '');
-
-  const isEditing = !!existingHabit;
-  const canSave = title.trim().length > 0;
-
-  const handleSave = useCallback(() => {
-    if (!canSave) return;
-    haptics.success();
-    const payload = { title: title.trim(), emoji, category, frequency, color, reminderTime: reminderTime || undefined };
-
-    if (isEditing && editHabitId) {
-      updateHabit(editHabitId, payload);
-    } else {
-      addHabit({ ...payload, description: undefined, customDays: undefined });
-    }
-    navigation.goBack();
-  }, [title, emoji, category, frequency, color, reminderTime, isEditing, editHabitId, addHabit, updateHabit, haptics, navigation, canSave]);
-
-  const handleArchive = useCallback(() => {
-    Alert.alert('Archive Habit', 'This will hide the habit from your daily list but keep your history.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Archive',
-        onPress: () => {
-          haptics.warning();
-          archiveHabit(editHabitId);
-          navigation.goBack();
-        },
-      },
-    ]);
-  }, [editHabitId, archiveHabit, haptics, navigation]);
+  // Habit colour drives a few accents (preview ring, title underline,
+  // emoji-chip outline). They're memoized so we don't allocate new objects
+  // every render — only when the user changes the colour.
+  const previewRingStyle = useMemo<ViewStyle>(
+    () => ({ backgroundColor: withAlpha(color, 0.2), borderColor: color }),
+    [color]
+  );
+  const titleUnderlineStyle = useMemo<ViewStyle>(
+    () => ({ borderBottomColor: title ? color : theme.colors.border }),
+    [color, title, theme]
+  );
+  const emojiChipActiveStyle = useMemo<ViewStyle>(
+    () => ({ backgroundColor: withAlpha(color, 0.2), borderColor: color }),
+    [color]
+  );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.flex1}
+      >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={[theme.text.bodyMedium, { color: theme.colors.textSecondary }]}>Cancel</Text>
+          <TouchableOpacity onPress={handleCancel}>
+            <Text style={[theme.text.bodyMedium, styles.cancelText]}>Cancel</Text>
           </TouchableOpacity>
-          <Text style={[theme.text.h4, { color: theme.colors.textPrimary }]}>
+          <Text style={[theme.text.h4, styles.headerTitle]}>
             {isEditing ? 'Edit Habit' : 'New Habit'}
           </Text>
           <Button label="Save" onPress={handleSave} variant="primary" size="sm" disabled={!canSave} />
         </View>
 
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          {/* Emoji Preview */}
           <View style={styles.emojiPreview}>
-            <View style={[styles.emojiCircle, { backgroundColor: color + '33', borderColor: color }]}>
-              <Text style={{ fontSize: 40 }}>{emoji}</Text>
+            <View style={[styles.emojiCircle, previewRingStyle]}>
+              <Text style={styles.previewEmoji}>{emoji}</Text>
             </View>
           </View>
 
-          {/* Title */}
           <TextInput
-            style={[styles.titleInput, { color: theme.colors.textPrimary, borderBottomColor: title ? color : theme.colors.border }]}
+            style={[styles.titleInput, titleUnderlineStyle]}
             placeholder="Habit name…"
             placeholderTextColor={theme.colors.textTertiary}
             value={title}
             onChangeText={setTitle}
             autoFocus={!isEditing}
             returnKeyType="done"
-            accessible accessibilityLabel="Habit title"
+            accessible
+            accessibilityLabel="Habit title"
           />
 
-          {/* Emoji Picker */}
           <View style={styles.section}>
-            <Text style={[theme.text.labelSmall, { color: theme.colors.textTertiary }]}>EMOJI</Text>
+            <Text style={[theme.text.labelSmall, styles.sectionLabel]}>EMOJI</Text>
             <View style={styles.emojiGrid}>
-              {HABIT_EMOJIS.map((e) => (
-                <TouchableOpacity
-                  key={e}
-                  onPress={() => { haptics.light(); setEmoji(e); }}
-                  style={[styles.emojiChip, { backgroundColor: emoji === e ? color + '33' : theme.colors.card, borderColor: emoji === e ? color : theme.colors.border }]}
-                >
-                  <Text style={{ fontSize: 22 }}>{e}</Text>
-                </TouchableOpacity>
-              ))}
+              {HABIT_EMOJIS.map((e) => {
+                const selected = emoji === e;
+                return (
+                  <TouchableOpacity
+                    key={e}
+                    onPress={() => handleSelectEmoji(e)}
+                    style={[
+                      styles.emojiChip,
+                      selected ? emojiChipActiveStyle : styles.emojiChipInactive,
+                    ]}
+                  >
+                    <Text style={styles.emojiChipText}>{e}</Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
 
-          {/* Color Picker */}
           <View style={styles.section}>
-            <Text style={[theme.text.labelSmall, { color: theme.colors.textTertiary }]}>COLOR</Text>
+            <Text style={[theme.text.labelSmall, styles.sectionLabel]}>COLOR</Text>
             <View style={styles.colorRow}>
-              {HABIT_COLORS.map((c) => (
-                <TouchableOpacity
-                  key={c}
-                  onPress={() => { haptics.light(); setColor(c); }}
-                  style={[styles.colorDot, { backgroundColor: c, borderWidth: color === c ? 3 : 0, borderColor: 'white' }]}
-                />
-              ))}
+              {HABIT_COLORS.map((c) => {
+                const selected = color === c;
+                const dotStyle: ViewStyle = {
+                  backgroundColor: c,
+                  borderWidth: selected ? borderWidths.extraThick : 0,
+                };
+                return (
+                  <TouchableOpacity
+                    key={c}
+                    onPress={() => handleSelectColor(c)}
+                    style={[styles.colorDot, dotStyle]}
+                    accessibilityLabel={`Color ${c}`}
+                  />
+                );
+              })}
             </View>
           </View>
 
-          {/* Category */}
           <View style={styles.section}>
-            <Text style={[theme.text.labelSmall, { color: theme.colors.textTertiary }]}>CATEGORY</Text>
+            <Text style={[theme.text.labelSmall, styles.sectionLabel]}>CATEGORY</Text>
             <View style={styles.categoryGrid}>
-              {CATEGORIES.map((cat) => (
-                <TouchableOpacity
-                  key={cat.key}
-                  onPress={() => { haptics.light(); setCategory(cat.key); }}
-                  style={[styles.categoryChip, { backgroundColor: category === cat.key ? theme.colors.primaryContainer : theme.colors.card, borderColor: category === cat.key ? theme.colors.primary : theme.colors.border }]}
-                >
-                  <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
-                  <Text style={[theme.text.labelSmall, { color: category === cat.key ? theme.colors.primaryLight : theme.colors.textSecondary }]}>
-                    {cat.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {HABIT_CATEGORIES.map((cat) => {
+                const selected = category === cat.key;
+                return (
+                  <TouchableOpacity
+                    key={cat.key}
+                    onPress={() => handleSelectCategory(cat.key)}
+                    style={[
+                      styles.categoryChip,
+                      selected ? styles.chipActive : styles.chipInactive,
+                    ]}
+                  >
+                    <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
+                    <Text
+                      style={[
+                        theme.text.labelSmall,
+                        selected ? styles.chipLabelActive : styles.chipLabelInactive,
+                      ]}
+                    >
+                      {cat.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
 
-          {/* Frequency */}
           <View style={styles.section}>
-            <Text style={[theme.text.labelSmall, { color: theme.colors.textTertiary }]}>FREQUENCY</Text>
+            <Text style={[theme.text.labelSmall, styles.sectionLabel]}>FREQUENCY</Text>
             <View style={styles.freqRow}>
-              {FREQUENCY_OPTIONS.map((opt) => (
-                <TouchableOpacity
-                  key={opt.key}
-                  onPress={() => { haptics.light(); setFrequency(opt.key); }}
-                  style={[styles.freqChip, { flex: 1, backgroundColor: frequency === opt.key ? theme.colors.primaryContainer : theme.colors.card, borderColor: frequency === opt.key ? theme.colors.primary : theme.colors.border }]}
-                >
-                  <Text style={[theme.text.labelMedium, { color: frequency === opt.key ? theme.colors.primaryLight : theme.colors.textPrimary, textAlign: 'center' }]}>
-                    {opt.label}
-                  </Text>
-                  <Text style={[theme.text.bodySmall, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
-                    {opt.desc}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {HABIT_FREQUENCY_OPTIONS.map((opt) => {
+                const selected = frequency === opt.key;
+                return (
+                  <TouchableOpacity
+                    key={opt.key}
+                    onPress={() => handleSelectFrequency(opt.key)}
+                    style={[
+                      styles.freqChip,
+                      selected ? styles.chipActive : styles.chipInactive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        theme.text.labelMedium,
+                        selected ? styles.freqLabelActive : styles.freqLabelInactive,
+                      ]}
+                    >
+                      {opt.label}
+                    </Text>
+                    <Text style={[theme.text.bodySmall, styles.freqDesc]}>{opt.description}</Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
 
           {isEditing && (
-            <Button label="Archive Habit" onPress={handleArchive} variant="ghost" size="md" fullWidth style={{ marginTop: spacing[1] }} />
+            <Button
+              label="Archive Habit"
+              onPress={handleArchive}
+              variant="ghost"
+              size="md"
+              fullWidth
+              style={styles.archiveBtn}
+            />
           )}
         </ScrollView>
       </KeyboardAvoidingView>
@@ -199,20 +215,122 @@ export const AddHabitScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: spacing[2], borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'rgba(255,255,255,0.08)' },
-  content: { padding: spacing[2], gap: spacing[2], paddingBottom: 100 },
-  emojiPreview: { alignItems: 'center' },
-  emojiCircle: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', borderWidth: 2 },
-  titleInput: { fontSize: 22, fontWeight: '600', borderBottomWidth: 2, paddingBottom: spacing[1] },
-  section: { gap: 10 },
-  emojiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  emojiChip: { width: 48, height: 48, borderRadius: borderRadius.md, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-  colorRow: { flexDirection: 'row', gap: 12 },
-  colorDot: { width: 32, height: 32, borderRadius: 16 },
-  categoryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  categoryChip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 8, borderRadius: borderRadius.full, borderWidth: 1 },
-  freqRow: { flexDirection: 'row', gap: spacing[1] },
-  freqChip: { padding: spacing[1.5], borderRadius: borderRadius.xl, borderWidth: 1.5, alignItems: 'center' },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    flex1: { flex: 1 },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: spacing.md,
+      borderBottomWidth: borderWidths.hairline,
+      borderBottomColor: 'rgba(255,255,255,0.08)',
+    },
+    cancelText: { color: theme.colors.textSecondary },
+    headerTitle: { color: theme.colors.textPrimary },
+    content: {
+      padding: spacing.md,
+      gap: spacing.md,
+      paddingBottom: spacing['9xl'],
+    },
+    emojiPreview: { alignItems: 'center' },
+    emojiCircle: {
+      width: controlSizes.emojiCircle,
+      height: controlSizes.emojiCircle,
+      borderRadius: controlSizes.emojiCircle / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: borderWidths.thick,
+    },
+    previewEmoji: { fontSize: iconSizes['4xl'] },
+    titleInput: {
+      fontSize: fontSizes.xl,
+      fontWeight: fontWeights.semibold,
+      borderBottomWidth: borderWidths.thick,
+      paddingBottom: spacing.xs,
+      color: theme.colors.textPrimary,
+    },
+    section: { gap: spacing.xs },
+    sectionLabel: { color: theme.colors.textTertiary },
+    emojiGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
+    },
+    emojiChip: {
+      width: controlSizes.emojiChip,
+      height: controlSizes.emojiChip,
+      borderRadius: borderRadius.md,
+      borderWidth: borderWidths.base,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emojiChipInactive: {
+      backgroundColor: theme.colors.card,
+      borderColor: theme.colors.border,
+    },
+    emojiChipText: { fontSize: iconSizes.xl },
+    colorRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    colorDot: {
+      width: controlSizes.colorDot,
+      height: controlSizes.colorDot,
+      borderRadius: controlSizes.colorDot / 2,
+      borderColor: 'white',
+    },
+    categoryGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
+    },
+    categoryChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing['3xs'],
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius.full,
+      borderWidth: borderWidths.thin,
+    },
+    chipActive: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderColor: theme.colors.primary,
+    },
+    chipInactive: {
+      backgroundColor: theme.colors.card,
+      borderColor: theme.colors.border,
+    },
+    chipLabelActive: { color: theme.colors.primaryLight },
+    chipLabelInactive: { color: theme.colors.textSecondary },
+    categoryEmoji: { fontSize: iconSizes.md },
+    freqRow: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+    },
+    freqChip: {
+      flex: 1,
+      padding: spacing.sm,
+      borderRadius: borderRadius.xl,
+      borderWidth: borderWidths.base,
+      alignItems: 'center',
+    },
+    freqLabelActive: {
+      color: theme.colors.primaryLight,
+      textAlign: 'center',
+    },
+    freqLabelInactive: {
+      color: theme.colors.textPrimary,
+      textAlign: 'center',
+    },
+    freqDesc: {
+      color: theme.colors.textTertiary,
+      textAlign: 'center',
+    },
+    archiveBtn: { marginTop: spacing.xs },
+  });

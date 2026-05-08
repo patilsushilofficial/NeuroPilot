@@ -16,7 +16,7 @@ export interface GamificationSlice {
   updateDailyStreak: () => void;
 }
 
-const initialStats: UserStats = {
+export const initialStats: UserStats = {
   totalXP: 0,
   level: 1,
   xpToNextLevel: 100,
@@ -30,9 +30,16 @@ const initialStats: UserStats = {
   weeklyTasks: [0, 0, 0, 0, 0, 0, 0],
 };
 
-export const createGamificationSlice: StateCreator<GamificationSlice, [], [], GamificationSlice> = (set, get) => ({
+export const initialGamificationState: Pick<
+  GamificationSlice,
+  'stats' | 'pendingAchievements'
+> = {
   stats: initialStats,
   pendingAchievements: [],
+};
+
+export const createGamificationSlice: StateCreator<GamificationSlice, [], [], GamificationSlice> = (set, get) => ({
+  ...initialGamificationState,
 
   addXP: (amount) => {
     set((s) => {

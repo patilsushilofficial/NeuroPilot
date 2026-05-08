@@ -1,18 +1,11 @@
-import React, { useEffect, useCallback } from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-  withSequence,
-  Easing,
-  interpolateColor,
-  useDerivedValue,
-} from 'react-native-reanimated';
-import Svg, { Path, Circle } from 'react-native-svg';
+import React, { useMemo } from 'react';
+import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
+import Animated from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useHaptics } from '../../hooks/useHaptics';
+import { useAnimatedCheckbox } from '../../hooks/useAnimatedCheckbox';
+import { borderWidths } from '../../theme/tokens';
+import { moderateScale } from '../../utils/responsive';
 
 interface AnimatedCheckboxProps {
   checked: boolean;
@@ -22,59 +15,30 @@ interface AnimatedCheckboxProps {
   disabled?: boolean;
 }
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const DEFAULT_SIZE = moderateScale(26);
 
 export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
   checked,
   onToggle,
-  size = 26,
+  size = DEFAULT_SIZE,
   color,
   disabled = false,
 }) => {
   const theme = useAppTheme();
-  const haptics = useHaptics();
   const checkColor = color ?? theme.colors.primary;
 
-  const progress = useSharedValue(checked ? 1 : 0);
-  const scale = useSharedValue(1);
+  const { containerStyle, circleStyle, handlePress } = useAnimatedCheckbox({
+    checked,
+    onToggle,
+    disabled,
+    uncheckedBorderColor: theme.colors.border,
+    checkColor,
+  });
 
-  useEffect(() => {
-    progress.value = withTiming(checked ? 1 : 0, {
-      duration: 200,
-      easing: Easing.out(Easing.quad),
-    });
-  }, [checked]);
-
-  const handlePress = useCallback(() => {
-    if (disabled) return;
-    if (!checked) haptics.success();
-    else haptics.light();
-    scale.value = withSequence(
-      withSpring(0.8, { damping: 15 }),
-      withSpring(1.1, { damping: 12 }),
-      withSpring(1, { damping: 15 })
-    );
-    onToggle();
-  }, [checked, disabled, onToggle, haptics]);
-
-  const containerStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const bgProgress = useDerivedValue(() => progress.value);
-
-  const circleStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      bgProgress.value,
-      [0, 1],
-      ['transparent', checkColor]
-    ),
-    borderColor: interpolateColor(
-      bgProgress.value,
-      [0, 1],
-      [theme.colors.border, checkColor]
-    ),
-  }));
+  const sizeStyle = useMemo<ViewStyle>(
+    () => ({ width: size, height: size, borderRadius: size / 2 }),
+    [size]
+  );
 
   return (
     <TouchableOpacity
@@ -84,7 +48,7 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
       accessibilityRole="checkbox"
       accessibilityState={{ checked, disabled }}
     >
-      <Animated.View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }, circleStyle, containerStyle]}>
+      <Animated.View style={[styles.circle, sizeStyle, circleStyle, containerStyle]}>
         {checked && (
           <Svg width={size * 0.55} height={size * 0.55} viewBox="0 0 12 12">
             <Path
@@ -104,7 +68,7 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
 
 const styles = StyleSheet.create({
   circle: {
-    borderWidth: 2,
+    borderWidth: borderWidths.thick,
     alignItems: 'center',
     justifyContent: 'center',
   },

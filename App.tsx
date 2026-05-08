@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -7,45 +7,21 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
 
 import { RootNavigator } from './src/navigation/RootNavigator';
-import { setupNotificationChannels, requestNotificationPermissions } from './src/utils/notifications';
-import { useAppStore } from './src/store';
 import { useAppTheme } from './src/hooks/useAppTheme';
-import { format } from 'date-fns';
+import { useAppInitialization } from './src/hooks/useAppInitialization';
+import { useAppFonts } from './src/hooks/useAppFonts';
+import { applyLexendDefaults } from './src/theme/applyLexendDefaults';
 
 // Keep splash screen visible during initialization
 SplashScreen.preventAutoHideAsync();
 
+// Patch <Text> / <TextInput> so every render auto-resolves the right Lexend
+// variant from its fontWeight. Single source of truth for app-wide coverage.
+applyLexendDefaults();
+
 function AppContent() {
   const theme = useAppTheme();
-  const { settings, lastActiveDate, setLastActiveDate, updateDailyStreak } = useAppStore();
-
-  const initialize = useCallback(async () => {
-    try {
-      // Set up Android notification channels
-      await setupNotificationChannels();
-
-      // Request notification permissions (non-blocking)
-      if (settings.notificationsEnabled) {
-        await requestNotificationPermissions();
-      }
-
-      // Check daily streak
-      const today = format(new Date(), 'yyyy-MM-dd');
-      if (lastActiveDate !== today) {
-        updateDailyStreak();
-        setLastActiveDate(today);
-      }
-    } catch (error) {
-      // Non-fatal — app works fully offline without notifications
-      console.warn('[NeuroPilot] Initialization warning:', error);
-    } finally {
-      await SplashScreen.hideAsync();
-    }
-  }, []);
-
-  useEffect(() => {
-    initialize();
-  }, []);
+  useAppInitialization();
 
   return (
     <>
@@ -56,6 +32,25 @@ function AppContent() {
 }
 
 export default function App() {
+  const [fontsLoaded, fontError] = useAppFonts();
+
+  useEffect(() => {
+    if (fontError) {
+      console.warn('[NeuroPilot] Lexend failed to load:', fontError);
+    } else if (fontsLoaded) {
+      console.log('[NeuroPilot] Lexend fonts loaded ✓');
+    }
+  }, [fontsLoaded, fontError]);
+
+  // While fonts are loading, the splash screen stays visible
+  // (preventAutoHideAsync above). We only render `null` until fonts are
+  // ready OR loading explicitly failed (in which case we render anyway and
+  // fall back to the system font, so the app is never permanently blocked
+  // on a font network issue).
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>

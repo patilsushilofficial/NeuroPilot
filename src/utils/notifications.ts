@@ -97,6 +97,20 @@ export const scheduleFocusTransitionAlert = async (
   });
 };
 
+export const triggerImmediateFocusAlert = async (message: string): Promise<string> => {
+  const id = await Notifications.scheduleNotificationAsync({
+    content: {
+      title: '🎯 Phase Complete!',
+      body: message,
+      data: { type: 'focus_complete' },
+      sound: true,
+    },
+    trigger: null, // immediate
+  });
+  return id;
+};
+
+
 export const cancelNotification = async (id: string): Promise<void> => {
   await Notifications.cancelScheduledNotificationAsync(id);
 };

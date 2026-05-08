@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useAppTheme } from '../../hooks/useAppTheme';
+import { Theme } from '../../theme';
 import { Button } from './Button';
 import { spacing } from '../../theme/spacing';
+import { iconSizes } from '../../theme/tokens';
 
 interface EmptyStateProps {
   emoji: string;
@@ -20,22 +22,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   onAction,
 }) => {
   const theme = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.emoji}>{emoji}</Text>
-      <Text style={[theme.text.h3, { color: theme.colors.textPrimary, textAlign: 'center', marginTop: spacing[1] }]}>
-        {title}
-      </Text>
+      <Text style={[theme.text.h3, styles.title]}>{title}</Text>
       {subtitle && (
-        <Text
-          style={[
-            theme.text.bodyMedium,
-            { color: theme.colors.textSecondary, textAlign: 'center', marginTop: spacing[0.5], lineHeight: 22 },
-          ]}
-        >
-          {subtitle}
-        </Text>
+        <Text style={[theme.text.bodyMedium, styles.subtitle]}>{subtitle}</Text>
       )}
       {actionLabel && onAction && (
         <Button
@@ -43,22 +37,36 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           onPress={onAction}
           variant="primary"
           size="md"
-          style={{ marginTop: spacing[2] }}
+          style={styles.action}
         />
       )}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[5],
-  },
-  emoji: {
-    fontSize: 56,
-  },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing['3xl'],
+      paddingVertical: spacing['4xl'],
+    },
+    emoji: {
+      fontSize: iconSizes['6xl'],
+    },
+    title: {
+      color: theme.colors.textPrimary,
+      textAlign: 'center',
+      marginTop: spacing.xs,
+    },
+    subtitle: {
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      marginTop: spacing['2xs'],
+    },
+    action: {
+      marginTop: spacing.md,
+    },
+  });

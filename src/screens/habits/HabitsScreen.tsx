@@ -1,93 +1,68 @@
-import React, { useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useHaptics } from '../../hooks/useHaptics';
-import { useAppStore } from '../../store';
+import { useHabitsScreen } from '../../hooks/useHabitsScreen';
 import { HabitCard } from '../../components/habits/HabitCard';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ProgressBar } from '../../components/common/ProgressBar';
+import { Theme } from '../../theme';
 import { spacing } from '../../theme/spacing';
+import { avatarSizes, iconSizes } from '../../theme/tokens';
+import { fontWeights } from '../../theme/typography';
 
 export const HabitsScreen: React.FC = () => {
   const theme = useAppTheme();
-  const haptics = useHaptics();
-  const navigation = useNavigation<any>();
-
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const {
-    getTodaysHabits,
-    completeHabit,
-    uncompleteHabit,
+    todaysHabits,
+    completedCount,
+    completionRate,
+    isPerfectDay,
     isHabitCompletedToday,
-    addXP,
-    recordHabitComplete,
-  } = useAppStore();
-
-  const todaysHabits = getTodaysHabits();
-  const completedCount = todaysHabits.filter((h) => isHabitCompletedToday(h.id)).length;
-  const completionRate = todaysHabits.length > 0 ? completedCount / todaysHabits.length : 0;
-
-  const handleToggle = useCallback(
-    (habitId: string) => {
-      const isAlreadyDone = isHabitCompletedToday(habitId);
-      if (isAlreadyDone) {
-        uncompleteHabit(habitId);
-      } else {
-        const xp = completeHabit(habitId);
-        if (xp > 0) {
-          addXP(xp);
-          recordHabitComplete();
-          haptics.success();
-        }
-      }
-    },
-    [completeHabit, uncompleteHabit, isHabitCompletedToday, addXP, recordHabitComplete, haptics]
-  );
+    handleToggle,
+    openAddHabit,
+    openHabitDetail,
+  } = useHabitsScreen();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {/* Header */}
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={[theme.text.h2, { color: theme.colors.textPrimary }]}>Habits</Text>
-          <Text style={[theme.text.bodySmall, { color: theme.colors.textSecondary }]}>
+          <Text style={[theme.text.h2, styles.title]}>Habits</Text>
+          <Text style={[theme.text.bodySmall, styles.subtitle]}>
             {completedCount} of {todaysHabits.length} done today
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate('AddHabit')}
-          style={[styles.addButton, { backgroundColor: theme.colors.secondary }]}
+          onPress={openAddHabit}
+          style={styles.addButton}
           accessible
           accessibilityRole="button"
           accessibilityLabel="Add new habit"
         >
-          <Text style={{ color: 'white', fontSize: 22, fontWeight: '600' }}>+</Text>
+          <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Daily Progress */}
       {todaysHabits.length > 0 && (
         <View style={styles.progressSection}>
           <View style={styles.progressRow}>
-            <Text style={[theme.text.bodySmall, { color: theme.colors.textSecondary }]}>
-              Daily Progress
-            </Text>
-            <Text style={[theme.text.labelMedium, { color: theme.colors.secondary }]}>
+            <Text style={[theme.text.bodySmall, styles.subtitle]}>Daily Progress</Text>
+            <Text style={[theme.text.labelMedium, styles.progressPercent]}>
               {Math.round(completionRate * 100)}%
             </Text>
           </View>
-          <ProgressBar progress={completionRate} color={theme.colors.secondary} height={8} />
-          {completionRate === 1 && (
-            <Text style={[theme.text.bodySmall, { color: theme.colors.success, marginTop: 6 }]}>
+          <ProgressBar progress={completionRate} color={theme.colors.secondary} />
+          {isPerfectDay && (
+            <Text style={[theme.text.bodySmall, styles.celebrate]}>
               🎉 Perfect day! All habits complete!
             </Text>
           )}
         </View>
       )}
 
-      {/* Habit List */}
       <FlatList
         data={todaysHabits}
         keyExtractor={(item) => item.id}
@@ -98,7 +73,7 @@ export const HabitsScreen: React.FC = () => {
             habit={item}
             isCompletedToday={isHabitCompletedToday(item.id)}
             onToggle={handleToggle}
-            onLongPress={(id) => navigation.navigate('AddHabit', { habitId: id })}
+            onLongPress={openHabitDetail}
           />
         )}
         ListEmptyComponent={
@@ -107,7 +82,7 @@ export const HabitsScreen: React.FC = () => {
             title="No habits yet"
             subtitle="Small daily habits rewire your brain over time. Start with just one."
             actionLabel="Add First Habit"
-            onAction={() => navigation.navigate('AddHabit')}
+            onAction={openAddHabit}
           />
         }
       />
@@ -115,34 +90,51 @@ export const HabitsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing[2],
-    paddingTop: spacing[1],
-    paddingBottom: spacing[0.5],
-  },
-  addButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  progressSection: {
-    paddingHorizontal: spacing[2],
-    marginBottom: spacing[1],
-    gap: 6,
-  },
-  progressRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  listContent: {
-    paddingHorizontal: spacing[2],
-    paddingBottom: spacing[10],
-  },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing['2xs'],
+    },
+    title: { color: theme.colors.textPrimary },
+    subtitle: { color: theme.colors.textSecondary },
+    addButton: {
+      width: avatarSizes.md,
+      height: avatarSizes.md,
+      borderRadius: avatarSizes.md / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.secondary,
+    },
+    addButtonText: {
+      color: 'white',
+      fontSize: iconSizes.xl,
+      fontWeight: fontWeights.semibold,
+    },
+    progressSection: {
+      paddingHorizontal: spacing.md,
+      marginBottom: spacing.xs,
+      gap: spacing['2xs'],
+    },
+    progressRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    progressPercent: { color: theme.colors.secondary },
+    celebrate: {
+      color: theme.colors.success,
+      marginTop: spacing['2xs'],
+    },
+    listContent: {
+      paddingHorizontal: spacing.md,
+      paddingBottom: spacing['8xl'],
+    },
+  });

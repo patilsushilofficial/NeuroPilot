@@ -13,7 +13,7 @@ graph TD
     UI[React Components] -->|Dispatch Actions| Store[Zustand Store]
     Store -->|Call Business Logic| Service[Services e.g., TaskService]
     Service -->|Queue Sync Actions| Sync[SyncService]
-    Sync -->|Save Local| DB[(AsyncStorage)]
+    Sync -->|Save Local| DB[(MMKV)]
     Sync -->|Background Push| API[Mock API / Remote Backend]
 ```
 
@@ -29,7 +29,7 @@ graph TD
 The app assumes the user may have intermittent connectivity. 
 
 * **Optimistic Updates**: When a user creates a task, the UI updates *instantly*.
-* **Action Queue**: The `SyncService` captures the action and saves it to a persistent local queue in `AsyncStorage`.
+* **Action Queue**: The `SyncService` captures the action and saves it to a persistent local queue in MMKV (synchronous, JSI-backed storage).
 * **Background Processing**: A background loop attempts to process the queue against the remote API when connectivity is available.
 
 ---

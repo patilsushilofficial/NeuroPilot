@@ -1,19 +1,23 @@
-import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSequence,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
+import React, { useCallback, useMemo } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { AnimatedCheckbox } from '../common/AnimatedCheckbox';
 import { Badge } from '../common/Badge';
 import { useAppTheme } from '../../hooks/useAppTheme';
+import { useTaskCardAnimation } from '../../hooks/useTaskCardAnimation';
 import { Task } from '../../types';
+import { Theme } from '../../theme';
 import { formatDueDate, getPriorityConfig } from '../../utils/dateUtils';
+import { getPriorityBadgeVariant } from '../../constants/taskPriorities';
+import { taskService } from '../../services/TaskService';
 import { spacing, borderRadius } from '../../theme/spacing';
+import {
+  borderWidths,
+  iconSizes,
+  opacity as opacityTokens,
+} from '../../theme/tokens';
+import { fontSizes, fontWeights } from '../../theme/typography';
+import { moderateScale } from '../../utils/responsive';
 
 interface TaskCardProps {
   task: Task;
@@ -29,44 +33,41 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onLongPress,
 }) => {
   const theme = useAppTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const priorityConfig = getPriorityConfig(task.priority);
   const isCompleted = task.status === 'completed';
 
-  const opacity = useSharedValue(1);
-  const translateX = useSharedValue(0);
-
-  const containerStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateX: translateX.value }],
-  }));
-
-  const handleComplete = useCallback(() => {
-    if (isCompleted) return;
-    translateX.value = withSequence(
-      withSpring(8, { damping: 15 }),
-      withSpring(0, { damping: 12 })
-    );
-    setTimeout(() => onComplete(task.id), 200);
-  }, [isCompleted, task.id, onComplete]);
+  const completeTask = useCallback(() => onComplete(task.id), [onComplete, task.id]);
+  const { containerStyle, handleComplete } = useTaskCardAnimation({
+    isCompleted,
+    onComplete: completeTask,
+  });
 
   const dueInfo = task.dueDate ? formatDueDate(task.dueDate) : null;
-  const completedSubtasks = task.subtasks.filter((s) => s.completed).length;
-  const hasSubtasks = task.subtasks.length > 0;
+  const subtaskProgress = useMemo(
+    () => taskService.getSubtaskProgress(task.subtasks),
+    [task.subtasks]
+  );
+  const hasSubtasks = subtaskProgress.total > 0;
+
+  const subtaskFillStyle = useMemo<ViewStyle>(
+    () => ({ width: `${subtaskProgress.ratio * 100}%` }),
+    [subtaskProgress.ratio]
+  );
+
+  const dueStatusStyle = dueInfo?.isOverdue
+    ? styles.dueOverdue
+    : dueInfo?.isUrgent
+    ? styles.dueUrgent
+    : styles.dueNormal;
 
   return (
-    <Animated.View style={[containerStyle]}>
+    <Animated.View style={containerStyle}>
       <TouchableOpacity
-        style={[
-          styles.card,
-          {
-            backgroundColor: theme.colors.card,
-            borderColor: isCompleted ? 'transparent' : theme.colors.border,
-            opacity: isCompleted ? 0.55 : 1,
-          },
-        ]}
+        style={[styles.card, isCompleted ? styles.cardCompleted : styles.cardActive]}
         onPress={() => onPress(task.id)}
         onLongPress={() => onLongPress?.(task.id)}
-        activeOpacity={0.85}
+        activeOpacity={opacityTokens.hover}
         accessible
         accessibilityRole="button"
         accessibilityLabel={`Task: ${task.title}${isCompleted ? ', completed' : ''}`}
@@ -75,7 +76,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           <AnimatedCheckbox
             checked={isCompleted}
             onToggle={handleComplete}
-            size={24}
+            size={iconSizes.xl}
             color={theme.colors[priorityConfig.colorKey]}
           />
 
@@ -83,11 +84,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             <Text
               style={[
                 theme.text.bodyMedium,
-                {
-                  color: isCompleted ? theme.colors.textTertiary : theme.colors.textPrimary,
-                  textDecorationLine: isCompleted ? 'line-through' : 'none',
-                  flex: 1,
-                },
+                styles.title,
+                isCompleted ? styles.titleCompleted : styles.titleActive,
               ]}
               numberOfLines={2}
             >
@@ -97,60 +95,28 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             <View style={styles.metaRow}>
               <Badge
                 label={priorityConfig.label}
-                variant={
-                  task.priority === 'high'
-                    ? 'error'
-                    : task.priority === 'medium'
-                    ? 'warning'
-                    : 'secondary'
-                }
+                variant={getPriorityBadgeVariant(task.priority)}
                 emoji={priorityConfig.emoji}
               />
 
               {dueInfo && (
-                <Text
-                  style={[
-                    styles.dueText,
-                    {
-                      color: dueInfo.isOverdue
-                        ? theme.colors.error
-                        : dueInfo.isUrgent
-                        ? theme.colors.warning
-                        : theme.colors.textTertiary,
-                      fontWeight: dueInfo.isOverdue || dueInfo.isUrgent ? '600' : '400',
-                    },
-                  ]}
-                >
-                  {dueInfo.label}
-                </Text>
+                <Text style={[styles.dueText, dueStatusStyle]}>{dueInfo.label}</Text>
               )}
 
               {hasSubtasks && (
-                <Text style={[styles.subtaskCount, { color: theme.colors.textTertiary }]}>
-                  {completedSubtasks}/{task.subtasks.length} steps
+                <Text style={styles.subtaskCount}>
+                  {subtaskProgress.completed}/{subtaskProgress.total} steps
                 </Text>
               )}
             </View>
           </View>
 
-          {/* XP reward indicator */}
-          <Text style={[styles.xpBadge, { color: theme.colors.primary }]}>
-            +{task.xpReward} XP
-          </Text>
+          <Text style={styles.xpBadge}>+{task.xpReward} XP</Text>
         </View>
 
-        {/* Subtask progress bar */}
         {hasSubtasks && !isCompleted && (
-          <View style={[styles.subtaskBar, { backgroundColor: theme.colors.border }]}>
-            <View
-              style={[
-                styles.subtaskFill,
-                {
-                  backgroundColor: theme.colors.primary,
-                  width: `${(completedSubtasks / task.subtasks.length) * 100}%`,
-                },
-              ]}
-            />
+          <View style={styles.subtaskBar}>
+            <View style={[styles.subtaskFill, subtaskFillStyle]} />
           </View>
         )}
       </TouchableOpacity>
@@ -158,47 +124,82 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    borderRadius: borderRadius.xl,
-    padding: spacing[1.5],
-    borderWidth: 1,
-    marginBottom: spacing[1],
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing[1],
-  },
-  content: {
-    flex: 1,
-    gap: 6,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[0.5],
-    flexWrap: 'wrap',
-  },
-  dueText: {
-    fontSize: 12,
-  },
-  subtaskCount: {
-    fontSize: 11,
-  },
-  xpBadge: {
-    fontSize: 11,
-    fontWeight: '700',
-    marginTop: 2,
-  },
-  subtaskBar: {
-    height: 3,
-    borderRadius: 2,
-    marginTop: spacing[1],
-    overflow: 'hidden',
-  },
-  subtaskFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    card: {
+      borderRadius: borderRadius.xl,
+      padding: spacing.sm,
+      borderWidth: borderWidths.thin,
+      marginBottom: spacing.xs,
+      backgroundColor: theme.colors.card,
+    },
+    cardActive: {
+      borderColor: theme.colors.border,
+      opacity: opacityTokens.full,
+    },
+    cardCompleted: {
+      borderColor: 'transparent',
+      opacity: opacityTokens.ghost,
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: spacing.xs,
+    },
+    content: {
+      flex: 1,
+      gap: spacing['3xs'],
+    },
+    title: { flex: 1 },
+    titleActive: {
+      color: theme.colors.textPrimary,
+      textDecorationLine: 'none',
+    },
+    titleCompleted: {
+      color: theme.colors.textTertiary,
+      textDecorationLine: 'line-through',
+    },
+    metaRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing['2xs'],
+      flexWrap: 'wrap',
+    },
+    dueText: {
+      fontSize: fontSizes.sm,
+    },
+    dueNormal: {
+      color: theme.colors.textTertiary,
+      fontWeight: fontWeights.regular,
+    },
+    dueUrgent: {
+      color: theme.colors.warning,
+      fontWeight: fontWeights.semibold,
+    },
+    dueOverdue: {
+      color: theme.colors.error,
+      fontWeight: fontWeights.semibold,
+    },
+    subtaskCount: {
+      fontSize: fontSizes.xs,
+      color: theme.colors.textTertiary,
+    },
+    xpBadge: {
+      fontSize: fontSizes.xs,
+      fontWeight: fontWeights.bold,
+      marginTop: spacing['3xs'],
+      color: theme.colors.primary,
+    },
+    subtaskBar: {
+      height: moderateScale(3),
+      borderRadius: borderRadius.sm / 2,
+      marginTop: spacing.xs,
+      overflow: 'hidden',
+      backgroundColor: theme.colors.border,
+    },
+    subtaskFill: {
+      height: '100%',
+      borderRadius: borderRadius.sm / 2,
+      backgroundColor: theme.colors.primary,
+    },
+  });
