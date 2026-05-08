@@ -6,6 +6,7 @@ import { useAppTheme } from '../../hooks/useAppTheme';
 import { useFocusTimer } from '../../hooks/useFocusTimer';
 import { CircularTimer } from '../../components/focus/CircularTimer';
 import { FocusShield } from '../../components/focus/FocusShield';
+import { FocusSessionSummary } from '../../components/focus/FocusSessionSummary';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
@@ -158,19 +159,7 @@ export const FocusScreen: React.FC = () => {
 
         <FocusShield isActive={shieldActive} onToggle={toggleShield} />
 
-        <Card style={styles.infoCard}>
-          <View style={styles.infoRow}>
-            {infoItems.map((item) => (
-              <View key={item.id} style={styles.infoItem}>
-                <Text style={styles.infoEmoji}>{item.emoji}</Text>
-                <Text style={[theme.text.h4, styles.infoValue]}>{item.value}</Text>
-                <Text style={[theme.text.labelSmall, styles.infoLabel]}>
-                  {item.label.toUpperCase()}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </Card>
+        <FocusSessionSummary items={infoItems} />
 
         <Card style={styles.tipCard}>
           <Text style={[theme.text.labelSmall, styles.tipHeader]}>💡 ADHD TIP</Text>
@@ -274,18 +263,6 @@ const makeStyles = (theme: Theme) =>
       paddingHorizontal: spacing.md,
     },
     abandonText: { color: theme.colors.textTertiary },
-    infoCard: {},
-    infoRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-    },
-    infoItem: {
-      alignItems: 'center',
-      gap: spacing['3xs'],
-    },
-    infoEmoji: { fontSize: iconSizes.lg },
-    infoValue: { color: theme.colors.textPrimary },
-    infoLabel: { color: theme.colors.textTertiary },
     tipCard: {
       borderRadius: borderRadius.lg,
       borderLeftColor: theme.colors.secondary,

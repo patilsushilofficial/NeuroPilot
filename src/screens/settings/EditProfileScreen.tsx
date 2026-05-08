@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useEditProfileScreen } from '../../hooks/useEditProfileScreen';
@@ -22,8 +23,9 @@ import { avatarSizes, borderWidths, iconSizes } from '../../theme/tokens';
 import { fontSizes, fontWeights } from '../../theme/typography';
 import { moderateScale } from '../../utils/responsive';
 
-const CHECK_BADGE_SIZE = moderateScale(18);
+const CHECK_BADGE_SIZE = moderateScale(22);
 const AVATAR_CHIP_SIZE = moderateScale(52);
+const MODE_EMOJI_WELL = moderateScale(64);
 
 export const EditProfileScreen: React.FC = () => {
   const theme = useAppTheme();
@@ -129,22 +131,35 @@ export const EditProfileScreen: React.FC = () => {
                 <TouchableOpacity
                   key={opt.key}
                   onPress={() => handleSelectMode(opt.key)}
+                  activeOpacity={0.85}
                   style={[
                     styles.modeCard,
                     isSelected ? styles.modeCardActive : styles.modeCardInactive,
-                    isSelected && previewGlowStyle,
                   ]}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: isSelected }}
                 >
-                  <Text style={styles.modeEmoji}>{opt.emoji}</Text>
+                  <View
+                    style={[
+                      styles.modeEmojiWell,
+                      isSelected
+                        ? styles.modeEmojiWellActive
+                        : styles.modeEmojiWellInactive,
+                    ]}
+                  >
+                    <Text style={styles.modeEmoji}>{opt.emoji}</Text>
+                  </View>
                   <Text style={[theme.text.h4, styles.modeLabel]}>{opt.label}</Text>
                   <Text style={[theme.text.bodySmall, styles.modeDesc]}>
                     {opt.shortDescription}
                   </Text>
                   {isSelected && (
                     <View style={styles.checkBadge}>
-                      <Text style={styles.checkBadgeText}>✓</Text>
+                      <Ionicons
+                        name="checkmark"
+                        size={CHECK_BADGE_SIZE * 0.7}
+                        color="#FFF"
+                      />
                     </View>
                   )}
                 </TouchableOpacity>
@@ -276,9 +291,10 @@ const makeStyles = (theme: Theme) =>
       flex: 1,
       borderRadius: borderRadius.xl,
       borderWidth: borderWidths.base,
-      padding: spacing.sm,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.sm,
       alignItems: 'center',
-      gap: spacing['3xs'],
+      gap: spacing['2xs'],
       position: 'relative',
     },
     modeCardActive: {
@@ -289,10 +305,26 @@ const makeStyles = (theme: Theme) =>
       backgroundColor: theme.colors.card,
       borderColor: theme.colors.border,
     },
-    modeEmoji: { fontSize: iconSizes['3xl'] },
+    modeEmojiWell: {
+      width: MODE_EMOJI_WELL,
+      height: MODE_EMOJI_WELL,
+      borderRadius: MODE_EMOJI_WELL / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: borderWidths.thin,
+      marginBottom: spacing['2xs'],
+    },
+    modeEmojiWellActive: {
+      backgroundColor: theme.colors.background,
+      borderColor: theme.colors.primary,
+    },
+    modeEmojiWellInactive: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+    },
+    modeEmoji: { fontSize: iconSizes['2xl'] },
     modeLabel: {
       color: theme.colors.textPrimary,
-      marginTop: spacing['2xs'],
     },
     modeDesc: {
       color: theme.colors.textSecondary,
@@ -308,11 +340,8 @@ const makeStyles = (theme: Theme) =>
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: theme.colors.primary,
-    },
-    checkBadgeText: {
-      color: '#FFF',
-      fontSize: fontSizes.xs,
-      fontWeight: fontWeights.bold,
+      borderWidth: borderWidths.base,
+      borderColor: theme.colors.background,
     },
     avatarGrid: {
       flexDirection: 'row',

@@ -109,10 +109,10 @@ describe('TasksScreen', () => {
     expect(mockNavigation.navigate).toHaveBeenCalledWith('AddTask', { taskId: 'task_1' });
   });
 
-  it('navigates to AddTask on empty state action', () => {
+  it('navigates to AddTask from the FAB even when the list is empty', () => {
     mockUseAppStore.tasks = [];
-    const { getByText } = render(<TasksScreen />);
-    fireEvent.press(getByText('Add a Task'));
+    const { getByLabelText } = render(<TasksScreen />);
+    fireEvent.press(getByLabelText('Add new task'));
     expect(mockNavigation.navigate).toHaveBeenCalledWith('AddTask');
   });
 
@@ -128,17 +128,6 @@ describe('TasksScreen', () => {
     expect(mockUseAppStore.recordTaskComplete).toHaveBeenCalled();
     expect(mockHaptics.success).toHaveBeenCalled();
     jest.useRealTimers();
-  });
-
-  it('captures a quick task via the QuickCapture input', () => {
-    const { getByPlaceholderText, getByText } = render(<TasksScreen />);
-    const input = getByPlaceholderText(/Capture/i);
-    fireEvent.changeText(input, 'Quick task');
-    fireEvent(input, 'submitEditing');
-    expect(mockUseAppStore.addTask).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'Quick task', priority: 'medium' })
-    );
-    expect(mockHaptics.light).toHaveBeenCalled();
   });
 
   it('confirms deletion via long-press alert', () => {

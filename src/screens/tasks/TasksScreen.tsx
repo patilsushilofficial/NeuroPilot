@@ -5,12 +5,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useTasksScreen } from '../../hooks/useTasksScreen';
 import { TaskCard } from '../../components/tasks/TaskCard';
-import { QuickCapture } from '../../components/tasks/QuickCapture';
 import { EmptyState } from '../../components/common/EmptyState';
+import { FloatingActionButton } from '../../components/common/FloatingActionButton';
 import { Theme } from '../../theme';
 import { borderRadius, spacing } from '../../theme/spacing';
-import { avatarSizes, borderWidths, iconSizes } from '../../theme/tokens';
-import { fontWeights } from '../../theme/typography';
+import { borderWidths, iconSizes } from '../../theme/tokens';
 import { TASK_FILTER_TABS } from '../../constants/tasksUi';
 
 export const TasksScreen: React.FC = () => {
@@ -24,7 +23,6 @@ export const TasksScreen: React.FC = () => {
     overdueCount,
     handleComplete,
     handleDelete,
-    handleQuickCapture,
     openAddTask,
     openTaskDetail,
   } = useTasksScreen();
@@ -32,24 +30,13 @@ export const TasksScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={[theme.text.h2, styles.title]}>Tasks</Text>
-          <Text style={[theme.text.bodySmall, styles.subtitle]}>
-            {pendingCount} pending
-            {overdueCount > 0 && (
-              <Text style={styles.overdueText}> · {overdueCount} overdue</Text>
-            )}
-          </Text>
-        </View>
-        <TouchableOpacity
-          onPress={openAddTask}
-          style={styles.addButton}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="Add new task"
-        >
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
+        <Text style={[theme.text.h2, styles.title]}>Tasks</Text>
+        <Text style={[theme.text.bodySmall, styles.subtitle]}>
+          {pendingCount} pending
+          {overdueCount > 0 && (
+            <Text style={styles.overdueText}> · {overdueCount} overdue</Text>
+          )}
+        </Text>
       </View>
 
       <View style={styles.filterRow}>
@@ -81,10 +68,6 @@ export const TasksScreen: React.FC = () => {
         })}
       </View>
 
-      <View style={styles.captureWrapper}>
-        <QuickCapture onCapture={handleQuickCapture} />
-      </View>
-
       <FlatList
         data={sortedTasks}
         keyExtractor={(item) => item.id}
@@ -105,12 +88,15 @@ export const TasksScreen: React.FC = () => {
             subtitle={
               filter === 'completed'
                 ? 'Complete some tasks to see them here.'
-                : 'Your task list is empty. Capture a thought above — it takes 10 seconds.'
+                : 'Your task list is empty. Tap + to add a task.'
             }
-            actionLabel={filter !== 'completed' ? 'Add a Task' : undefined}
-            onAction={filter !== 'completed' ? openAddTask : undefined}
           />
         }
+      />
+
+      <FloatingActionButton
+        onPress={openAddTask}
+        accessibilityLabel="Add new task"
       />
     </SafeAreaView>
   );
@@ -123,9 +109,6 @@ const makeStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
       paddingHorizontal: spacing.md,
       paddingTop: spacing.xs,
       paddingBottom: spacing['2xs'],
@@ -133,19 +116,6 @@ const makeStyles = (theme: Theme) =>
     title: { color: theme.colors.textPrimary },
     subtitle: { color: theme.colors.textSecondary },
     overdueText: { color: theme.colors.error },
-    addButton: {
-      width: avatarSizes.md,
-      height: avatarSizes.md,
-      borderRadius: avatarSizes.md / 2,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: theme.colors.primary,
-    },
-    addButtonText: {
-      color: 'white',
-      fontSize: iconSizes.xl,
-      fontWeight: fontWeights.semibold,
-    },
     filterRow: {
       flexDirection: 'row',
       paddingHorizontal: spacing.md,
@@ -172,10 +142,6 @@ const makeStyles = (theme: Theme) =>
     filterEmoji: { fontSize: iconSizes.sm },
     filterLabelActive: { color: theme.colors.primaryLight },
     filterLabelInactive: { color: theme.colors.textSecondary },
-    captureWrapper: {
-      paddingHorizontal: spacing.md,
-      marginBottom: spacing.xs,
-    },
     listContent: {
       paddingHorizontal: spacing.md,
       paddingBottom: spacing['8xl'],

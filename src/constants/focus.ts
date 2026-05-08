@@ -63,5 +63,5 @@ export const FOCUS_INFO_TILES: readonly FocusInfoTile[] = [
   { id: 'focus', label: 'Focus', emoji: '🧠' },
   { id: 'shortBreak', label: 'Short Break', emoji: '☕' },
   { id: 'longBreak', label: 'Long Break', emoji: '🌿' },
-  { id: 'xp', label: 'XP/session', emoji: '⚡' },
+  { id: 'xp', label: 'Per session', emoji: '⚡' },
 ] as const;

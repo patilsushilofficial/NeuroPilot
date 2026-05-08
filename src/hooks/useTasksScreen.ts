@@ -3,7 +3,6 @@ import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { useAppStore } from '../store';
-import { TaskPriority } from '../types';
 import { TaskFilterKey } from '../constants/tasksUi';
 import { sortTasksByPriorityAndCompletion } from '../utils/taskSorting';
 import { useHaptics } from './useHaptics';
@@ -12,8 +11,8 @@ import { useHaptics } from './useHaptics';
  * View-model for the Tasks list screen. Owns:
  *  - The filter selection.
  *  - Derived list (filtered + sorted) and counters (pending / overdue).
- *  - Task lifecycle handlers (complete, delete, quick-capture) including
- *    XP/streak side effects and haptic feedback.
+ *  - Task lifecycle handlers (complete, delete) including XP/streak side
+ *    effects and haptic feedback.
  *
  * The screen renders this state; it does not mutate the store directly.
  */
@@ -23,7 +22,6 @@ export const useTasksScreen = () => {
 
   const {
     tasks,
-    addTask,
     completeTask,
     deleteTask,
     addXP,
@@ -89,14 +87,6 @@ export const useTasksScreen = () => {
     [deleteTask, haptics]
   );
 
-  const handleQuickCapture = useCallback(
-    (title: string, priority?: TaskPriority) => {
-      addTask({ title, priority: priority ?? 'medium', tags: [] });
-      haptics.light();
-    },
-    [addTask, haptics]
-  );
-
   const openAddTask = useCallback(() => {
     navigation.navigate('AddTask');
   }, [navigation]);
@@ -116,7 +106,6 @@ export const useTasksScreen = () => {
     overdueCount,
     handleComplete,
     handleDelete,
-    handleQuickCapture,
     openAddTask,
     openTaskDetail,
   };

@@ -109,10 +109,10 @@ describe('HabitsScreen', () => {
     expect(mockNavigation.navigate).toHaveBeenCalledWith('AddHabit', { habitId: 'habit_1' });
   });
 
-  it('navigates to AddHabit on empty state action', () => {
+  it('navigates to AddHabit from the FAB even when the list is empty', () => {
     mockUseAppStore.getTodaysHabits.mockReturnValueOnce([]);
-    const { getByText } = render(<HabitsScreen />);
-    fireEvent.press(getByText('Add First Habit'));
+    const { getByLabelText } = render(<HabitsScreen />);
+    fireEvent.press(getByLabelText('Add new habit'));
     expect(mockNavigation.navigate).toHaveBeenCalledWith('AddHabit');
   });
 });

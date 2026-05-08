@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
@@ -7,10 +7,9 @@ import { useHabitsScreen } from '../../hooks/useHabitsScreen';
 import { HabitCard } from '../../components/habits/HabitCard';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ProgressBar } from '../../components/common/ProgressBar';
+import { FloatingActionButton } from '../../components/common/FloatingActionButton';
 import { Theme } from '../../theme';
 import { spacing } from '../../theme/spacing';
-import { avatarSizes, iconSizes } from '../../theme/tokens';
-import { fontWeights } from '../../theme/typography';
 
 export const HabitsScreen: React.FC = () => {
   const theme = useAppTheme();
@@ -29,21 +28,10 @@ export const HabitsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={[theme.text.h2, styles.title]}>Habits</Text>
-          <Text style={[theme.text.bodySmall, styles.subtitle]}>
-            {completedCount} of {todaysHabits.length} done today
-          </Text>
-        </View>
-        <TouchableOpacity
-          onPress={openAddHabit}
-          style={styles.addButton}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="Add new habit"
-        >
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
+        <Text style={[theme.text.h2, styles.title]}>Habits</Text>
+        <Text style={[theme.text.bodySmall, styles.subtitle]}>
+          {completedCount} of {todaysHabits.length} done today
+        </Text>
       </View>
 
       {todaysHabits.length > 0 && (
@@ -81,10 +69,13 @@ export const HabitsScreen: React.FC = () => {
             emoji="🌱"
             title="No habits yet"
             subtitle="Small daily habits rewire your brain over time. Start with just one."
-            actionLabel="Add First Habit"
-            onAction={openAddHabit}
           />
         }
+      />
+
+      <FloatingActionButton
+        onPress={openAddHabit}
+        accessibilityLabel="Add new habit"
       />
     </SafeAreaView>
   );
@@ -97,28 +88,12 @@ const makeStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
       paddingHorizontal: spacing.md,
       paddingTop: spacing.xs,
       paddingBottom: spacing['2xs'],
     },
     title: { color: theme.colors.textPrimary },
     subtitle: { color: theme.colors.textSecondary },
-    addButton: {
-      width: avatarSizes.md,
-      height: avatarSizes.md,
-      borderRadius: avatarSizes.md / 2,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: theme.colors.secondary,
-    },
-    addButtonText: {
-      color: 'white',
-      fontSize: iconSizes.xl,
-      fontWeight: fontWeights.semibold,
-    },
     progressSection: {
       paddingHorizontal: spacing.md,
       marginBottom: spacing.xs,
