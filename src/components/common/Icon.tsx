@@ -35,7 +35,11 @@ export type IconName =
   | 'bar-chart-2'
   | 'calendar'
   | 'home'
-  | 'list';
+  | 'list'
+  | 'info'
+  | 'alert-triangle'
+  | 'alert-circle'
+  | 'x';
 
 interface IconProps {
   name: IconName;
