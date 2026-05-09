@@ -2,6 +2,28 @@ import { StateCreator } from 'zustand';
 import { ActiveFocusState, FocusPhase, FocusSession } from '../../types';
 import { DEFAULT_PRESET_ID, getPresetById, XP_REWARDS } from '../../constants/focusPresets';
 import { triggerImmediateFocusAlert } from '../../utils/notifications';
+import { focusTransitionAlerts } from '../../services/focusTransitionAlerts';
+
+/**
+ * Schedule the "wrap up — phase ending in 3 minutes" heads-up for a
+ * phase that has just become *running*. Always pre-cancels any prior
+ * alert internally, so callers can fire-and-forget.
+ *
+ * Gated on `settings.notificationsEnabled` — a flipped-off setting
+ * still triggers a `cancel()` so any heads-up scheduled before the
+ * user toggled the switch is cleaned up rather than left dangling.
+ */
+const scheduleHeadsUp = (
+  state: any,
+  phase: FocusPhase,
+  secondsRemaining: number
+) => {
+  if (state.settings?.notificationsEnabled) {
+    focusTransitionAlerts.scheduleFor(phase, secondsRemaining);
+  } else {
+    focusTransitionAlerts.cancel();
+  }
+};
 
 let sessionIdCounter = Date.now();
 const newId = () => `focus_${++sessionIdCounter}_${Math.random().toString(36).slice(2, 7)}`;
@@ -88,18 +110,27 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
         presetId,
       },
     }));
+
+    scheduleHeadsUp(get(), 'focus', totalSeconds);
   },
 
   pauseFocus: () => {
     set((s) => ({
       active: { ...s.active, status: 'paused' },
     }));
+    // Pausing makes the prior heads-up's fire date meaningless.
+    focusTransitionAlerts.cancel();
   },
 
   resumeFocus: () => {
     set((s) => ({
       active: { ...s.active, status: 'running' },
     }));
+    // Re-schedule based on whatever time is left, not the full preset
+    // — a session resumed with 4 minutes left should still get a
+    // 1-minute-out cue (if enabled).
+    const { active } = get();
+    scheduleHeadsUp(get(), active.phase, active.secondsRemaining);
   },
 
   tickSecond: () => {
@@ -127,6 +158,11 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
         : 'Break is over. Ready to dive back in?';
       triggerImmediateFocusAlert(message);
     }
+
+    // The heads-up for *this* phase is no longer meaningful — the
+    // phase already ended. The next phase auto-pauses below, so the
+    // user's `resumeFocus` will schedule the cue for the new phase.
+    focusTransitionAlerts.cancel();
 
     if (active.phase === 'focus') {
       // Award XP for focus minutes
@@ -195,6 +231,10 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
         status: 'paused',
       },
     }));
+    // Skipping ends the current phase early — the heads-up no longer
+    // applies. The next phase auto-pauses, so the user's resume will
+    // schedule a fresh one.
+    focusTransitionAlerts.cancel();
   },
 
   abandonFocus: () => {
@@ -210,6 +250,9 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
       active: defaultActive(),
       shieldActive: false, // Auto-deactivate shield when session ends
     }));
+    // Session is over — clear any pending heads-up so it doesn't
+    // surprise the user later.
+    focusTransitionAlerts.cancel();
   },
 
   getTotalFocusMinutes: () =>

@@ -1,8 +1,21 @@
 import { createFocusSlice } from '../focusSlice';
+import { focusTransitionAlerts } from '../../../services/focusTransitionAlerts';
 
 jest.mock('../../../utils/notifications', () => ({
   triggerImmediateFocusAlert: jest.fn().mockResolvedValue('notif_id'),
 }));
+
+jest.mock('../../../services/focusTransitionAlerts', () => ({
+  focusTransitionAlerts: {
+    scheduleFor: jest.fn().mockResolvedValue(undefined),
+    cancel: jest.fn().mockResolvedValue(undefined),
+  },
+}));
+
+const mockHeadsUp = focusTransitionAlerts as unknown as {
+  scheduleFor: jest.Mock;
+  cancel: jest.Mock;
+};
 
 describe('focusSlice', () => {
   let set: jest.Mock;
@@ -192,5 +205,85 @@ describe('focusSlice', () => {
     const state = get();
     expect(state.active.presetId).toBe('classic');
     expect(state.active.currentTaskId).toBeNull();
+  });
+
+  describe('focus-transition heads-up wiring', () => {
+    // The "wrap up — phase ending in 3 minutes" cue is owned by the
+    // focusTransitionAlerts service. The slice is responsible for
+    // *when* schedule / cancel get called; the service is responsible
+    // for *how*. These tests guard the "when" contract so a regression
+    // in the slice can't silently leave the cue dangling or doubled.
+    beforeEach(() => {
+      mockHeadsUp.scheduleFor.mockClear();
+      mockHeadsUp.cancel.mockClear();
+    });
+
+    it('schedules a heads-up when a fresh session starts', () => {
+      slice.startFocus('classic');
+      expect(mockHeadsUp.scheduleFor).toHaveBeenCalledWith(
+        'focus',
+        25 * 60 // Classic focus = 25 minutes
+      );
+    });
+
+    it('cancels the heads-up when paused', () => {
+      slice.pauseFocus();
+      expect(mockHeadsUp.cancel).toHaveBeenCalled();
+    });
+
+    it('reschedules the heads-up using whatever time is left on resume', () => {
+      // Resume must use the *remaining* time, not the full preset —
+      // otherwise pausing for ten minutes and resuming would extend
+      // the alert past the actual phase end.
+      const state = get();
+      state.active.status = 'paused';
+      state.active.phase = 'focus';
+      state.active.secondsRemaining = 12 * 60;
+      slice.resumeFocus();
+      expect(mockHeadsUp.scheduleFor).toHaveBeenCalledWith('focus', 12 * 60);
+    });
+
+    it('cancels the heads-up when a phase rolls over inside tickSecond', () => {
+      // The phase that just ended no longer needs its cue; the next
+      // phase auto-pauses, so a fresh schedule is the user's
+      // resumeFocus to issue.
+      const state = get();
+      state.active.secondsRemaining = 1;
+      state.active.phase = 'focus';
+      state.active.completedPomodoros = 0;
+      state.active.presetId = 'classic';
+      state.focusSessions = [
+        { id: 'session_1', completedPomodoros: 0, totalFocusMinutes: 0, xpEarned: 0 },
+      ];
+      slice.tickSecond();
+      expect(mockHeadsUp.cancel).toHaveBeenCalled();
+    });
+
+    it('cancels the heads-up when the user skips a phase', () => {
+      const state = get();
+      state.active.phase = 'focus';
+      state.active.presetId = 'classic';
+      slice.skipPhase();
+      expect(mockHeadsUp.cancel).toHaveBeenCalled();
+    });
+
+    it('cancels the heads-up when the session is abandoned', () => {
+      const state = get();
+      state.active.sessionId = 'session_1';
+      state.focusSessions = [{ id: 'session_1', status: 'running' }];
+      slice.abandonFocus();
+      expect(mockHeadsUp.cancel).toHaveBeenCalled();
+    });
+
+    it('cancels (rather than schedules) the heads-up when notifications are off', () => {
+      // The user might toggle notifications off mid-session — calling
+      // cancel ensures any heads-up that was scheduled before the
+      // toggle gets cleaned up rather than firing later.
+      const state = get();
+      state.settings = { notificationsEnabled: false };
+      slice.startFocus('classic');
+      expect(mockHeadsUp.scheduleFor).not.toHaveBeenCalled();
+      expect(mockHeadsUp.cancel).toHaveBeenCalled();
+    });
   });
 });

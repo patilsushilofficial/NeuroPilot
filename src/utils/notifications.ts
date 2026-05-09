@@ -74,16 +74,19 @@ export const scheduleHabitReminder = async (
 export const scheduleFocusTransitionAlert = async (
   phase: 'focus' | 'break',
   minutesUntil: number
-): Promise<void> => {
+): Promise<string | null> => {
+  // The "wrap up" cue lands 3 minutes before the phase ends. If the
+  // phase is already too short for that, we silently no-op so callers
+  // can fire-and-forget without guarding the lead time themselves.
   const fireDate = new Date(Date.now() + minutesUntil * 60 * 1000 - 3 * 60 * 1000);
-  if (fireDate <= new Date()) return;
+  if (fireDate <= new Date()) return null;
 
   const message =
     phase === 'focus'
       ? '🧠 Focus session ending in 3 minutes. Start wrapping up.'
       : '☕ Break ending soon. Prepare to refocus.';
 
-  await Notifications.scheduleNotificationAsync({
+  return Notifications.scheduleNotificationAsync({
     content: {
       title: 'NeuroPilot Transition Alert',
       body: message,
