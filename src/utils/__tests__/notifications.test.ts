@@ -80,21 +80,25 @@ describe('notifications', () => {
   });
 
   describe('scheduleFocusTransitionAlert', () => {
-    it('schedules a focus alert in the future', async () => {
-      await scheduleFocusTransitionAlert('focus', 30);
-      expect(Notifications.scheduleNotificationAsync).toHaveBeenCalled();
+    it('returns the notification id when scheduling a focus heads-up', async () => {
+      const id = await scheduleFocusTransitionAlert('focus', 30);
+      // The id round-trips so callers can cancel later — the focus
+      // transition service relies on this contract.
+      expect(id).toBe('notif_id');
       const arg = (Notifications.scheduleNotificationAsync as jest.Mock).mock.calls[0][0];
       expect(arg.content.body).toContain('Focus session');
     });
 
-    it('schedules a break-end alert in the future', async () => {
-      await scheduleFocusTransitionAlert('break', 10);
+    it('returns the notification id when scheduling a break heads-up', async () => {
+      const id = await scheduleFocusTransitionAlert('break', 10);
+      expect(id).toBe('notif_id');
       const arg = (Notifications.scheduleNotificationAsync as jest.Mock).mock.calls[0][0];
       expect(arg.content.body).toContain('Break ending');
     });
 
-    it('skips when alert would already be in the past', async () => {
-      await scheduleFocusTransitionAlert('focus', 1);
+    it('returns null and skips scheduling when the alert would fire in the past', async () => {
+      const id = await scheduleFocusTransitionAlert('focus', 1);
+      expect(id).toBeNull();
       expect(Notifications.scheduleNotificationAsync).not.toHaveBeenCalled();
     });
   });
