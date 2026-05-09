@@ -41,6 +41,18 @@ jest.mock('../../../utils/notifications', () => ({
   scheduleTaskReminder: jest.fn().mockResolvedValue('notif_1'),
 }));
 
+const mockToastShow = jest.fn();
+jest.mock('../../../hooks/useToast', () => ({
+  useToast: () => ({
+    show: mockToastShow,
+    dismiss: jest.fn(),
+    success: jest.fn(),
+    error: jest.fn(),
+    warning: jest.fn(),
+    info: jest.fn(),
+  }),
+}));
+
 describe('DebugScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -116,5 +128,29 @@ describe('DebugScreen', () => {
     fireEvent.press(getByText('Give me 100 XP ⚡'));
     expect(mockHaptics.achievement).toHaveBeenCalled();
     expect(mockAddXP).toHaveBeenCalledWith(100);
+  });
+
+  describe('toast triggers', () => {
+    // Each pairing (position × variant) maps to one button on the
+    // screen. Parametrising keeps the assertions tight and a future
+    // sixth pairing is one row of data, not a new test block.
+    it.each([
+      ['Top — info', 'top', 'info'],
+      ['Top — warning', 'top', 'warning'],
+      ['Bottom — success', 'bottom', 'success'],
+      ['Bottom — error', 'bottom', 'error'],
+    ] as const)('%s shows the matching toast', (label, position, variant) => {
+      const { getByText } = render(<DebugScreen />);
+      fireEvent.press(getByText(label));
+      expect(mockHaptics.light).toHaveBeenCalled();
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variant,
+          position,
+          message: expect.any(String),
+          title: expect.any(String),
+        })
+      );
+    });
   });
 });

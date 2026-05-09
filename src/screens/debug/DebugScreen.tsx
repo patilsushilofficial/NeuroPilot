@@ -16,6 +16,7 @@ export const DebugScreen: React.FC = () => {
     testImmediateNotification,
     testScheduledNotification,
     testHaptic,
+    testToast,
     grantTestXP,
     debugXpGrant,
     scheduledTestDelaySeconds,
@@ -53,6 +54,42 @@ export const DebugScreen: React.FC = () => {
           <View style={[styles.buttonRow, styles.buttonRowSpaced]}>
             <Button label="Error" onPress={() => testHaptic('error')} variant="outline" style={styles.button} />
             <Button label="Heavy" onPress={() => testHaptic('heavy')} variant="outline" style={styles.button} />
+          </View>
+        </Card>
+
+        <Card style={styles.section}>
+          <Text style={[theme.text.h4, styles.sectionTitle]}>Toast</Text>
+          {/* Two rows so QA can verify both slide directions and a
+              spread of variants without a wall of buttons. The pairs
+              are picked to look distinct (info vs warning, success vs
+              error) — same icon would never appear in both rows. */}
+          <View style={styles.buttonRow}>
+            <Button
+              label="Top — info"
+              onPress={() => testToast('top', 'info')}
+              variant="primary"
+              style={styles.button}
+            />
+            <Button
+              label="Top — warning"
+              onPress={() => testToast('top', 'warning')}
+              variant="outline"
+              style={styles.button}
+            />
+          </View>
+          <View style={[styles.buttonRow, styles.buttonRowSpaced]}>
+            <Button
+              label="Bottom — success"
+              onPress={() => testToast('bottom', 'success')}
+              variant="outline"
+              style={styles.button}
+            />
+            <Button
+              label="Bottom — error"
+              onPress={() => testToast('bottom', 'error')}
+              variant="outline"
+              style={styles.button}
+            />
           </View>
         </Card>
 

@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
 
 import { RootNavigator } from './src/navigation/RootNavigator';
+import { ToastHost } from './src/components/common/ToastHost';
 import { useAppTheme } from './src/hooks/useAppTheme';
 import { useAppInitialization } from './src/hooks/useAppInitialization';
 import { useAppFonts } from './src/hooks/useAppFonts';
@@ -32,6 +33,10 @@ function AppContent() {
     <>
       <StatusBar style={theme.mode === 'dark' ? 'light' : 'dark'} />
       <RootNavigator />
+      {/* Mounted once at the root so any screen / hook / service can
+          call `toastService.show(...)` without rendering anything
+          itself. Sits above the navigator so toasts overlay screens. */}
+      <ToastHost />
     </>
   );
 }
