@@ -13,28 +13,35 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useOnboarding } from '../../hooks/useOnboarding';
 import { Button } from '../../components/common/Button';
-import { UserMode } from '../../types';
 import { Theme } from '../../theme';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { avatarSizes, borderWidths, iconSizes } from '../../theme/tokens';
 import { fontSizes, fontWeights } from '../../theme/typography';
-import { ONBOARDING_FEATURES, ONBOARDING_STEPS } from '../../constants/onboarding';
+import {
+  ONBOARDING_FEATURES,
+  ONBOARDING_QUICK_START_STEPS,
+  ONBOARDING_STEPS,
+} from '../../constants/onboarding';
 import { ONBOARDING_AVATARS, USER_MODE_OPTIONS } from '../../constants/profile';
 import { moderateScale } from '../../utils/responsive';
+import {
+  ModeStepProps,
+  ProfileStepProps,
+  ReadyStepProps,
+  StepProps,
+} from './types';
 
 const PROGRESS_DOT_HEIGHT = moderateScale(8);
 const PROGRESS_DOT_ACTIVE_WIDTH = moderateScale(24);
 const PROGRESS_DOT_WIDTH = moderateScale(8);
 
 type Styles = ReturnType<typeof makeStyles>;
+type OnboardingStepProps = StepProps<Styles>;
+type OnboardingModeStepProps = ModeStepProps<Styles>;
+type OnboardingProfileStepProps = ProfileStepProps<Styles>;
+type OnboardingReadyStepProps = ReadyStepProps<Styles>;
 
-interface StepProps {
-  onNext: () => void;
-  theme: Theme;
-  styles: Styles;
-}
-
-const WelcomeStep: React.FC<StepProps> = ({ onNext, theme, styles }) => (
+const WelcomeStep: React.FC<OnboardingStepProps> = ({ onNext, theme, styles }) => (
   <View style={styles.stepContainer}>
     <Text style={styles.bigEmoji}>🧠</Text>
     <Text style={[theme.text.displayMedium, styles.titleCenter]}>Meet NeuroPilot</Text>
@@ -55,12 +62,31 @@ const WelcomeStep: React.FC<StepProps> = ({ onNext, theme, styles }) => (
   </View>
 );
 
-interface ModeStepProps extends StepProps {
-  mode: UserMode;
-  onSelectMode: (mode: UserMode) => void;
-}
+const HowItWorksStep: React.FC<OnboardingStepProps> = ({ onNext, theme, styles }) => (
+  <View style={styles.stepContainer}>
+    <Text style={styles.bigEmoji}>🗺️</Text>
+    <Text style={[theme.text.h1, styles.titleCenter]}>How to use NeuroPilot</Text>
+    <Text style={[theme.text.bodyMedium, styles.modeCaption]}>
+      Follow this simple daily flow to stay calm, focused, and consistent.
+    </Text>
 
-const ModeStep: React.FC<ModeStepProps> = ({ onNext, theme, mode, onSelectMode, styles }) => (
+    <View style={styles.quickStartList}>
+      {ONBOARDING_QUICK_START_STEPS.map((item) => (
+        <View key={item.title} style={styles.quickStartCard}>
+          <Text style={styles.quickStartEmoji}>{item.emoji}</Text>
+          <View style={styles.quickStartBody}>
+            <Text style={[theme.text.h4, styles.quickStartTitle]}>{item.title}</Text>
+            <Text style={[theme.text.bodySmall, styles.quickStartDesc]}>{item.description}</Text>
+          </View>
+        </View>
+      ))}
+    </View>
+
+    <Button label="Got it, continue →" onPress={onNext} variant="primary" size="lg" fullWidth />
+  </View>
+);
+
+const ModeStep: React.FC<OnboardingModeStepProps> = ({ onNext, theme, mode, onSelectMode, styles }) => (
   <View style={styles.stepContainer}>
     <Text style={styles.bigEmoji}>👤</Text>
     <Text style={[theme.text.h1, styles.titleCenter]}>Who is this for?</Text>
@@ -93,14 +119,7 @@ const ModeStep: React.FC<ModeStepProps> = ({ onNext, theme, mode, onSelectMode, 
   </View>
 );
 
-interface ProfileStepProps extends StepProps {
-  name: string;
-  setName: (next: string) => void;
-  avatar: string;
-  onSelectAvatar: (next: string) => void;
-}
-
-const ProfileStep: React.FC<ProfileStepProps> = ({
+const ProfileStep: React.FC<OnboardingProfileStepProps> = ({
   onNext,
   theme,
   name,
@@ -155,12 +174,7 @@ const ProfileStep: React.FC<ProfileStepProps> = ({
   </View>
 );
 
-interface ReadyStepProps extends StepProps {
-  name: string;
-  avatar: string;
-}
-
-const ReadyStep: React.FC<ReadyStepProps> = ({ onNext, theme, name, avatar, styles }) => (
+const ReadyStep: React.FC<OnboardingReadyStepProps> = ({ onNext, theme, name, avatar, styles }) => (
   <View style={[styles.stepContainer, styles.centered]}>
     <Text style={styles.heroEmoji}>{avatar}</Text>
     <Text style={[theme.text.displayMedium, styles.readyTitle]}>
@@ -194,8 +208,12 @@ export const OnboardingScreen: React.FC = () => {
     handleSelectMode,
     handleSelectAvatar,
     nextStep,
+    previousStep,
+    skipToProfile,
     finish,
   } = useOnboarding();
+  const canGoBack = stepIndex > 0;
+  const canSkip = step !== 'ready' && step !== 'profile';
 
   // Progress dot widths are state-driven (active vs inactive). The structural
   // styling sits in the stylesheet; we only pick a width here.
@@ -225,7 +243,34 @@ export const OnboardingScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {(canGoBack || canSkip) && (
+          <View style={styles.topActions}>
+            {canGoBack ? (
+              <Button
+                label="Back"
+                onPress={previousStep}
+                variant="ghost"
+                size="sm"
+                style={styles.topActionButton}
+              />
+            ) : (
+              <View />
+            )}
+            {canSkip ? (
+              <Button
+                label="Skip setup"
+                onPress={skipToProfile}
+                variant="ghost"
+                size="sm"
+                style={styles.topActionButton}
+              />
+            ) : (
+              <View />
+            )}
+          </View>
+        )}
         {step === 'welcome' && <WelcomeStep onNext={nextStep} theme={theme} styles={styles} />}
+        {step === 'howItWorks' && <HowItWorksStep onNext={nextStep} theme={theme} styles={styles} />}
         {step === 'mode' && (
           <ModeStep
             onNext={nextStep}
@@ -286,6 +331,15 @@ const makeStyles = (theme: Theme) =>
       flexGrow: 1,
       padding: spacing.md,
     },
+    topActions: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    topActionButton: {
+      paddingHorizontal: spacing['2xs'],
+    },
     stepContainer: {
       flex: 1,
       gap: spacing.md,
@@ -321,6 +375,34 @@ const makeStyles = (theme: Theme) =>
     featureText: {
       color: theme.colors.textSecondary,
       flex: 1,
+    },
+    quickStartList: {
+      gap: spacing.xs,
+      marginTop: spacing.xs,
+    },
+    quickStartCard: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      borderWidth: borderWidths.base,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.card,
+      borderRadius: borderRadius.lg,
+      padding: spacing.sm,
+      alignItems: 'flex-start',
+    },
+    quickStartEmoji: {
+      fontSize: iconSizes.xl,
+      marginTop: spacing['3xs'],
+    },
+    quickStartBody: {
+      flex: 1,
+      gap: spacing['3xs'],
+    },
+    quickStartTitle: {
+      color: theme.colors.textPrimary,
+    },
+    quickStartDesc: {
+      color: theme.colors.textSecondary,
     },
     modeCaption: {
       color: theme.colors.textSecondary,
