@@ -33,7 +33,9 @@ export type IconName =
   | 'award'
   | 'activity'
   | 'bar-chart-2'
-  | 'calendar';
+  | 'calendar'
+  | 'home'
+  | 'list';
 
 interface IconProps {
   name: IconName;

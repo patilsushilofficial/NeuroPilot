@@ -12,6 +12,7 @@ jest.mock('../../hooks/useAppTheme', () => ({
       textTertiary: '#999999',
       primary: '#007AFF',
       card: '#F5F5F5',
+      cardElevated: '#FFFFFF',
       border: '#CCCCCC',
       success: '#34C759',
       primaryContainer: '#E3F2FD',
@@ -39,7 +40,9 @@ let mockActiveStatus: 'idle' | 'running' = 'idle';
 
 jest.mock('../../store', () => ({
   useAppStore: (selector: any) =>
-    selector ? selector({ active: { status: mockActiveStatus } }) : { active: { status: mockActiveStatus } },
+    selector
+      ? selector({ active: { status: mockActiveStatus } })
+      : { active: { status: mockActiveStatus } },
 }));
 
 jest.mock('react-native-safe-area-context', () => {
@@ -134,9 +137,28 @@ describe('TabNavigator', () => {
     expect(mockHaptics.light).not.toHaveBeenCalled();
   });
 
+  it('marks the focused tab with the selected accessibility state', () => {
+    const { getByLabelText } = renderTabs();
+    expect(getByLabelText('Home').props.accessibilityState).toEqual({
+      selected: true,
+    });
+    expect(getByLabelText('Tasks').props.accessibilityState).toEqual({
+      selected: false,
+    });
+  });
+
+  it('hides the Settings tab from the bar', () => {
+    // Settings is reachable from the Home avatar/cog stack but should NOT be
+    // a top-level tab — the bar would have 6 entries otherwise.
+    const { queryByLabelText } = renderTabs();
+    expect(queryByLabelText('Settings')).toBeNull();
+  });
+
   it('renders an active focus indicator when a session is running', () => {
     mockActiveStatus = 'running';
     const { toJSON } = renderTabs();
+    // Snapshot-style smoke test — the running dot is decorative (no a11y
+    // label) so we just assert the tree mounts cleanly with the cue active.
     expect(toJSON()).toBeTruthy();
   });
 });

@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useHaptics } from './useHaptics';
 
 interface UseTabBarPressArgs {
-  /** React Navigation `navigation` object passed to the tab-bar component. */
-  navigation: {
-    emit: (args: { type: string; target: string; canPreventDefault: boolean }) => {
-      defaultPrevented: boolean;
-    };
-    navigate: (route: string) => void;
-  };
+  /**
+   * React Navigation `navigation` object passed to the tab-bar
+   * component. Reusing RN's own type avoids drift between our interface
+   * and the (generic) `emit` / `navigate` signatures it ships with.
+   */
+  navigation: BottomTabBarProps['navigation'];
 }
 
 /**
