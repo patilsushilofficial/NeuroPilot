@@ -1,100 +1,24 @@
 import React, { useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Switch,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useHaptics } from '../../hooks/useHaptics';
 import { useSettings } from '../../hooks/useSettings';
 import { Card } from '../../components/common/Card';
+import { SettingsItemList } from '../../components/settings/SettingsItemList';
+import { SettingsRow } from '../../components/settings/SettingsRow';
+import { SettingsSection } from '../../components/settings/SettingsSection';
 import { Theme } from '../../theme';
-import { spacing } from '../../theme/spacing';
+import { spacing, borderRadius } from '../../theme/spacing';
 import { avatarSizes, borderWidths, iconSizes } from '../../theme/tokens';
-import { fontWeights } from '../../theme/typography';
-import { moderateScale } from '../../utils/responsive';
-
-const ROW_EMOJI_WIDTH = moderateScale(28);
-
-interface SettingsRowProps {
-  emoji: string;
-  label: string;
-  description?: string;
-  value?: boolean;
-  onToggle?: (v: boolean) => void;
-  onPress?: () => void;
-  rightText?: string;
-  danger?: boolean;
-}
-
-const SettingsRow: React.FC<SettingsRowProps> = ({
-  emoji,
-  label,
-  description,
-  value,
-  onToggle,
-  onPress,
-  rightText,
-  danger = false,
-}) => {
-  const theme = useAppTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const haptics = useHaptics();
-
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={!onPress && onToggle === undefined}
-      style={styles.row}
-      accessible
-      accessibilityRole={onToggle ? 'switch' : 'button'}
-      accessibilityState={onToggle ? { checked: value } : undefined}
-      accessibilityLabel={label}
-    >
-      <Text style={styles.rowEmoji}>{emoji}</Text>
-      <View style={styles.rowContent}>
-        <Text
-          style={[
-            theme.text.bodyMedium,
-            styles.rowLabel,
-            danger ? styles.rowLabelDanger : styles.rowLabelDefault,
-          ]}
-        >
-          {label}
-        </Text>
-        {description && (
-          <Text style={[theme.text.bodySmall, styles.rowDescription]}>{description}</Text>
-        )}
-      </View>
-      {onToggle !== undefined ? (
-        <Switch
-          testID={`switch-${label}`}
-          value={value}
-          onValueChange={(v) => {
-            haptics.light();
-            onToggle(v);
-          }}
-          trackColor={styles.switchTrackColors}
-          thumbColor="white"
-          accessible
-        />
-      ) : (
-        <Text style={[theme.text.bodySmall, styles.rowChevron]}>{rightText ?? '›'}</Text>
-      )}
-    </TouchableOpacity>
-  );
-};
-
-const SectionHeader: React.FC<{ title: string }> = ({ title }) => {
-  const theme = useAppTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  return <Text style={[theme.text.labelSmall, styles.sectionHeader]}>{title}</Text>;
-};
+import {
+  EDIT_PROFILE_ROW,
+  NOTIFICATIONS_ROW,
+  RESET_ROW,
+  SETTINGS_SCREEN_COPY,
+  THEME_ROW,
+} from './constants';
+import { useSettingsSections } from './useSettingsSections';
 
 export const SettingsScreen: React.FC = () => {
   const theme = useAppTheme();
@@ -111,19 +35,32 @@ export const SettingsScreen: React.FC = () => {
     navigation,
   } = useSettings();
 
+  const { accessibilityItems, aboutItems } = useSettingsSections({
+    settings,
+    toggleHaptics,
+    updateSettings,
+    handleRateApp,
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={[theme.text.h2, styles.screenTitle]}>Settings</Text>
+        <View style={styles.hero}>
+          <View>
+            <Text style={[theme.text.h2, styles.screenTitle]}>{SETTINGS_SCREEN_COPY.title}</Text>
+            <Text style={[theme.text.bodySmall, styles.screenSubtitle]}>
+              {SETTINGS_SCREEN_COPY.subtitle}
+            </Text>
+          </View>
+        </View>
 
-        <View>
-          <SectionHeader title="PROFILE" />
-          <Card>
+        <SettingsSection title="PROFILE">
+          <Card variant="glass" elevated style={styles.profileCard}>
             <View style={styles.profileRow}>
               <View style={styles.avatarCircle}>
                 <Text style={styles.avatarEmoji}>{profile?.avatar ?? '🧠'}</Text>
               </View>
-              <View>
+              <View style={styles.profileCopy}>
                 <Text style={[theme.text.h4, styles.profileName]}>{profile?.name ?? 'Pilot'}</Text>
                 <Text style={[theme.text.bodySmall, styles.profileMode]}>
                   {profile?.mode === 'child' ? '👶 Child Mode' : '💼 Adult Mode'}
@@ -133,133 +70,93 @@ export const SettingsScreen: React.FC = () => {
           </Card>
           <Card noPadding style={styles.cardSpaced}>
             <SettingsRow
-              emoji="✏️"
-              label="Edit Profile"
-              description="Change your name, avatar, and mode"
+              emoji={EDIT_PROFILE_ROW.emoji}
+              label={EDIT_PROFILE_ROW.label}
+              description={EDIT_PROFILE_ROW.description}
               onPress={() => navigation.navigate('EditProfile')}
             />
           </Card>
-        </View>
+        </SettingsSection>
 
-        <View>
-          <SectionHeader title="APPEARANCE" />
+        <SettingsSection title="APPEARANCE">
           <Card noPadding>
             <SettingsRow
-              emoji="🎨"
-              label="Theme"
-              description="Choose light, dark, or system"
+              emoji={THEME_ROW.emoji}
+              label={THEME_ROW.label}
+              description={THEME_ROW.description}
               onPress={handleThemeChange}
               rightText={themeLabel}
             />
           </Card>
-        </View>
+        </SettingsSection>
 
-        <View>
-          <SectionHeader title="ACCESSIBILITY" />
+        <SettingsSection title="ACCESSIBILITY">
           <Card noPadding>
-            <SettingsRow
-              emoji="📳"
-              label="Haptic Feedback"
-              description="Tactile reinforcement for task completion"
-              value={settings.hapticsEnabled}
-              onToggle={() => toggleHaptics()}
-            />
-            <View style={styles.divider} />
-            <SettingsRow
-              emoji="🏃"
-              label="Reduced Motion"
-              description="Minimize animations (for sensory sensitivity)"
-              value={settings.reducedMotion}
-              onToggle={(v) => updateSettings({ reducedMotion: v })}
-            />
-            <View style={styles.divider} />
-            <SettingsRow
-              emoji="💬"
-              label="Motivational Quotes"
-              description="Daily quotes on the home screen"
-              value={settings.showMotivationalQuotes}
-              onToggle={(v) => updateSettings({ showMotivationalQuotes: v })}
-            />
+            <SettingsItemList items={accessibilityItems} />
           </Card>
-        </View>
+        </SettingsSection>
 
-        <View>
-          <SectionHeader title="NOTIFICATIONS" />
+        <SettingsSection title="NOTIFICATIONS">
           <Card noPadding>
             <SettingsRow
-              emoji="🔔"
-              label="Enable Notifications"
-              description="Reminders and focus alerts (local only)"
+              emoji={NOTIFICATIONS_ROW.emoji}
+              label={NOTIFICATIONS_ROW.label}
+              description={NOTIFICATIONS_ROW.description}
               value={settings.notificationsEnabled}
               onToggle={(v) => updateSettings({ notificationsEnabled: v })}
             />
           </Card>
-        </View>
+        </SettingsSection>
 
-        <View>
-          <SectionHeader title="ABOUT" />
+        <SettingsSection title="ABOUT">
           <Card noPadding>
-            <SettingsRow emoji="🧠" label="NeuroPilot" description="v1.0.0 · Built for ADHD brains" rightText="💜" />
-            <View style={styles.divider} />
-            <SettingsRow
-              emoji="🔒"
-              label="Privacy"
-              description="All data stored on your device only. No internet required."
-              rightText="100% Offline"
-            />
-            <View style={styles.divider} />
-            <SettingsRow
-              emoji="🌟"
-              label="Rate on Play Store"
-              onPress={handleRateApp}
-            />
+            <SettingsItemList items={aboutItems} />
           </Card>
-        </View>
+        </SettingsSection>
 
-        <View>
-          <SectionHeader title="DANGER ZONE" />
+        <SettingsSection title="DANGER ZONE">
           <Card noPadding>
             <SettingsRow
-              emoji="🗑️"
-              label="Reset All Data"
-              description="Permanently delete everything"
+              emoji={RESET_ROW.emoji}
+              label={RESET_ROW.label}
+              description={RESET_ROW.description}
               onPress={handleResetData}
-              danger
+              danger={RESET_ROW.danger}
             />
           </Card>
-        </View>
+        </SettingsSection>
 
-        <Text style={[theme.text.bodySmall, styles.footerText]}>
-          Made with 💜 for neurodivergent minds.{'\n'}
-          All data lives on your device. No servers. No tracking.
-        </Text>
+        <Card variant="surface" style={styles.footerCard}>
+          <Text style={[theme.text.bodySmall, styles.footerText]}>
+            {SETTINGS_SCREEN_COPY.footer}
+          </Text>
+        </Card>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
 const makeStyles = (theme: Theme) => {
-  // Switch's `trackColor` is a typed object literal, not a style key. We
-  // pre-allocate it once per theme so JSX can reference it like any other
-  // stylesheet entry without rebuilding it on every render.
-  const switchTrackColors = { false: theme.colors.border, true: theme.colors.primary };
-
-  return Object.assign(
-    StyleSheet.create({
+  return StyleSheet.create({
       container: {
         flex: 1,
         backgroundColor: theme.colors.background,
       },
       content: {
         padding: spacing.md,
-        gap: spacing.sm,
+        gap: spacing.lg,
         paddingBottom: spacing['7xl'],
       },
       screenTitle: { color: theme.colors.textPrimary },
-      sectionHeader: {
-        color: theme.colors.textTertiary,
-        paddingHorizontal: spacing['2xs'],
-        paddingTop: spacing.xs,
+      screenSubtitle: {
+        color: theme.colors.textSecondary,
+        marginTop: spacing['3xs'],
+      },
+      hero: {
+        gap: spacing.xs,
+      },
+      profileCard: {
+        borderRadius: borderRadius['2xl'],
       },
       profileRow: {
         flexDirection: 'row',
@@ -273,41 +170,20 @@ const makeStyles = (theme: Theme) => {
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: theme.colors.primaryContainer,
+        borderWidth: borderWidths.thin,
+        borderColor: theme.colors.primary,
       },
       avatarEmoji: { fontSize: iconSizes['2xl'] },
+      profileCopy: { flex: 1, gap: spacing['3xs'] },
       profileName: { color: theme.colors.textPrimary },
       profileMode: { color: theme.colors.textSecondary },
       cardSpaced: { marginTop: spacing.xs },
-      row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.sm,
-        paddingVertical: spacing.sm,
-        gap: spacing.xs,
-      },
-      rowEmoji: {
-        fontSize: iconSizes.lg,
-        width: ROW_EMOJI_WIDTH,
-      },
-      rowContent: {
-        flex: 1,
-        gap: spacing['3xs'],
-      },
-      rowLabel: { fontWeight: fontWeights.medium },
-      rowLabelDefault: { color: theme.colors.textPrimary },
-      rowLabelDanger: { color: theme.colors.error },
-      rowDescription: { color: theme.colors.textTertiary },
-      rowChevron: { color: theme.colors.textTertiary },
-      divider: {
-        height: borderWidths.hairline,
-        marginLeft: spacing['4xl'],
-        backgroundColor: theme.colors.divider,
-      },
       footerText: {
         color: theme.colors.textDisabled,
         textAlign: 'center',
       },
-    }),
-    { switchTrackColors }
-  );
+      footerCard: {
+        borderRadius: borderRadius.xl,
+      },
+    });
 };
