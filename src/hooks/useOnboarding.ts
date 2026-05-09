@@ -34,6 +34,17 @@ export const useOnboarding = () => {
     }
   }, [stepIndex, haptics]);
 
+  const previousStep = useCallback(() => {
+    if (stepIndex <= 0) return;
+    haptics.light();
+    setStep(ONBOARDING_STEPS[stepIndex - 1]);
+  }, [stepIndex, haptics]);
+
+  const skipToProfile = useCallback(() => {
+    haptics.light();
+    setStep('profile');
+  }, [haptics]);
+
   const handleSelectMode = useCallback(
     (next: UserMode) => {
       haptics.medium();
@@ -71,6 +82,8 @@ export const useOnboarding = () => {
     handleSelectMode,
     handleSelectAvatar,
     nextStep,
+    previousStep,
+    skipToProfile,
     finish,
   };
 };

@@ -68,6 +68,9 @@ describe('OnboardingScreen', () => {
     );
 
     fireEvent.press(getByText("Let's Go →"));
+    expect(getByText('How to use NeuroPilot')).toBeTruthy();
+
+    fireEvent.press(getByText('Got it, continue →'));
     expect(getByText('Who is this for?')).toBeTruthy();
 
     fireEvent.press(getByText('Child Mode'));
@@ -102,6 +105,7 @@ describe('OnboardingScreen', () => {
     const { getByText, getByPlaceholderText } = render(<OnboardingScreen />);
 
     fireEvent.press(getByText("Let's Go →"));
+    fireEvent.press(getByText('Got it, continue →'));
     fireEvent.press(getByText('Continue →'));
 
     const input = getByPlaceholderText('Your name or nickname…');
@@ -117,9 +121,19 @@ describe('OnboardingScreen', () => {
   it('disables continue when name is empty', () => {
     const { getByText } = render(<OnboardingScreen />);
     fireEvent.press(getByText("Let's Go →"));
+    fireEvent.press(getByText('Got it, continue →'));
     fireEvent.press(getByText('Continue →'));
 
     fireEvent.press(getByText("Let's Start! 🚀"));
     expect(mockSetProfile).not.toHaveBeenCalled();
+  });
+
+  it('allows skipping setup hints to profile step', () => {
+    const { getByText } = render(<OnboardingScreen />);
+
+    fireEvent.press(getByText("Let's Go →"));
+    fireEvent.press(getByText('Skip setup'));
+
+    expect(getByText('What should we call you?')).toBeTruthy();
   });
 });
