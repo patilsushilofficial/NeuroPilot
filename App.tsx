@@ -10,6 +10,7 @@ import { RootNavigator } from './src/navigation/RootNavigator';
 import { useAppTheme } from './src/hooks/useAppTheme';
 import { useAppInitialization } from './src/hooks/useAppInitialization';
 import { useAppFonts } from './src/hooks/useAppFonts';
+import { useGlobalFocusTicker } from './src/hooks/useGlobalFocusTicker';
 import { applyLexendDefaults } from './src/theme/applyLexendDefaults';
 
 // Keep splash screen visible during initialization
@@ -22,6 +23,10 @@ applyLexendDefaults();
 function AppContent() {
   const theme = useAppTheme();
   useAppInitialization();
+  // Drives the focus countdown app-wide so the timer keeps progressing
+  // (and phase transitions still award XP) regardless of which screen
+  // is mounted.
+  useGlobalFocusTicker();
 
   return (
     <>

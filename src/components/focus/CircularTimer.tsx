@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import Svg, { Circle, G } from 'react-native-svg';
-import Animated from 'react-native-reanimated';
+
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useCircularProgressAnimation } from '../../hooks/useCircularProgressAnimation';
 import { formatTimerDisplay } from '../../utils/dateUtils';
-import { computeCircleGeometry } from '../../utils/svgGeometry';
+import { remainingProgress } from '../../utils/svgGeometry';
 import { FocusPhase } from '../../types';
 import { Theme } from '../../theme';
 import { fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
@@ -18,6 +16,8 @@ import {
   getFocusPhaseColor,
 } from '../../constants/focus';
 
+import { ProgressRing } from '../common/ProgressRing';
+
 interface CircularTimerProps {
   secondsRemaining: number;
   totalSeconds: number;
@@ -25,8 +25,6 @@ interface CircularTimerProps {
   isRunning: boolean;
   size?: number;
 }
-
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const DEFAULT_SIZE = moderateScale(260);
 const STROKE_WIDTH = moderateScale(10);
@@ -41,62 +39,33 @@ export const CircularTimer: React.FC<CircularTimerProps> = ({
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
-  const { radius, circumference, cx, cy } = useMemo(
-    () => computeCircleGeometry(size, STROKE_WIDTH),
-    [size]
-  );
+  const phaseColor = getFocusPhaseColor(phase, theme);
+  const phaseLabelStyle = styles[PHASE_LABEL_KEYS[phase]];
 
   const sizeStyle = useMemo<ViewStyle>(
     () => ({ width: size, height: size }),
     [size]
   );
 
-  const phaseColor = getFocusPhaseColor(phase, theme);
-  const phaseLabelStyle = styles[PHASE_LABEL_KEYS[phase]];
-
-  const { animatedProps } = useCircularProgressAnimation({
-    secondsRemaining,
-    totalSeconds,
-    isRunning,
-    circumference,
-  });
-
+  const progress = remainingProgress(secondsRemaining, totalSeconds);
   const isPaused = !isRunning && secondsRemaining < totalSeconds;
 
   return (
     <View style={[styles.container, sizeStyle]}>
-      <Svg width={size} height={size}>
-        <Circle
-          cx={cx}
-          cy={cy}
-          r={radius}
-          stroke={theme.colors.border}
-          strokeWidth={STROKE_WIDTH}
-          fill="none"
-        />
-        <G rotation="-90" origin={`${cx}, ${cy}`}>
-          <AnimatedCircle
-            cx={cx}
-            cy={cy}
-            r={radius}
-            stroke={phaseColor}
-            strokeWidth={STROKE_WIDTH}
-            fill="none"
-            strokeDasharray={circumference}
-            animatedProps={animatedProps}
-            strokeLinecap="round"
-          />
-        </G>
-      </Svg>
-
-      <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <View style={styles.centerContent}>
+      <ProgressRing
+        progress={progress}
+        size={size}
+        strokeWidth={STROKE_WIDTH}
+        color={phaseColor}
+        trackColor={theme.colors.border}
+      >
+        <View style={styles.centerContent} pointerEvents="none">
           <Text style={styles.phaseEmoji}>{FOCUS_PHASE_EMOJIS[phase]}</Text>
           <Text style={styles.timerText}>{formatTimerDisplay(secondsRemaining)}</Text>
           <Text style={[styles.phaseLabel, phaseLabelStyle]}>{FOCUS_PHASE_LABELS[phase]}</Text>
           {isPaused && <Text style={styles.pausedLabel}>PAUSED</Text>}
         </View>
-      </View>
+      </ProgressRing>
     </View>
   );
 };
@@ -109,7 +78,6 @@ const makeStyles = (theme: Theme) =>
       justifyContent: 'center',
     },
     centerContent: {
-      flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -142,11 +110,6 @@ const makeStyles = (theme: Theme) =>
     phaseLabelSuccess: { color: theme.colors.successContainer },
   });
 
-/**
- * Maps each focus phase to the correct phase-label style key. Resolved
- * once at module scope so consumers stay free of template-literal style
- * lookups.
- */
 const PHASE_LABEL_KEYS: Record<FocusPhase, PhaseLabelKey> = {
   focus: 'phaseLabelPrimary',
   short_break: 'phaseLabelSecondary',

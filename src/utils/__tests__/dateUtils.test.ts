@@ -131,8 +131,8 @@ describe('dateUtils', () => {
   });
 
   describe('getWeekDayLabels', () => {
-    it('returns 7 labels starting from Monday', () => {
-      expect(getWeekDayLabels()).toEqual(['M', 'T', 'W', 'T', 'F', 'S', 'S']);
+    it('returns 7 labels starting from Sunday so they align with getDay() indexing', () => {
+      expect(getWeekDayLabels()).toEqual(['S', 'M', 'T', 'W', 'T', 'F', 'S']);
     });
   });
 

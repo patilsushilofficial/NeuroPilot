@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 import { useAppStore, selectActiveFocus, selectStats } from '../store';
 import { useHaptics } from './useHaptics';
@@ -25,15 +25,11 @@ export const useFocusTimer = () => {
   const startFocus = useAppStore((s) => s.startFocus);
   const pauseFocus = useAppStore((s) => s.pauseFocus);
   const resumeFocus = useAppStore((s) => s.resumeFocus);
-  const tickSecond = useAppStore((s) => s.tickSecond);
   const skipPhase = useAppStore((s) => s.skipPhase);
   const abandonFocus = useAppStore((s) => s.abandonFocus);
-  const addXP = useAppStore((s) => s.addXP);
-  const recordFocusMinutes = useAppStore((s) => s.recordFocusMinutes);
   const getSessionsToday = useAppStore((s) => s.getSessionsToday);
   const toggleShield = useAppStore((s) => s.toggleShield);
 
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<string>(DEFAULT_PRESET_ID);
 
   const isIdle = active.status === 'idle';
@@ -56,30 +52,9 @@ export const useFocusTimer = () => {
     ? preset.focusMinutes * 60
     : active.totalSeconds;
 
-  // Timer tick — only runs while the session is actively running.
-  useEffect(() => {
-    if (isRunning) {
-      timerRef.current = setInterval(() => {
-        const xp = tickSecond();
-        if (xp > 0) {
-          // Phase just completed — credit XP / minutes from the active preset.
-          const minutesCompleted = getPresetById(active.presetId).focusMinutes;
-          addXP(xp);
-          recordFocusMinutes(minutesCompleted);
-          haptics.focusComplete();
-        }
-      }, 1000);
-    } else if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [isRunning, active.presetId, tickSecond, addXP, recordFocusMinutes, haptics]);
+  // The countdown interval lives in `useGlobalFocusTicker` (mounted at the
+  // app root) so the timer keeps progressing even when the user is on the
+  // Home / Tasks / Habits tab. This hook now just wires up actions.
 
   const handleStart = useCallback(() => {
     haptics.heavy();

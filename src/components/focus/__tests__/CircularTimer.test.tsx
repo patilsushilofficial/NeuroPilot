@@ -30,6 +30,10 @@ jest.mock('react-native-reanimated', () => {
     createAnimatedComponent: jest.fn().mockImplementation((comp) => comp),
     Easing: {
       linear: {},
+      cubic: {},
+      quad: {},
+      out: jest.fn().mockReturnValue({}),
+      inOut: jest.fn().mockReturnValue({}),
     },
   };
 });

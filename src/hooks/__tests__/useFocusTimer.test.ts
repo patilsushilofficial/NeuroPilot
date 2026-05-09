@@ -202,31 +202,8 @@ describe('useFocusTimer', () => {
     expect(result.current.active.totalSeconds).toBe(1500);
   });
 
-  it('should tick seconds when running', () => {
-    const tickSecond = jest.fn().mockReturnValue(10);
-    const addXP = jest.fn();
-    const mockStore = {
-      shieldActive: false,
-      tickSecond,
-      addXP,
-      recordFocusMinutes: jest.fn(),
-      getSessionsToday: jest.fn().mockReturnValue([]),
-    };
-    (useAppStore as unknown as jest.Mock).mockImplementation((selector) => {
-      if (typeof selector === 'function') return selector(mockStore);
-      return mockStore;
-    });
-    
-    // Mock active focus as running
-    (useAppStore as unknown as jest.Mock).mockReturnValueOnce({ status: 'running', presetId: 'pomodoro' });
-    
-    const { result } = renderHook(() => useFocusTimer());
-    
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
-    
-    expect(tickSecond).toHaveBeenCalled();
-    expect(addXP).toHaveBeenCalledWith(10);
-  });
+  // Note: the per-second tick that used to live here was moved to
+  // `useGlobalFocusTicker` (mounted at App root), so the timer keeps
+  // counting down when the user is on a screen other than Focus.
+  // Tick coverage now lives in `useGlobalFocusTicker.test.ts`.
 });

@@ -25,7 +25,6 @@ import { moderateScale } from '../../utils/responsive';
 
 const CHECK_BADGE_SIZE = moderateScale(22);
 const AVATAR_CHIP_SIZE = moderateScale(52);
-const MODE_EMOJI_WELL = moderateScale(64);
 
 export const EditProfileScreen: React.FC = () => {
   const theme = useAppTheme();
@@ -139,16 +138,15 @@ export const EditProfileScreen: React.FC = () => {
                   accessibilityRole="radio"
                   accessibilityState={{ selected: isSelected }}
                 >
-                  <View
+                  <Text
                     style={[
-                      styles.modeEmojiWell,
-                      isSelected
-                        ? styles.modeEmojiWellActive
-                        : styles.modeEmojiWellInactive,
+                      styles.modeEmoji,
+                      isSelected ? styles.modeEmojiActive : styles.modeEmojiInactive,
                     ]}
+                    allowFontScaling={false}
                   >
-                    <Text style={styles.modeEmoji}>{opt.emoji}</Text>
-                  </View>
+                    {opt.emoji}
+                  </Text>
                   <Text style={[theme.text.h4, styles.modeLabel]}>{opt.label}</Text>
                   <Text style={[theme.text.bodySmall, styles.modeDesc]}>
                     {opt.shortDescription}
@@ -291,11 +289,13 @@ const makeStyles = (theme: Theme) =>
       flex: 1,
       borderRadius: borderRadius.xl,
       borderWidth: borderWidths.base,
-      paddingVertical: spacing.md,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.md,
       paddingHorizontal: spacing.sm,
       alignItems: 'center',
       gap: spacing['2xs'],
       position: 'relative',
+      overflow: 'hidden',
     },
     modeCardActive: {
       backgroundColor: theme.colors.primaryContainer,
@@ -305,24 +305,14 @@ const makeStyles = (theme: Theme) =>
       backgroundColor: theme.colors.card,
       borderColor: theme.colors.border,
     },
-    modeEmojiWell: {
-      width: MODE_EMOJI_WELL,
-      height: MODE_EMOJI_WELL,
-      borderRadius: MODE_EMOJI_WELL / 2,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: borderWidths.thin,
+    modeEmoji: {
+      fontSize: iconSizes['4xl'],
+      lineHeight: iconSizes['4xl'] * 1.15,
+      textAlign: 'center',
       marginBottom: spacing['2xs'],
     },
-    modeEmojiWellActive: {
-      backgroundColor: theme.colors.background,
-      borderColor: theme.colors.primary,
-    },
-    modeEmojiWellInactive: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-    },
-    modeEmoji: { fontSize: iconSizes['2xl'] },
+    modeEmojiActive: { opacity: 1 },
+    modeEmojiInactive: { opacity: 0.85 },
     modeLabel: {
       color: theme.colors.textPrimary,
     },

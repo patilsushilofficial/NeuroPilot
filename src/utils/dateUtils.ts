@@ -71,9 +71,11 @@ export const getPriorityConfig = (priority: 'high' | 'medium' | 'low') => {
 };
 
 /**
- * Returns the weekday labels starting from Monday for habit grid display.
+ * Returns the weekday labels in Sun→Sat order so they align with the
+ * `getDay()` indexing the gamification slice uses to record `weeklyXP`
+ * and `weeklyTasks` (Sunday = 0 … Saturday = 6).
  */
-export const getWeekDayLabels = (): string[] => ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+export const getWeekDayLabels = (): string[] => ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 /**
  * Returns the last N days as YYYY-MM-DD strings (most recent last).
