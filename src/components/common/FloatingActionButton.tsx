@@ -1,11 +1,23 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, TouchableOpacity, ViewStyle, StyleProp } from 'react-native';
+import {
+  StyleSheet,
+  StyleProp,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { Theme } from '../../theme';
-import { shadows, spacing } from '../../theme/spacing';
+import { borderRadius, shadows, spacing } from '../../theme/spacing';
 import { controlSizes, opacity, zIndex } from '../../theme/tokens';
+import {
+  fontSizes,
+  fontWeights,
+  letterSpacings,
+} from '../../theme/typography';
 
 interface FloatingActionButtonProps {
   /** Ionicons glyph name — defaults to a "+" `add`. */
@@ -16,6 +28,13 @@ interface FloatingActionButtonProps {
   onPress: () => void;
   /** Required for screen-reader users. */
   accessibilityLabel: string;
+  /**
+   * Optional visible text. When provided, the FAB renders as an
+   * **extended FAB** — pill-shaped, with the icon and label sitting
+   * side by side. Without it, the FAB stays a circle (existing
+   * behaviour for callers that don't want the label).
+   */
+  label?: string;
   /** Optional override for the position / margins. */
   style?: StyleProp<ViewStyle>;
 }
@@ -23,17 +42,26 @@ interface FloatingActionButtonProps {
 /**
  * Reusable bottom-right Floating Action Button. Pinned with absolute
  * positioning so it floats above any list / FlatList content.
+ *
+ * Two visual modes:
+ *  - **Compact** (default): a circular icon button — minimal footprint.
+ *  - **Extended** (when `label` is set): a pill-shaped icon + label
+ *    button — more discoverable, used when the action benefits from a
+ *    spelled-out CTA (e.g. an empty Tasks list).
  */
 export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   icon = 'add',
   color,
   onPress,
   accessibilityLabel,
+  label,
   style,
 }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const background = color ?? theme.colors.primary;
+
+  const isExtended = Boolean(label);
 
   return (
     <TouchableOpacity
@@ -42,9 +70,29 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       accessible
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      style={[styles.fab, { backgroundColor: background }, style]}
+      style={[
+        styles.fab,
+        isExtended ? styles.fabExtended : styles.fabCompact,
+        { backgroundColor: background },
+        style,
+      ]}
     >
-      <Ionicons name={icon} size={controlSizes.fab * 0.5} color="white" />
+      <View style={styles.content}>
+        <Ionicons
+          name={icon}
+          size={controlSizes.fab * 0.5}
+          color={theme.colors.textOnPrimary}
+        />
+        {isExtended && (
+          <Text
+            numberOfLines={1}
+            allowFontScaling={false}
+            style={[styles.label, { color: theme.colors.textOnPrimary }]}
+          >
+            {label}
+          </Text>
+        )}
+      </View>
     </TouchableOpacity>
   );
 };
@@ -55,12 +103,30 @@ const makeStyles = (_theme: Theme) =>
       position: 'absolute',
       right: spacing.md,
       bottom: spacing.md,
-      width: controlSizes.fab,
       height: controlSizes.fab,
-      borderRadius: controlSizes.fab / 2,
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: zIndex.overlay,
       ...shadows.md,
+    },
+    fabCompact: {
+      width: controlSizes.fab,
+      borderRadius: controlSizes.fab / 2,
+    },
+    fabExtended: {
+      // Pill — `borderRadius.full` snaps to whatever the height is so the
+      // ends are perfect half-circles regardless of label length.
+      paddingHorizontal: spacing.lg,
+      borderRadius: borderRadius.full,
+    },
+    content: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    label: {
+      fontSize: fontSizes.base,
+      fontWeight: fontWeights.semibold,
+      letterSpacing: letterSpacings.wide,
     },
   });

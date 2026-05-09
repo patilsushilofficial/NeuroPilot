@@ -1,24 +1,42 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { SectionList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useTasksScreen } from '../../hooks/useTasksScreen';
+import { useTasksScreen, type TaskSection } from '../../hooks/useTasksScreen';
 import { TaskCard } from '../../components/tasks/TaskCard';
+import { SegmentedFilterBar } from '../../components/common/SegmentedFilterBar';
+import { ListSectionHeader } from '../../components/common/ListSectionHeader';
 import { EmptyState } from '../../components/common/EmptyState';
 import { FloatingActionButton } from '../../components/common/FloatingActionButton';
 import { Theme } from '../../theme';
-import { borderRadius, spacing } from '../../theme/spacing';
-import { borderWidths, iconSizes } from '../../theme/tokens';
-import { TASK_FILTER_TABS } from '../../constants/tasksUi';
+import { spacing } from '../../theme/spacing';
+import { durations } from '../../theme/tokens';
+import { TASK_FILTER_TABS, TASK_FILTER_EMPTY_STATE } from '../../constants/tasksUi';
+import type { Task } from '../../types';
 
+/**
+ * Tasks list screen. Pure composition: the view-model
+ * (`useTasksScreen`) owns state, derivations, counts, sections, and
+ * navigation handlers. The screen only knows how to lay them out.
+ *
+ * Why composition-only:
+ *  - Filter bar is the shared `SegmentedFilterBar`, not a Task-specific
+ *    one — keeps the visual language identical with Habits.
+ *  - Empty-state copy comes from `tasksUi.ts` (config), not an inline
+ *    map declared in this file.
+ *  - The eyebrow label and section partition come from the hook, so
+ *    nothing here re-derives state that already lives there.
+ */
 export const TasksScreen: React.FC = () => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const {
     filter,
+    activeFilterLabel,
     selectFilter,
-    sortedTasks,
+    sections,
     pendingCount,
     overdueCount,
     handleComplete,
@@ -27,10 +45,40 @@ export const TasksScreen: React.FC = () => {
     openTaskDetail,
   } = useTasksScreen();
 
+  const renderItem = useCallback(
+    ({ item }: { item: Task }) => (
+      <TaskCard
+        task={item}
+        onComplete={handleComplete}
+        onPress={openTaskDetail}
+        onLongPress={handleDelete}
+      />
+    ),
+    [handleComplete, handleDelete, openTaskDetail]
+  );
+
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: TaskSection }) => (
+      <Animated.View entering={FadeInDown.duration(durations.base)}>
+        <ListSectionHeader
+          title={section.title}
+          count={section.data.length}
+          accent={section.accent ?? 'primary'}
+        />
+      </Animated.View>
+    ),
+    []
+  );
+
+  const empty = TASK_FILTER_EMPTY_STATE[filter];
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Text style={[theme.text.h2, styles.title]}>Tasks</Text>
+        <Text style={[theme.text.labelSmall, styles.eyebrow]}>
+          {activeFilterLabel.toUpperCase()}
+        </Text>
+        <Text style={[theme.text.h1, styles.title]}>Tasks</Text>
         <Text style={[theme.text.bodySmall, styles.subtitle]}>
           {pendingCount} pending
           {overdueCount > 0 && (
@@ -40,63 +88,34 @@ export const TasksScreen: React.FC = () => {
       </View>
 
       <View style={styles.filterRow}>
-        {TASK_FILTER_TABS.map((tab) => {
-          const selected = filter === tab.key;
-          return (
-            <TouchableOpacity
-              key={tab.key}
-              onPress={() => selectFilter(tab.key)}
-              style={[
-                styles.filterTab,
-                selected ? styles.filterTabActive : styles.filterTabInactive,
-              ]}
-              accessible
-              accessibilityRole="tab"
-              accessibilityState={{ selected }}
-            >
-              <Text style={styles.filterEmoji}>{tab.emoji}</Text>
-              <Text
-                style={[
-                  theme.text.labelMedium,
-                  selected ? styles.filterLabelActive : styles.filterLabelInactive,
-                ]}
-              >
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+        <SegmentedFilterBar
+          options={TASK_FILTER_TABS}
+          selected={filter}
+          onSelect={selectFilter}
+        />
       </View>
 
-      <FlatList
-        data={sortedTasks}
+      <SectionList
+        sections={sections}
         keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <TaskCard
-            task={item}
-            onComplete={handleComplete}
-            onPress={openTaskDetail}
-            onLongPress={handleDelete}
-          />
-        )}
+        stickySectionHeadersEnabled={false}
         ListEmptyComponent={
           <EmptyState
-            emoji="📋"
-            title={filter === 'completed' ? 'No completed tasks yet' : 'Brain clear!'}
-            subtitle={
-              filter === 'completed'
-                ? 'Complete some tasks to see them here.'
-                : 'Your task list is empty. Tap + to add a task.'
-            }
+            emoji={empty.emoji}
+            title={empty.title}
+            subtitle={empty.subtitle}
           />
         }
       />
 
       <FloatingActionButton
         onPress={openAddTask}
-        accessibilityLabel="Add new task"
+        label="Add task"
+        accessibilityLabel="Add task"
       />
     </SafeAreaView>
   );
@@ -111,39 +130,28 @@ const makeStyles = (theme: Theme) =>
     header: {
       paddingHorizontal: spacing.md,
       paddingTop: spacing.xs,
-      paddingBottom: spacing['2xs'],
+      paddingBottom: spacing.xs,
+    },
+    eyebrow: {
+      color: theme.colors.textTertiary,
+      marginBottom: spacing['3xs'],
     },
     title: { color: theme.colors.textPrimary },
-    subtitle: { color: theme.colors.textSecondary },
+    subtitle: {
+      color: theme.colors.textSecondary,
+      marginTop: spacing['3xs'],
+    },
     overdueText: { color: theme.colors.error },
     filterRow: {
-      flexDirection: 'row',
       paddingHorizontal: spacing.md,
-      gap: spacing['2xs'],
-      marginBottom: spacing.xs,
+      paddingBottom: spacing.xs,
     },
-    filterTab: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing['3xs'],
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs,
-      borderRadius: borderRadius['2xl'],
-      borderWidth: borderWidths.thin,
-    },
-    filterTabActive: {
-      backgroundColor: theme.colors.primaryContainer,
-      borderColor: theme.colors.primary,
-    },
-    filterTabInactive: {
-      backgroundColor: 'transparent',
-      borderColor: theme.colors.border,
-    },
-    filterEmoji: { fontSize: iconSizes.sm },
-    filterLabelActive: { color: theme.colors.primaryLight },
-    filterLabelInactive: { color: theme.colors.textSecondary },
     listContent: {
       paddingHorizontal: spacing.md,
       paddingBottom: spacing['8xl'],
+      // SectionList has no built-in vertical breathing room when empty;
+      // padding-top here keeps the EmptyState centred under the filter
+      // bar instead of flush against it.
+      flexGrow: 1,
     },
   });

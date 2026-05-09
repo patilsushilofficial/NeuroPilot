@@ -11,6 +11,7 @@ jest.mock('../../../hooks/useAppTheme', () => ({
       card: '#FFFFFF',
       surface: '#F2F2F7',
       textPrimary: '#000',
+      textOnPrimary: '#FFF',
       primary: '#007AFF',
       streakFire: '#FF9500',
     },
@@ -76,7 +77,9 @@ describe('HabitCard', () => {
       />
     );
     expect(getByText('Read Book')).toBeTruthy();
-    expect(getByText('Done ✓')).toBeTruthy();
+    // The trailing check icon now carries the "✓" meaning visually,
+    // so the label itself was simplified to just "Done".
+    expect(getByText('Done')).toBeTruthy();
   });
 
   it('handles toggle', () => {

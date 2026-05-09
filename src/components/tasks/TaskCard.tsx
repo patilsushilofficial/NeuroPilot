@@ -61,10 +61,27 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     ? styles.dueUrgent
     : styles.dueNormal;
 
+  // Priority cue rendered as a coloured left bar. Lets users feel the
+  // urgency of a card before they read the badge — important for ADHD
+  // scanning where the eye lands on shape/colour first. We hide it for
+  // completed cards so they recede into the background.
+  const accentBorderStyle = useMemo<ViewStyle>(
+    () => ({
+      borderLeftColor: isCompleted
+        ? 'transparent'
+        : theme.colors[priorityConfig.colorKey],
+    }),
+    [isCompleted, theme.colors, priorityConfig.colorKey]
+  );
+
   return (
     <Animated.View style={containerStyle}>
       <TouchableOpacity
-        style={[styles.card, isCompleted ? styles.cardCompleted : styles.cardActive]}
+        style={[
+          styles.card,
+          accentBorderStyle,
+          isCompleted ? styles.cardCompleted : styles.cardActive,
+        ]}
         onPress={() => onPress(task.id)}
         onLongPress={() => onLongPress?.(task.id)}
         activeOpacity={opacityTokens.hover}
@@ -128,17 +145,26 @@ const makeStyles = (theme: Theme) =>
   StyleSheet.create({
     card: {
       borderRadius: borderRadius.xl,
-      padding: spacing.sm,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.sm,
       borderWidth: borderWidths.thin,
+      // The left border carries the priority colour cue. We always
+      // reserve the width so completing/uncompleting a task doesn't
+      // shift the row's content position; only the *colour* changes.
+      borderLeftWidth: borderWidths.extraThick,
       marginBottom: spacing.xs,
       backgroundColor: theme.colors.card,
     },
     cardActive: {
-      borderColor: theme.colors.border,
+      borderTopColor: theme.colors.border,
+      borderRightColor: theme.colors.border,
+      borderBottomColor: theme.colors.border,
       opacity: opacityTokens.full,
     },
     cardCompleted: {
-      borderColor: 'transparent',
+      borderTopColor: 'transparent',
+      borderRightColor: 'transparent',
+      borderBottomColor: 'transparent',
       opacity: opacityTokens.ghost,
     },
     row: {
