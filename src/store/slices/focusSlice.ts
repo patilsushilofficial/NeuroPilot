@@ -3,6 +3,10 @@ import { ActiveFocusState, FocusPhase, FocusSession } from '../../types';
 import { DEFAULT_PRESET_ID, getPresetById, XP_REWARDS } from '../../constants/focusPresets';
 import { triggerImmediateFocusAlert } from '../../utils/notifications';
 import { focusTransitionAlerts } from '../../services/focusTransitionAlerts';
+import {
+  computeRunningEndsAt,
+  getEffectiveSecondsRemaining,
+} from '../../utils/focusTimerClock';
 
 /**
  * Schedule the "wrap up — phase ending in 3 minutes" heads-up for a
@@ -46,6 +50,8 @@ export interface FocusSlice {
   tickSecond: () => number; // returns xp if session completed, else 0
   skipPhase: () => void;
   abandonFocus: () => void;
+  /** Sync store timer from wall clock after returning from background. */
+  reconcileFocusTimerFromClock: () => void;
 
   // Queries
   getTotalFocusMinutes: () => number;
@@ -63,6 +69,7 @@ const defaultActive = (): ActiveFocusState => {
     completedPomodoros: 0,
     currentTaskId: null,
     presetId: DEFAULT_PRESET_ID,
+    runningEndsAt: null,
   };
 };
 
@@ -108,6 +115,7 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
         completedPomodoros: 0,
         currentTaskId: taskId ?? null,
         presetId,
+        runningEndsAt: computeRunningEndsAt(totalSeconds),
       },
     }));
 
@@ -115,16 +123,28 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
   },
 
   pauseFocus: () => {
-    set((s) => ({
-      active: { ...s.active, status: 'paused' },
-    }));
+    set((s) => {
+      const secondsRemaining = getEffectiveSecondsRemaining(s.active);
+      return {
+        active: {
+          ...s.active,
+          status: 'paused',
+          secondsRemaining,
+          runningEndsAt: null,
+        },
+      };
+    });
     // Pausing makes the prior heads-up's fire date meaningless.
     focusTransitionAlerts.cancel();
   },
 
   resumeFocus: () => {
     set((s) => ({
-      active: { ...s.active, status: 'running' },
+      active: {
+        ...s.active,
+        status: 'running',
+        runningEndsAt: computeRunningEndsAt(s.active.secondsRemaining),
+      },
     }));
     // Re-schedule based on whatever time is left, not the full preset
     // — a session resumed with 4 minutes left should still get a
@@ -141,7 +161,11 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
 
     if (newSeconds > 0) {
       set((s) => ({
-        active: { ...s.active, secondsRemaining: newSeconds },
+        active: {
+          ...s.active,
+          secondsRemaining: newSeconds,
+          runningEndsAt: computeRunningEndsAt(newSeconds),
+        },
       }));
       return 0;
     }
@@ -184,6 +208,7 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
           totalSeconds: nextSeconds,
           completedPomodoros: newPomodoros,
           status: 'paused', // Auto-pause at phase transition
+          runningEndsAt: null,
         },
         focusSessions: s.focusSessions.map((sess) =>
           sess.id === active.sessionId
@@ -206,6 +231,7 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
           secondsRemaining: nextSeconds,
           totalSeconds: nextSeconds,
           status: 'paused',
+          runningEndsAt: null,
         },
       }));
     }
@@ -229,12 +255,40 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
         secondsRemaining: nextSeconds,
         totalSeconds: nextSeconds,
         status: 'paused',
+        runningEndsAt: null,
       },
     }));
     // Skipping ends the current phase early — the heads-up no longer
     // applies. The next phase auto-pauses, so the user's resume will
     // schedule a fresh one.
     focusTransitionAlerts.cancel();
+  },
+
+  reconcileFocusTimerFromClock: () => {
+    const { active } = get();
+    if (active.status !== 'running' || active.runningEndsAt == null) return;
+
+    let remaining = getEffectiveSecondsRemaining(active);
+
+    while (remaining <= 0 && get().active.status === 'running') {
+      get().tickSecond();
+      const next = get().active;
+      if (next.status !== 'running' || next.runningEndsAt == null) return;
+      remaining = getEffectiveSecondsRemaining(next);
+    }
+
+    const current = get().active;
+    if (current.status !== 'running') return;
+
+    if (remaining !== current.secondsRemaining) {
+      set({
+        active: {
+          ...current,
+          secondsRemaining: remaining,
+          runningEndsAt: computeRunningEndsAt(remaining),
+        },
+      });
+    }
   },
 
   abandonFocus: () => {

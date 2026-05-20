@@ -1,3 +1,24 @@
+jest.mock('@notifee/react-native', () => ({
+  __esModule: true,
+  default: {
+    createChannel: jest.fn().mockResolvedValue(undefined),
+    displayNotification: jest.fn().mockResolvedValue(undefined),
+    cancelNotification: jest.fn().mockResolvedValue(undefined),
+    onForegroundEvent: jest.fn(() => jest.fn()),
+    onBackgroundEvent: jest.fn(() => jest.fn()),
+  },
+  AndroidImportance: { DEFAULT: 3, LOW: 2 },
+  EventType: { ACTION_PRESS: 1 },
+}));
+
+jest.mock('react-native-background-timer', () => ({
+  __esModule: true,
+  default: {
+    runBackgroundTimer: jest.fn(),
+    stopBackgroundTimer: jest.fn(),
+  },
+}));
+
 jest.mock('react-native-mmkv', () => {
   // Each MMKV instance gets its own in-memory backing map so tests are isolated.
   class MMKV {

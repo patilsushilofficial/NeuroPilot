@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler';
+import './src/notifeeBackground';
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -12,6 +13,7 @@ import { useAppTheme } from './src/hooks/useAppTheme';
 import { useAppInitialization } from './src/hooks/useAppInitialization';
 import { useAppFonts } from './src/hooks/useAppFonts';
 import { useGlobalFocusTicker } from './src/hooks/useGlobalFocusTicker';
+import { useFocusTimerNotification } from './src/hooks/useFocusTimerNotification';
 import { applyLexendDefaults } from './src/theme/applyLexendDefaults';
 
 // Keep splash screen visible during initialization
@@ -28,6 +30,7 @@ function AppContent() {
   // (and phase transitions still award XP) regardless of which screen
   // is mounted.
   useGlobalFocusTicker();
+  useFocusTimerNotification();
 
   return (
     <>

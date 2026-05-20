@@ -11,6 +11,11 @@ import {
   setupNotificationChannels,
 } from '../notifications';
 
+jest.mock('../../services/focusTimerNotification', () => ({
+  setupFocusTimerNotificationCategories: jest.fn().mockResolvedValue(undefined),
+  setupFocusTimerAndroidNotificationChannel: jest.fn().mockResolvedValue(undefined),
+}));
+
 jest.mock('expo-notifications', () => ({
   setNotificationHandler: jest.fn(),
   getPermissionsAsync: jest.fn(),
@@ -145,9 +150,25 @@ describe('notifications', () => {
 
   it('configures the notification handler at module load', async () => {
     expect(installedHandler).toBeDefined();
-    await expect(installedHandler.handleNotification()).resolves.toEqual({
+    await expect(
+      installedHandler.handleNotification({
+        request: { content: { data: { type: 'task_reminder' } } },
+      })
+    ).resolves.toEqual({
       shouldShowAlert: true,
       shouldPlaySound: true,
+      shouldSetBadge: false,
+    });
+  });
+
+  it('suppresses banner UI for live focus timer updates', async () => {
+    await expect(
+      installedHandler.handleNotification({
+        request: { content: { data: { type: 'focus_timer_live' } } },
+      })
+    ).resolves.toEqual({
+      shouldShowAlert: false,
+      shouldPlaySound: false,
       shouldSetBadge: false,
     });
   });

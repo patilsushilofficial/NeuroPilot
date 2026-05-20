@@ -35,6 +35,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "./plugins/withNotifeeMavenRepo.js",
+      "./plugins/withFocusTimerNotification.js",
       [
         "expo-notifications",
         {
