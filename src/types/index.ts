@@ -126,6 +126,8 @@ export interface ActiveFocusState {
   completedPomodoros: number;
   currentTaskId: string | null;
   presetId: string;
+  /** While `running`, wall-clock time when the current segment ends. */
+  runningEndsAt: number | null;
 }
 
 // ─── Gamification ─────────────────────────────────────────────────────────────

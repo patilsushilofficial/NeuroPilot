@@ -1,17 +1,34 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+import { FOCUS_TIMER_NOTIFICATION_TYPE } from '../constants/focusTimerNotification';
+import {
+  setupFocusTimerAndroidNotificationChannel,
+  setupFocusTimerNotificationCategories,
+} from '../services/focusTimerNotification';
+
 /**
  * NeuroPilot Notification Service — 100% local, 100% offline.
  * All alerts are scheduled on-device; no network required.
  */
 
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
+  handleNotification: async (notification) => {
+    const type = notification.request.content.data?.type;
+    // Live focus timer updates are shown only from the tray while backgrounded.
+    if (type === FOCUS_TIMER_NOTIFICATION_TYPE) {
+      return {
+        shouldShowAlert: false,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+      };
+    }
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    };
+  },
 });
 
 export const requestNotificationPermissions = async (): Promise<boolean> => {
@@ -123,6 +140,9 @@ export const cancelAllNotifications = async (): Promise<void> => {
 };
 
 export const setupNotificationChannels = async (): Promise<void> => {
+  await setupFocusTimerNotificationCategories();
+  await setupFocusTimerAndroidNotificationChannel();
+
   if (Platform.OS !== 'android') return;
 
   await Notifications.setNotificationChannelAsync('task-reminders', {

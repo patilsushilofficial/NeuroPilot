@@ -186,6 +186,29 @@ describe('focusSlice', () => {
     expect(state.focusSessions).toEqual([]);
   });
 
+  it('reconcileFocusTimerFromClock syncs seconds remaining from runningEndsAt', () => {
+    const state = get();
+    state.active.runningEndsAt = Date.now() + 5_000;
+    state.active.secondsRemaining = 120;
+
+    slice.reconcileFocusTimerFromClock();
+
+    expect(get().active.secondsRemaining).toBeLessThanOrEqual(6);
+    expect(get().active.runningEndsAt).toBeGreaterThan(Date.now());
+  });
+
+  it('does nothing in reconcileFocusTimerFromClock when paused', () => {
+    const state = get();
+    state.active.status = 'paused';
+    state.active.runningEndsAt = null;
+    state.active.secondsRemaining = 90;
+    set.mockClear();
+
+    slice.reconcileFocusTimerFromClock();
+
+    expect(set).not.toHaveBeenCalled();
+  });
+
   it('does not trigger notification when settings.notificationsEnabled is false', () => {
     const state = get();
     state.settings = { notificationsEnabled: false };
