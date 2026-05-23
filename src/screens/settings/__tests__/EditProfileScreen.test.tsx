@@ -25,7 +25,7 @@ jest.mock('../../../hooks/useAppTheme', () => ({
 
 jest.mock('react-native-reanimated', () => {
   const Reanimated = require('react-native-reanimated/mock');
-  Reanimated.withSpring = (val, config, cb) => {
+  Reanimated.withSpring = (val: any, config?: any, cb?: any) => {
     if (cb) cb();
     return val;
   };

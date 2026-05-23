@@ -10,6 +10,8 @@ import {
   getLastNDates,
 } from '../dateUtils';
 
+declare const global: any;
+
 describe('dateUtils', () => {
   describe('formatDueDate', () => {
     it('should return Today for today date', () => {

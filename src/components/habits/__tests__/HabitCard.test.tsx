@@ -43,7 +43,7 @@ jest.mock('react-native-reanimated', () => {
 });
 
 describe('HabitCard', () => {
-  const mockHabit = {
+  const mockHabit: any = {
     id: '1',
     title: 'Read Book',
     emoji: '📚',

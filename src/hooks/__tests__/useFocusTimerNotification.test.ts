@@ -168,7 +168,7 @@ describe('useFocusTimerNotification', () => {
   });
 
   it('does not start background sync when the session is paused', () => {
-    mockStoreState.active = { ...baseActive, status: 'paused', runningEndsAt: null };
+    mockStoreState.active = { ...baseActive, status: 'paused', runningEndsAt: null } as any;
 
     renderHook(() => useFocusTimerNotification());
 

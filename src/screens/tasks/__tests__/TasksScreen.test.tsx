@@ -97,7 +97,7 @@ const overdueTask = {
   xpReward: 20,
 };
 
-const mockUseAppStore = {
+const mockUseAppStore: any = {
   tasks: mockTasks as any[],
   getTodaysTasks: jest.fn(() =>
     mockUseAppStore.tasks.filter(
@@ -220,7 +220,7 @@ describe('TasksScreen', () => {
     fireEvent(getByText('Task 1'), 'longPress');
     expect(alertSpy).toHaveBeenCalled();
     const buttons = alertSpy.mock.calls[0][2];
-    const confirm = buttons?.find((b: any) => b.text === 'Delete');
+    const confirm = (buttons as any)?.find((b: any) => b.text === 'Delete');
     confirm?.onPress?.();
     expect(mockUseAppStore.deleteTask).toHaveBeenCalledWith('task_1');
     expect(mockHaptics.warning).toHaveBeenCalled();

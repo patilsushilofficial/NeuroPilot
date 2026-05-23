@@ -154,7 +154,7 @@ describe('useTasksScreen', () => {
 
       expect(spy).toHaveBeenCalled();
       const buttons = spy.mock.calls[0][2];
-      const confirm = buttons?.find((b: any) => b.text === 'Delete');
+      const confirm = (buttons as any)?.find((b: any) => b.text === 'Delete');
       confirm?.onPress?.();
 
       expect(mockStore.deleteTask).toHaveBeenCalledWith('t1');

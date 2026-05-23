@@ -91,7 +91,7 @@ describe('useFocusTimer', () => {
     // Simulate pressing 'End Session'
     const buttons = spy.mock.calls[0][2];
     if (buttons) {
-      buttons[1].onPress();
+      buttons[1].onPress?.();
       expect(abandonFocus).toHaveBeenCalled();
     }
   });

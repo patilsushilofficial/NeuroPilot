@@ -35,9 +35,9 @@ jest.mock('../../native/focusTimerNotificationNative', () => ({
   get isFocusTimerNativeAvailable() {
     return mockNativeAvailable;
   },
-  displayFocusTimerNativeNotification: (...args: unknown[]) => mockDisplay(...args),
-  dismissFocusTimerNativeNotification: (...args: unknown[]) => mockDismiss(...args),
-  subscribeFocusTimerNotificationActions: (...args: unknown[]) => mockSubscribe(...args),
+  displayFocusTimerNativeNotification: (...args: any[]) => mockDisplay(...args),
+  dismissFocusTimerNativeNotification: (...args: any[]) => mockDismiss(...args),
+  subscribeFocusTimerNotificationActions: (...args: any[]) => mockSubscribe(...args),
 }));
 
 jest.mock('expo-notifications', () => ({
@@ -366,7 +366,7 @@ describe('focusTimerNotification', () => {
     it('forwards native action events to the store', () => {
       const handler = jest.fn();
       let actionHandler: ((actionId: string) => void) | undefined;
-      mockSubscribe.mockImplementation((cb: (actionId: string) => void) => {
+      (mockSubscribe as any).mockImplementation((cb: (actionId: string) => void) => {
         actionHandler = cb;
         return jest.fn();
       });

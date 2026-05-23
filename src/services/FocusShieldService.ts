@@ -32,7 +32,7 @@ class FocusShieldService {
       if (trigger) {
         try {
           await Notifications.scheduleNotificationAsync({
-            content: notif.content,
+            content: notif.content as any,
             trigger,
           });
         } catch {

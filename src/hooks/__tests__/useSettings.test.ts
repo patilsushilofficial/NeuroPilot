@@ -57,7 +57,7 @@ describe('useSettings', () => {
     // Simulate pressing the second option (Light)
     const buttons = spy.mock.calls[0][2];
     if (buttons) {
-      buttons[1].onPress();
+      buttons[1].onPress?.();
       expect(updateSettings).toHaveBeenCalledWith({ theme: 'light' });
     }
   });
