@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  createBottomTabNavigator,
-  type BottomTabBarProps,
-} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 
 import { TabParamList } from './types';
 import { CustomTabBar } from './CustomTabBar';
@@ -36,10 +33,6 @@ export const TabNavigator: React.FC = () => (
     <Tab.Screen name="Focus" component={FocusScreen} />
     <Tab.Screen name="HabitsTab" component={HabitsNavigator} />
     <Tab.Screen name="Progress" component={ProgressScreen} />
-    <Tab.Screen
-      name="Settings"
-      component={SettingsNavigator}
-      options={HIDDEN_TAB_OPTIONS}
-    />
+    <Tab.Screen name="Settings" component={SettingsNavigator} options={HIDDEN_TAB_OPTIONS} />
   </Tab.Navigator>
 );

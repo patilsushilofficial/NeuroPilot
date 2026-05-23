@@ -85,7 +85,10 @@ describe('focusTimerNotification', () => {
     Object.defineProperty(AppState, 'currentState', { value: state, configurable: true });
   };
 
-  const mockStore = (active: typeof runningActive, settings = { notificationsEnabled: true, theme: 'dark' as const }) => {
+  const mockStore = (
+    active: typeof runningActive,
+    settings = { notificationsEnabled: true, theme: 'dark' as const }
+  ) => {
     (useAppStore.getState as jest.Mock).mockReturnValue({
       active,
       settings,
@@ -286,7 +289,9 @@ describe('focusTimerNotification', () => {
 
     it('skips when Android notification permission is denied', async () => {
       (Notifications.getPermissionsAsync as jest.Mock).mockResolvedValueOnce({ status: 'denied' });
-      (Notifications.requestPermissionsAsync as jest.Mock).mockResolvedValueOnce({ status: 'denied' });
+      (Notifications.requestPermissionsAsync as jest.Mock).mockResolvedValueOnce({
+        status: 'denied',
+      });
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
 
       await syncFocusTimerNotificationFromStore();
@@ -315,7 +320,9 @@ describe('focusTimerNotification', () => {
     it('handles Notifee action presses on the fallback path', () => {
       mockNativeAvailable = false;
       const handler = jest.fn();
-      let actionHandler: ((event: { type: number; detail: { pressAction?: { id: string } } }) => void) | undefined;
+      let actionHandler:
+        | ((event: { type: number; detail: { pressAction?: { id: string } } }) => void)
+        | undefined;
       (notifee.onForegroundEvent as jest.Mock).mockImplementation((cb) => {
         actionHandler = cb;
         return jest.fn();
@@ -339,7 +346,9 @@ describe('focusTimerNotification', () => {
     it('ignores non-action and default Notifee presses', () => {
       mockNativeAvailable = false;
       const handler = jest.fn();
-      let actionHandler: ((event: { type: number; detail: { pressAction?: { id: string } } }) => void) | undefined;
+      let actionHandler:
+        | ((event: { type: number; detail: { pressAction?: { id: string } } }) => void)
+        | undefined;
       (notifee.onForegroundEvent as jest.Mock).mockImplementation((cb) => {
         actionHandler = cb;
         return jest.fn();

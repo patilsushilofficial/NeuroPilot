@@ -24,7 +24,7 @@ describe('focusSlice', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     const state = {
       active: {
         sessionId: 'session_1',
@@ -36,21 +36,22 @@ describe('focusSlice', () => {
       focusSessions: [],
       settings: { notificationsEnabled: true },
     };
-    
+
     set = jest.fn((fn) => {
       const updates = typeof fn === 'function' ? fn(state) : fn;
       Object.assign(state, updates || fn);
     });
-    
+
     get = jest.fn(() => state);
-    
+
     slice = createFocusSlice(set, get, {} as any);
   });
 
   it('should tick a second', () => {
     slice.tickSecond();
     expect(set).toHaveBeenCalled();
-  });  it('should toggle shield', () => {
+  });
+  it('should toggle shield', () => {
     slice.toggleShield(true);
     expect(get().shieldActive).toBe(true);
   });
@@ -120,7 +121,9 @@ describe('focusSlice', () => {
     state.active.phase = 'focus';
     state.active.completedPomodoros = 0;
     state.active.presetId = 'classic';
-    state.focusSessions = [{ id: 'session_1', completedPomodoros: 0, totalFocusMinutes: 0, xpEarned: 0 }];
+    state.focusSessions = [
+      { id: 'session_1', completedPomodoros: 0, totalFocusMinutes: 0, xpEarned: 0 },
+    ];
 
     slice.tickSecond();
 
@@ -216,7 +219,9 @@ describe('focusSlice', () => {
     state.active.phase = 'focus';
     state.active.completedPomodoros = 0;
     state.active.presetId = 'classic';
-    state.focusSessions = [{ id: 'session_1', completedPomodoros: 0, totalFocusMinutes: 0, xpEarned: 0 }];
+    state.focusSessions = [
+      { id: 'session_1', completedPomodoros: 0, totalFocusMinutes: 0, xpEarned: 0 },
+    ];
     const { triggerImmediateFocusAlert } = require('../../../utils/notifications');
     triggerImmediateFocusAlert.mockClear();
     slice.tickSecond();

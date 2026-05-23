@@ -18,16 +18,24 @@ export interface TaskPriorityOption {
 
 export const TASK_PRIORITY_OPTIONS: readonly TaskPriorityOption[] = [
   { key: 'high', emoji: '🔴', shortLabel: 'High', label: 'High', description: 'Must do today' },
-  { key: 'medium', emoji: '🟡', shortLabel: 'Med', label: 'Medium', description: 'Important but flexible' },
+  {
+    key: 'medium',
+    emoji: '🟡',
+    shortLabel: 'Med',
+    label: 'Medium',
+    description: 'Important but flexible',
+  },
   { key: 'low', emoji: '🟢', shortLabel: 'Low', label: 'Low', description: 'Nice to do' },
 ] as const;
 
 /** Compact options for inline pickers like `QuickCapture`. */
-export const QUICK_CAPTURE_PRIORITY_OPTIONS = TASK_PRIORITY_OPTIONS.map(({ key, emoji, shortLabel }) => ({
-  key,
-  emoji,
-  label: shortLabel,
-}));
+export const QUICK_CAPTURE_PRIORITY_OPTIONS = TASK_PRIORITY_OPTIONS.map(
+  ({ key, emoji, shortLabel }) => ({
+    key,
+    emoji,
+    label: shortLabel,
+  })
+);
 
 /**
  * `Badge` variant to use when displaying a task's priority chip. Centralised
@@ -41,6 +49,5 @@ const PRIORITY_BADGE_VARIANTS: Record<TaskPriority, PriorityBadgeVariant> = {
   low: 'secondary',
 };
 
-export const getPriorityBadgeVariant = (
-  priority: TaskPriority
-): PriorityBadgeVariant => PRIORITY_BADGE_VARIANTS[priority];
+export const getPriorityBadgeVariant = (priority: TaskPriority): PriorityBadgeVariant =>
+  PRIORITY_BADGE_VARIANTS[priority];

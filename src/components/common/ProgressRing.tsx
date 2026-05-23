@@ -10,10 +10,7 @@ import Animated, {
 
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { durations } from '../../theme/tokens';
-import {
-  computeCircleGeometry,
-  dashOffsetForProgress,
-} from '../../utils/svgGeometry';
+import { computeCircleGeometry, dashOffsetForProgress } from '../../utils/svgGeometry';
 
 interface ProgressRingProps {
   /** 0..1 fraction of the ring that should appear filled. */

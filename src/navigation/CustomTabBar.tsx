@@ -35,10 +35,7 @@ type CustomTabBarProps = Pick<BottomTabBarProps, 'state' | 'navigation'>;
  *  - The safe-area inset is applied via inline style so the stylesheet
  *    stays a pure function of the theme.
  */
-export const CustomTabBar: React.FC<CustomTabBarProps> = ({
-  state,
-  navigation,
-}) => {
+export const CustomTabBar: React.FC<CustomTabBarProps> = ({ state, navigation }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const insets = useSafeAreaInsets();

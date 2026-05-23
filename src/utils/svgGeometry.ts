@@ -25,10 +25,7 @@ export interface CircleGeometry {
  * clipped on either side; this matches what the old inline `CircularTimer`
  * math was doing.
  */
-export const computeCircleGeometry = (
-  size: number,
-  strokeWidth: number
-): CircleGeometry => {
+export const computeCircleGeometry = (size: number, strokeWidth: number): CircleGeometry => {
   const radius = (size - strokeWidth * 2) / 2;
   const circumference = 2 * Math.PI * radius;
   const cx = size / 2;
@@ -40,18 +37,14 @@ export const computeCircleGeometry = (
  * Convert a 0..1 progress fraction into the `strokeDashoffset` value that
  * draws that fraction of the perimeter (with 0 = full circle, 1 = empty).
  */
-export const dashOffsetForProgress = (
-  circumference: number,
-  progress: number
-): number => circumference * (1 - clamp01(progress));
+export const dashOffsetForProgress = (circumference: number, progress: number): number =>
+  circumference * (1 - clamp01(progress));
 
 /**
  * Compute the 0..1 progress fraction for a remaining/total pair, guarding
  * against divide-by-zero by returning 1 (i.e. "full") when total is zero.
  */
-export const remainingProgress = (
-  remaining: number,
-  total: number
-): number => (total > 0 ? clamp01(remaining / total) : 1);
+export const remainingProgress = (remaining: number, total: number): number =>
+  total > 0 ? clamp01(remaining / total) : 1;
 
 const clamp01 = (n: number): number => Math.min(1, Math.max(0, n));

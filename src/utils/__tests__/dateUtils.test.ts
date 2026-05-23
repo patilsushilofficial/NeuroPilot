@@ -1,4 +1,14 @@
-import { formatDueDate, formatTimerDisplay, formatFocusTime, getTimeGreeting, getPriorityConfig, getLevelTitle, getTodayStr, getWeekDayLabels, getLastNDates } from '../dateUtils';
+import {
+  formatDueDate,
+  formatTimerDisplay,
+  formatFocusTime,
+  getTimeGreeting,
+  getPriorityConfig,
+  getLevelTitle,
+  getTodayStr,
+  getWeekDayLabels,
+  getLastNDates,
+} from '../dateUtils';
 
 describe('dateUtils', () => {
   describe('formatDueDate', () => {

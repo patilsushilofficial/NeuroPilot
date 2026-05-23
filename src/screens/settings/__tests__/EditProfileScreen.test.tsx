@@ -84,25 +84,25 @@ describe('EditProfileScreen', () => {
   it('validates empty name on save', () => {
     const { getByLabelText } = render(<EditProfileScreen />);
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
-    
+
     const nameInput = getByLabelText('Name input');
     fireEvent.changeText(nameInput, '');
-    
+
     fireEvent(getByLabelText('Save profile'), 'press');
-    
+
     expect(alertSpy).toHaveBeenCalledWith('Name required', 'Please enter a name to continue.');
   });
 
   it('changes name and avatar', () => {
     const { getByLabelText } = render(<EditProfileScreen />);
-    
+
     const nameInput = getByLabelText('Name input');
     fireEvent.changeText(nameInput, 'New Name');
-    
+
     fireEvent.press(getByLabelText('Select avatar 🚀'));
-    
+
     fireEvent.press(getByLabelText('Save profile'));
-    
+
     expect(mockUpdateProfile).toHaveBeenCalledWith({
       name: 'New Name',
       avatar: '🚀',
@@ -118,9 +118,9 @@ describe('EditProfileScreen', () => {
 
   it('saves profile on save press', () => {
     const { getByLabelText } = render(<EditProfileScreen />);
-    
+
     fireEvent.press(getByLabelText('Save profile'));
-    
+
     expect(mockHaptics.achievement).toHaveBeenCalled();
     expect(mockUpdateProfile).toHaveBeenCalledWith({
       name: 'Pilot',
@@ -128,19 +128,19 @@ describe('EditProfileScreen', () => {
       mode: 'adult',
     });
     expect(mockUpdateSettings).toHaveBeenCalledWith({ userMode: 'adult' });
-    
+
     // Fast-forward time for the goBack timeout
     act(() => {
       jest.advanceTimersByTime(400);
     });
-    
+
     expect(mockNavigation.goBack).toHaveBeenCalled();
   });
   it('changes mode on press', () => {
     const { getByText } = render(<EditProfileScreen />);
-    
+
     fireEvent.press(getByText('Child'));
-    
+
     expect(mockHaptics.medium).toHaveBeenCalled();
   });
 });

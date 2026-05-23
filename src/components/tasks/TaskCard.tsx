@@ -11,11 +11,7 @@ import { formatDueDate, getPriorityConfig } from '../../utils/dateUtils';
 import { getPriorityBadgeVariant } from '../../constants/taskPriorities';
 import { taskService } from '../../services/TaskService';
 import { spacing, borderRadius } from '../../theme/spacing';
-import {
-  borderWidths,
-  iconSizes,
-  opacity as opacityTokens,
-} from '../../theme/tokens';
+import { borderWidths, iconSizes, opacity as opacityTokens } from '../../theme/tokens';
 import { fontSizes, fontWeights } from '../../theme/typography';
 import { moderateScale } from '../../utils/responsive';
 
@@ -26,12 +22,7 @@ interface TaskCardProps {
   onLongPress?: (id: string) => void;
 }
 
-export const TaskCard: React.FC<TaskCardProps> = ({
-  task,
-  onComplete,
-  onPress,
-  onLongPress,
-}) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task, onComplete, onPress, onLongPress }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const priorityConfig = getPriorityConfig(task.priority);
@@ -58,8 +49,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   const dueStatusStyle = dueInfo?.isOverdue
     ? styles.dueOverdue
     : dueInfo?.isUrgent
-    ? styles.dueUrgent
-    : styles.dueNormal;
+      ? styles.dueUrgent
+      : styles.dueNormal;
 
   // Priority cue rendered as a coloured left bar. Lets users feel the
   // urgency of a card before they read the badge — important for ADHD
@@ -67,9 +58,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   // completed cards so they recede into the background.
   const accentBorderStyle = useMemo<ViewStyle>(
     () => ({
-      borderLeftColor: isCompleted
-        ? 'transparent'
-        : theme.colors[priorityConfig.colorKey],
+      borderLeftColor: isCompleted ? 'transparent' : theme.colors[priorityConfig.colorKey],
     }),
     [isCompleted, theme.colors, priorityConfig.colorKey]
   );
@@ -116,9 +105,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                 emoji={priorityConfig.emoji}
               />
 
-              {dueInfo && (
-                <Text style={[styles.dueText, dueStatusStyle]}>{dueInfo.label}</Text>
-              )}
+              {dueInfo && <Text style={[styles.dueText, dueStatusStyle]}>{dueInfo.label}</Text>}
 
               {hasSubtasks && (
                 <Text style={styles.subtaskCount}>

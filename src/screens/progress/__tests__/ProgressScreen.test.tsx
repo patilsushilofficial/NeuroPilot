@@ -155,9 +155,7 @@ describe('ProgressScreen', () => {
   it('renders achievement count in the section header', () => {
     const { getByText } = render(<ProgressScreen />);
     expect(getByText('Achievements')).toBeTruthy();
-    expect(
-      getByText(`1 / ${baseProgressReturn.achievementsTotal}`)
-    ).toBeTruthy();
+    expect(getByText(`1 / ${baseProgressReturn.achievementsTotal}`)).toBeTruthy();
   });
 
   it('renders unlocked achievement cards and locked rows', () => {
@@ -166,9 +164,7 @@ describe('ProgressScreen', () => {
     expect(getByText(/UP NEXT/)).toBeTruthy();
     // The locked list cap defaults to 6, so at least one locked title from
     // the early-game cohort should appear (multiple matches are fine).
-    expect(
-      getAllByText(/First Spark|Deep Diver|Flow Architect/).length
-    ).toBeGreaterThan(0);
+    expect(getAllByText(/First Spark|Deep Diver|Flow Architect/).length).toBeGreaterThan(0);
     expect(getAllByTestId('icon-lock').length).toBeGreaterThan(0);
   });
 
@@ -204,9 +200,7 @@ describe('ProgressScreen', () => {
       achievementsUnlockedCount: 0,
     };
     const { getByText } = render(<ProgressScreen />);
-    expect(
-      getByText(/Achievements appear here as you build your habits/)
-    ).toBeTruthy();
+    expect(getByText(/Achievements appear here as you build your habits/)).toBeTruthy();
   });
 
   it('shows the "more to discover" tail when locked exceeds the visible cap', () => {

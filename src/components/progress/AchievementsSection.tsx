@@ -59,11 +59,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
       {visibleLocked.length > 0 && (
         <View style={styles.lockedList}>
           <View style={styles.lockedHeader}>
-            <Icon
-              name="lock"
-              size={iconSizes.sm}
-              color={theme.colors.textTertiary}
-            />
+            <Icon name="lock" size={iconSizes.sm} color={theme.colors.textTertiary} />
             <Text style={[theme.text.labelSmall, styles.lockedHeading]}>
               UP NEXT ({locked.length})
             </Text>
@@ -93,11 +89,7 @@ const AchievementsEmptyState: React.FC = () => {
   const styles = useMemo(() => makeStyles(theme), [theme]);
   return (
     <View style={styles.empty}>
-      <Icon
-        name="award"
-        size={iconSizes.xl}
-        color={theme.colors.textTertiary}
-      />
+      <Icon name="award" size={iconSizes.xl} color={theme.colors.textTertiary} />
       <Text style={[theme.text.bodyMedium, styles.emptyText]}>
         Achievements appear here as you build your habits.
       </Text>

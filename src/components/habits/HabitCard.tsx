@@ -9,11 +9,7 @@ import { MiniCalendar } from './MiniCalendar';
 import { Habit } from '../../types';
 import { Theme } from '../../theme';
 import { spacing, borderRadius } from '../../theme/spacing';
-import {
-  borderWidths,
-  iconSizes,
-  opacity as opacityTokens,
-} from '../../theme/tokens';
+import { borderWidths, iconSizes, opacity as opacityTokens } from '../../theme/tokens';
 import { fontSizes, fontWeights } from '../../theme/typography';
 import { moderateScale } from '../../utils/responsive';
 
@@ -79,10 +75,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
   );
   const doneLabelStyle = useMemo<TextStyle>(() => ({ color: habit.color }), [habit.color]);
 
-  const completionDates = useMemo(
-    () => habit.completions.map((c) => c.date),
-    [habit.completions]
-  );
+  const completionDates = useMemo(() => habit.completions.map((c) => c.date), [habit.completions]);
 
   return (
     <Animated.View style={animatedStyle}>
@@ -114,15 +107,10 @@ export const HabitCard: React.FC<HabitCardProps> = ({
 
           <View style={styles.content}>
             <View style={styles.titleRow}>
-              <Text
-                style={[theme.text.bodyMedium, styles.title]}
-                numberOfLines={1}
-              >
+              <Text style={[theme.text.bodyMedium, styles.title]} numberOfLines={1}>
                 {habit.title}
               </Text>
-              {isCompletedToday && (
-                <Text style={[styles.doneLabel, doneLabelStyle]}>Done</Text>
-              )}
+              {isCompletedToday && <Text style={[styles.doneLabel, doneLabelStyle]}>Done</Text>}
             </View>
 
             <MiniCalendar completions={completionDates} color={habit.color} />
@@ -147,11 +135,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
             ]}
           >
             {isCompletedToday && (
-              <Icon
-                name="check"
-                size={iconSizes.md}
-                color={theme.colors.textOnPrimary}
-              />
+              <Icon name="check" size={iconSizes.md} color={theme.colors.textOnPrimary} />
             )}
           </View>
         </View>

@@ -24,12 +24,7 @@ import {
 } from '../../constants/onboarding';
 import { ONBOARDING_AVATARS, USER_MODE_OPTIONS } from '../../constants/profile';
 import { moderateScale } from '../../utils/responsive';
-import {
-  ModeStepProps,
-  ProfileStepProps,
-  ReadyStepProps,
-  StepProps,
-} from './types';
+import { ModeStepProps, ProfileStepProps, ReadyStepProps, StepProps } from './types';
 
 const PROGRESS_DOT_HEIGHT = moderateScale(8);
 const PROGRESS_DOT_ACTIVE_WIDTH = moderateScale(24);
@@ -86,7 +81,13 @@ const HowItWorksStep: React.FC<OnboardingStepProps> = ({ onNext, theme, styles }
   </View>
 );
 
-const ModeStep: React.FC<OnboardingModeStepProps> = ({ onNext, theme, mode, onSelectMode, styles }) => (
+const ModeStep: React.FC<OnboardingModeStepProps> = ({
+  onNext,
+  theme,
+  mode,
+  onSelectMode,
+  styles,
+}) => (
   <View style={styles.stepContainer}>
     <Text style={styles.bigEmoji}>👤</Text>
     <Text style={[theme.text.h1, styles.titleCenter]}>Who is this for?</Text>
@@ -154,7 +155,10 @@ const ProfileStep: React.FC<OnboardingProfileStepProps> = ({
           <TouchableOpacity
             key={a}
             onPress={() => onSelectAvatar(a)}
-            style={[styles.avatarChip, selected ? styles.avatarChipActive : styles.avatarChipInactive]}
+            style={[
+              styles.avatarChip,
+              selected ? styles.avatarChipActive : styles.avatarChipInactive,
+            ]}
           >
             <Text style={styles.avatarChipText}>{a}</Text>
           </TouchableOpacity>
@@ -178,7 +182,8 @@ const ReadyStep: React.FC<OnboardingReadyStepProps> = ({ onNext, theme, name, av
   <View style={[styles.stepContainer, styles.centered]}>
     <Text style={styles.heroEmoji}>{avatar}</Text>
     <Text style={[theme.text.displayMedium, styles.readyTitle]}>
-      You're all set,{'\n'}{name}! 🎉
+      You're all set,{'\n'}
+      {name}! 🎉
     </Text>
     <Text style={[theme.text.bodyLarge, styles.readyBody]}>
       Your NeuroPilot is ready to launch. Remember: done is better than perfect.
@@ -270,7 +275,9 @@ export const OnboardingScreen: React.FC = () => {
           </View>
         )}
         {step === 'welcome' && <WelcomeStep onNext={nextStep} theme={theme} styles={styles} />}
-        {step === 'howItWorks' && <HowItWorksStep onNext={nextStep} theme={theme} styles={styles} />}
+        {step === 'howItWorks' && (
+          <HowItWorksStep onNext={nextStep} theme={theme} styles={styles} />
+        )}
         {step === 'mode' && (
           <ModeStep
             onNext={nextStep}

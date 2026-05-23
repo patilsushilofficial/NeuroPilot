@@ -9,11 +9,7 @@ import {
   StyleProp,
   View,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useHaptics } from '../../hooks/useHaptics';
 import { Theme } from '../../theme';
@@ -88,9 +84,7 @@ export const Button: React.FC<ButtonProps> = ({
   const labelStyle = [
     styles.label,
     styles[LABEL_SIZE_KEYS[size]],
-    disabled
-      ? styles[LABEL_DISABLED_KEYS[variant]]
-      : styles[LABEL_VARIANT_KEYS[variant]],
+    disabled ? styles[LABEL_DISABLED_KEYS[variant]] : styles[LABEL_VARIANT_KEYS[variant]],
   ];
 
   const indicatorColor =

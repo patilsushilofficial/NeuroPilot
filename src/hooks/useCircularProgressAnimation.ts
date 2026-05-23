@@ -1,10 +1,5 @@
 import { useEffect } from 'react';
-import {
-  Easing,
-  useAnimatedProps,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import { Easing, useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { dashOffsetForProgress, remainingProgress } from '../utils/svgGeometry';
 
@@ -34,18 +29,13 @@ export const useCircularProgressAnimation = ({
   circumference,
 }: UseCircularProgressAnimationArgs) => {
   const progress = remainingProgress(secondsRemaining, totalSeconds);
-  const strokeDashoffset = useSharedValue(
-    dashOffsetForProgress(circumference, progress)
-  );
+  const strokeDashoffset = useSharedValue(dashOffsetForProgress(circumference, progress));
 
   useEffect(() => {
-    strokeDashoffset.value = withTiming(
-      dashOffsetForProgress(circumference, progress),
-      {
-        duration: isRunning ? RUNNING_DURATION_MS : IDLE_DURATION_MS,
-        easing: Easing.linear,
-      }
-    );
+    strokeDashoffset.value = withTiming(dashOffsetForProgress(circumference, progress), {
+      duration: isRunning ? RUNNING_DURATION_MS : IDLE_DURATION_MS,
+      easing: Easing.linear,
+    });
   }, [progress, isRunning, circumference]);
 
   const animatedProps = useAnimatedProps(() => ({

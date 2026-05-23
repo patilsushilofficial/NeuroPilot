@@ -26,11 +26,9 @@ describe('notifeeBackground', () => {
       | undefined;
 
     const notifee = require('@notifee/react-native').default;
-    notifee.onBackgroundEvent.mockImplementation(
-      (cb: typeof backgroundHandler) => {
-        backgroundHandler = cb;
-      }
-    );
+    notifee.onBackgroundEvent.mockImplementation((cb: typeof backgroundHandler) => {
+      backgroundHandler = cb;
+    });
 
     require('../notifeeBackground');
 

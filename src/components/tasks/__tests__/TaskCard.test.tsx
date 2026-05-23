@@ -57,11 +57,7 @@ describe('TaskCard', () => {
   it('renders correctly', () => {
     const onPress = jest.fn();
     const { getByText } = render(
-      <TaskCard
-        task={mockTask as any}
-        onComplete={jest.fn()}
-        onPress={onPress}
-      />
+      <TaskCard task={mockTask as any} onComplete={jest.fn()} onPress={onPress} />
     );
     expect(getByText('Test Task')).toBeTruthy();
     expect(getByText('+50 XP')).toBeTruthy();
@@ -70,13 +66,9 @@ describe('TaskCard', () => {
   it('handles press', () => {
     const onPress = jest.fn();
     const { getByRole } = render(
-      <TaskCard
-        task={mockTask as any}
-        onComplete={jest.fn()}
-        onPress={onPress}
-      />
+      <TaskCard task={mockTask as any} onComplete={jest.fn()} onPress={onPress} />
     );
-    
+
     const button = getByRole('button');
     fireEvent.press(button);
     expect(onPress).toHaveBeenCalledWith('1');
@@ -86,16 +78,12 @@ describe('TaskCard', () => {
     jest.useFakeTimers();
     const onComplete = jest.fn();
     const { getByRole } = render(
-      <TaskCard
-        task={mockTask as any}
-        onComplete={onComplete}
-        onPress={jest.fn()}
-      />
+      <TaskCard task={mockTask as any} onComplete={onComplete} onPress={jest.fn()} />
     );
-    
+
     const checkbox = getByRole('checkbox');
     fireEvent.press(checkbox);
-    
+
     jest.advanceTimersByTime(200);
     expect(onComplete).toHaveBeenCalledWith('1');
     jest.useRealTimers();
@@ -111,11 +99,7 @@ describe('TaskCard', () => {
     };
 
     const { getByText } = render(
-      <TaskCard
-        task={taskWithSubtasks as any}
-        onComplete={jest.fn()}
-        onPress={jest.fn()}
-      />
+      <TaskCard task={taskWithSubtasks as any} onComplete={jest.fn()} onPress={jest.fn()} />
     );
 
     expect(getByText('1/2 steps')).toBeTruthy();
@@ -128,15 +112,13 @@ describe('TaskCard', () => {
     };
 
     const { getByText } = render(
-      <TaskCard
-        task={completedTask as any}
-        onComplete={jest.fn()}
-        onPress={jest.fn()}
-      />
+      <TaskCard task={completedTask as any} onComplete={jest.fn()} onPress={jest.fn()} />
     );
 
     const title = getByText('Test Task');
-    expect(title.props.style).toContainEqual(expect.objectContaining({ textDecorationLine: 'line-through' }));
+    expect(title.props.style).toContainEqual(
+      expect.objectContaining({ textDecorationLine: 'line-through' })
+    );
   });
 
   it('handles long press', () => {
@@ -149,7 +131,7 @@ describe('TaskCard', () => {
         onLongPress={onLongPress}
       />
     );
-    
+
     const button = getByRole('button');
     fireEvent(button, 'longPress');
     expect(onLongPress).toHaveBeenCalledWith('1');

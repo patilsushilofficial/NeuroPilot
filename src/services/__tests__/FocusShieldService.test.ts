@@ -38,13 +38,13 @@ describe('FocusShieldService', () => {
   it('should deactivate and restore notifications', async () => {
     const mockNotif = { content: {}, trigger: { type: 'daily' } };
     (Notifications.getAllScheduledNotificationsAsync as jest.Mock).mockResolvedValue([mockNotif]);
-    
+
     // First activate to capture notifications
     await focusShieldService.activate();
-    
+
     // Then deactivate
     await focusShieldService.deactivate();
-    
+
     expect(Notifications.scheduleNotificationAsync).toHaveBeenCalled();
   });
 
@@ -63,7 +63,7 @@ describe('FocusShieldService', () => {
   it('should fallback to openSettings if sendIntent fails on Android', async () => {
     Platform.OS = 'android';
     (Linking.sendIntent as jest.Mock).mockRejectedValue(new Error('Intent failed'));
-    
+
     await focusShieldService.openDNDSettings();
     expect(Linking.openSettings).toHaveBeenCalled();
   });
@@ -71,9 +71,7 @@ describe('FocusShieldService', () => {
   it('skips a notification with no trigger when deactivating', async () => {
     Platform.OS = 'android';
     const triggerless = { content: {}, trigger: null };
-    (Notifications.getAllScheduledNotificationsAsync as jest.Mock).mockResolvedValue([
-      triggerless,
-    ]);
+    (Notifications.getAllScheduledNotificationsAsync as jest.Mock).mockResolvedValue([triggerless]);
     await focusShieldService.activate();
     (Notifications.scheduleNotificationAsync as jest.Mock).mockClear();
     await focusShieldService.deactivate();
@@ -83,9 +81,7 @@ describe('FocusShieldService', () => {
   it('silently swallows errors from re-scheduling on deactivate', async () => {
     Platform.OS = 'android';
     const expired = { content: {}, trigger: { type: 'date' } };
-    (Notifications.getAllScheduledNotificationsAsync as jest.Mock).mockResolvedValue([
-      expired,
-    ]);
+    (Notifications.getAllScheduledNotificationsAsync as jest.Mock).mockResolvedValue([expired]);
     await focusShieldService.activate();
     (Notifications.scheduleNotificationAsync as jest.Mock).mockRejectedValueOnce(
       new Error('expired')

@@ -54,11 +54,7 @@ describe('useHabitsScreen', () => {
 
   describe('counts and progress', () => {
     it('reports completion counts split by completed/pending', () => {
-      mockHabits = [
-        buildHabit({ id: 'a' }),
-        buildHabit({ id: 'b' }),
-        buildHabit({ id: 'c' }),
-      ];
+      mockHabits = [buildHabit({ id: 'a' }), buildHabit({ id: 'b' }), buildHabit({ id: 'c' })];
       mockCompletedIds = new Set(['a']);
       const { result } = renderHook(() => useHabitsScreen());
       expect(result.current.completedCount).toBe(1);
@@ -86,10 +82,7 @@ describe('useHabitsScreen', () => {
       mockHabits = [buildHabit({ id: 'a' }), buildHabit({ id: 'b' })];
       mockCompletedIds = new Set(['b']);
       const { result } = renderHook(() => useHabitsScreen());
-      expect(result.current.sections.map((s) => s.id)).toEqual([
-        'pending',
-        'done',
-      ]);
+      expect(result.current.sections.map((s) => s.id)).toEqual(['pending', 'done']);
       expect(result.current.sections[0].data.map((h) => h.id)).toEqual(['a']);
       expect(result.current.sections[1].data.map((h) => h.id)).toEqual(['b']);
     });

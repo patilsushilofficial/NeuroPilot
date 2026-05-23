@@ -81,18 +81,12 @@ export const TasksScreen: React.FC = () => {
         <Text style={[theme.text.h1, styles.title]}>Tasks</Text>
         <Text style={[theme.text.bodySmall, styles.subtitle]}>
           {pendingCount} pending
-          {overdueCount > 0 && (
-            <Text style={styles.overdueText}> · {overdueCount} overdue</Text>
-          )}
+          {overdueCount > 0 && <Text style={styles.overdueText}> · {overdueCount} overdue</Text>}
         </Text>
       </View>
 
       <View style={styles.filterRow}>
-        <SegmentedFilterBar
-          options={TASK_FILTER_TABS}
-          selected={filter}
-          onSelect={selectFilter}
-        />
+        <SegmentedFilterBar options={TASK_FILTER_TABS} selected={filter} onSelect={selectFilter} />
       </View>
 
       <SectionList
@@ -104,19 +98,11 @@ export const TasksScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         stickySectionHeadersEnabled={false}
         ListEmptyComponent={
-          <EmptyState
-            emoji={empty.emoji}
-            title={empty.title}
-            subtitle={empty.subtitle}
-          />
+          <EmptyState emoji={empty.emoji} title={empty.title} subtitle={empty.subtitle} />
         }
       />
 
-      <FloatingActionButton
-        onPress={openAddTask}
-        label="Add task"
-        accessibilityLabel="Add task"
-      />
+      <FloatingActionButton onPress={openAddTask} label="Add task" accessibilityLabel="Add task" />
     </SafeAreaView>
   );
 };

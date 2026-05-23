@@ -69,11 +69,7 @@ export function SegmentedFilterBar<K extends string>({
             <Icon
               name={tab.icon}
               size={iconSizes.sm}
-              color={
-                isSelected
-                  ? theme.colors.textOnPrimary
-                  : theme.colors.textSecondary
-              }
+              color={isSelected ? theme.colors.textOnPrimary : theme.colors.textSecondary}
             />
             <Text
               numberOfLines={1}

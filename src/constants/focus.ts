@@ -44,8 +44,7 @@ export const FOCUS_PHASE_TIPS: Record<FocusPhase, string> = {
     'Remove distractions: phone face-down, notifications off. Your brain needs one input at a time.',
   short_break:
     "Move your body! A 5-minute walk resets your prefrontal cortex's attention capacity.",
-  long_break:
-    'Long break earned! Hydrate, stretch, or do something you genuinely enjoy.',
+  long_break: 'Long break earned! Hydrate, stretch, or do something you genuinely enjoy.',
 };
 
 export interface FocusInfoTile {

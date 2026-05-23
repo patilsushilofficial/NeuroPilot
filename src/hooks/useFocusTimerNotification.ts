@@ -23,11 +23,9 @@ const isBackgrounded = (state: AppStateStatus) => BACKGROUND_STATES.includes(sta
 const isActiveSession = (active: ReturnType<typeof selectActiveFocus>) =>
   active.sessionId !== null && (active.status === 'running' || active.status === 'paused');
 
-const getBackgroundSyncIntervalMs = () =>
-  Platform.OS === 'ios' ? IOS_SYNC_MS : ANDROID_SYNC_MS;
+const getBackgroundSyncIntervalMs = () => (Platform.OS === 'ios' ? IOS_SYNC_MS : ANDROID_SYNC_MS);
 
-const shouldRunBackgroundSync = () =>
-  Platform.OS === 'ios' || usesNativeCountdownNotification();
+const shouldRunBackgroundSync = () => Platform.OS === 'ios' || usesNativeCountdownNotification();
 
 /**
  * Shows a themed, ongoing focus-timer notification while the app is

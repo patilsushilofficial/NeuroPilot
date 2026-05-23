@@ -46,7 +46,7 @@ describe('settingsSlice', () => {
   it('should update profile', () => {
     const profile = { name: 'Test User', avatar: 'avatar_url', bio: 'Bio' };
     get().profile = profile;
-    
+
     slice.updateProfile({ name: 'Updated Name' });
     expect(set).toHaveBeenCalled();
     expect(get().profile.name).toBe('Updated Name');
@@ -56,7 +56,7 @@ describe('settingsSlice', () => {
     slice.toggleTheme();
     expect(set).toHaveBeenCalled();
     expect(get().settings.theme).toBe('light');
-    
+
     slice.toggleTheme();
     expect(get().settings.theme).toBe('dark');
   });

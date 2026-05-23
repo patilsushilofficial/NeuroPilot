@@ -72,15 +72,9 @@ export const WeeklyActivityCard: React.FC<WeeklyActivityCardProps> = ({
   return (
     <Card>
       <View style={styles.topRow}>
-        <Text style={[theme.text.labelSmall, styles.weekLabel]}>
-          THIS WEEK
-        </Text>
+        <Text style={[theme.text.labelSmall, styles.weekLabel]}>THIS WEEK</Text>
 
-        <View
-          style={styles.segmentedControl}
-          accessible
-          accessibilityRole="tablist"
-        >
+        <View style={styles.segmentedControl} accessible accessibilityRole="tablist">
           {METRICS.map((m) => {
             const selected = m.key === metric;
             return (
@@ -140,11 +134,7 @@ export const WeeklyActivityCard: React.FC<WeeklyActivityCardProps> = ({
           </Text>
         </View>
         <View style={styles.metaItem}>
-          <Icon
-            name="bar-chart-2"
-            size={iconSizes.sm}
-            color={theme.colors.textTertiary}
-          />
+          <Icon name="bar-chart-2" size={iconSizes.sm} color={theme.colors.textTertiary} />
           <Text style={[theme.text.bodySmall, styles.metaText]}>
             Peak: <Text style={styles.metaValue}>{peakValue.toLocaleString()}</Text>
           </Text>

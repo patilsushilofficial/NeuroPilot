@@ -56,17 +56,7 @@ interface IconProps {
   color?: string;
 }
 
-export const Icon: React.FC<IconProps> = ({
-  name,
-  size = iconSizes.md,
-  color,
-}) => {
+export const Icon: React.FC<IconProps> = ({ name, size = iconSizes.md, color }) => {
   const theme = useAppTheme();
-  return (
-    <Feather
-      name={name}
-      size={size}
-      color={color ?? theme.colors.textPrimary}
-    />
-  );
+  return <Feather name={name} size={size} color={color ?? theme.colors.textPrimary} />;
 };

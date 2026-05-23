@@ -26,10 +26,7 @@ const COMPLETE_DELAY_MS = 200;
  * complete, plus the deferred `onComplete` dispatch. The component file
  * stays free of `useSharedValue`, `withSequence`, and `setTimeout`.
  */
-export const useTaskCardAnimation = ({
-  isCompleted,
-  onComplete,
-}: UseTaskCardAnimationArgs) => {
+export const useTaskCardAnimation = ({ isCompleted, onComplete }: UseTaskCardAnimationArgs) => {
   const opacityValue = useSharedValue(1);
   const translateX = useSharedValue(0);
 

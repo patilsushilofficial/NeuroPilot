@@ -94,21 +94,21 @@ describe('AddHabitScreen', () => {
 
   it('saves new habit on save press', () => {
     const { getByPlaceholderText, getByText, getAllByText } = render(<AddHabitScreen />);
-    
+
     const input = getByPlaceholderText('Habit name…');
     fireEvent.changeText(input, 'New Habit');
-    
+
     // Select emoji '🧘'
     fireEvent.press(getAllByText('🧘')[0]);
-    
+
     // Select category 'Mindfulness'
     fireEvent.press(getByText('Mindfulness'));
-    
+
     // Select frequency 'Every Day'
     fireEvent.press(getByText('Every Day'));
-    
+
     fireEvent.press(getByText('Save'));
-    
+
     expect(mockAddHabit).toHaveBeenCalledWith({
       title: 'New Habit',
       emoji: '🧘',
@@ -125,9 +125,9 @@ describe('AddHabitScreen', () => {
 
   it('changes color on press', () => {
     const { getByLabelText } = render(<AddHabitScreen />);
-    
+
     fireEvent.press(getByLabelText('Color #4ECDC4'));
-    
+
     expect(mockHaptics.light).toHaveBeenCalled();
   });
 
@@ -144,12 +144,12 @@ describe('AddHabitScreen', () => {
     mockGetHabitById.mockReturnValue(mockHabit);
 
     const { getByPlaceholderText, getByText } = render(<AddHabitScreen />);
-    
+
     const input = getByPlaceholderText('Habit name…');
     fireEvent.changeText(input, 'Updated Habit');
-    
+
     fireEvent.press(getByText('Save'));
-    
+
     expect(mockUpdateHabit).toHaveBeenCalledWith('habit_1', {
       title: 'Updated Habit',
       emoji: '🧘',
@@ -174,19 +174,19 @@ describe('AddHabitScreen', () => {
 
     const { getByText } = render(<AddHabitScreen />);
     const alertSpy = jest.spyOn(Alert, 'alert');
-    
+
     fireEvent.press(getByText('Archive Habit'));
-    
+
     expect(alertSpy).toHaveBeenCalled();
-    
+
     // Simulate pressing Archive in the alert
     const buttons = alertSpy.mock.calls[0][2];
     const archiveButton = buttons?.find((b) => b.text === 'Archive');
-    
+
     act(() => {
       archiveButton?.onPress?.();
     });
-    
+
     expect(mockArchiveHabit).toHaveBeenCalledWith('habit_1');
     expect(mockNavigation.goBack).toHaveBeenCalled();
   });

@@ -41,14 +41,9 @@ describe('EmptyState', () => {
   it('renders action button when provided', () => {
     const onAction = jest.fn();
     const { getByText, getByRole } = render(
-      <EmptyState
-        emoji="🤷‍♂️"
-        title="No Data"
-        actionLabel="Add Item"
-        onAction={onAction}
-      />
+      <EmptyState emoji="🤷‍♂️" title="No Data" actionLabel="Add Item" onAction={onAction} />
     );
-    
+
     expect(getByText('Add Item')).toBeTruthy();
     const button = getByRole('button');
     fireEvent.press(button);

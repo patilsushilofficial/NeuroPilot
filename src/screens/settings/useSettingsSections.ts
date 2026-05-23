@@ -43,7 +43,13 @@ export const useSettingsSections = ({
         onToggle: (v) => updateSettings({ showMotivationalQuotes: v }),
       },
     ],
-    [settings.hapticsEnabled, settings.reducedMotion, settings.showMotivationalQuotes, toggleHaptics, updateSettings]
+    [
+      settings.hapticsEnabled,
+      settings.reducedMotion,
+      settings.showMotivationalQuotes,
+      toggleHaptics,
+      updateSettings,
+    ]
   );
 
   const aboutItems = useMemo<SettingsItem[]>(

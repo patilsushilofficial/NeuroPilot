@@ -6,13 +6,32 @@ import { HabitCategory, HabitFrequency } from '../types';
  */
 
 export const HABIT_EMOJIS = [
-  '💪', '🧘', '📚', '🏃', '💧', '🌿', '🎯', '✍️', '🧹', '🛌',
-  '🥗', '🎮', '🎵', '🌅', '🙏',
+  '💪',
+  '🧘',
+  '📚',
+  '🏃',
+  '💧',
+  '🌿',
+  '🎯',
+  '✍️',
+  '🧹',
+  '🛌',
+  '🥗',
+  '🎮',
+  '🎵',
+  '🌅',
+  '🙏',
 ] as const;
 
 export const HABIT_COLORS = [
-  '#7B6CF6', '#4ECDC4', '#FF6B6B', '#FFD43B', '#51CF66',
-  '#FF8C42', '#A9DEF9', '#E27396',
+  '#7B6CF6',
+  '#4ECDC4',
+  '#FF6B6B',
+  '#FFD43B',
+  '#51CF66',
+  '#FF8C42',
+  '#A9DEF9',
+  '#E27396',
 ] as const;
 
 export interface HabitCategoryOption {

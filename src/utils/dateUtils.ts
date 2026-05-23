@@ -1,11 +1,21 @@
-import { format, formatDistance, isToday, isYesterday, isTomorrow, isPast, differenceInDays } from 'date-fns';
+import {
+  format,
+  formatDistance,
+  isToday,
+  isYesterday,
+  isTomorrow,
+  isPast,
+  differenceInDays,
+} from 'date-fns';
 
 /**
  * Format a Unix timestamp for task due dates.
  * ADHD-friendly: uses relative terms ("Today", "Tomorrow", "Yesterday")
  * rather than abstract dates.
  */
-export const formatDueDate = (timestamp: number): { label: string; isOverdue: boolean; isUrgent: boolean } => {
+export const formatDueDate = (
+  timestamp: number
+): { label: string; isOverdue: boolean; isUrgent: boolean } => {
   const date = new Date(timestamp);
   const now = new Date();
   const isOverdue = isPast(date) && !isToday(date);

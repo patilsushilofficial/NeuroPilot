@@ -132,13 +132,7 @@ export interface ActiveFocusState {
 
 // ─── Gamification ─────────────────────────────────────────────────────────────
 
-export type AchievementCategory =
-  | 'focus'
-  | 'tasks'
-  | 'habits'
-  | 'streak'
-  | 'milestone'
-  | 'special';
+export type AchievementCategory = 'focus' | 'tasks' | 'habits' | 'streak' | 'milestone' | 'special';
 
 export interface Achievement {
   id: string;
@@ -165,7 +159,7 @@ export interface UserStats {
   currentStreak: number;
   longestStreak: number;
   unlockedAchievements: string[];
-  weeklyXP: number[];   // last 7 days
+  weeklyXP: number[]; // last 7 days
   weeklyTasks: number[]; // last 7 days
 }
 

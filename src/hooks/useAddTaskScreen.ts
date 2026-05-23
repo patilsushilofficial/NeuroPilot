@@ -38,9 +38,7 @@ export const useAddTaskScreen = () => {
 
   const [title, setTitle] = useState(existingTask?.title ?? '');
   const [description, setDescription] = useState(existingTask?.description ?? '');
-  const [priority, setPriority] = useState<TaskPriority>(
-    existingTask?.priority ?? 'medium'
-  );
+  const [priority, setPriority] = useState<TaskPriority>(existingTask?.priority ?? 'medium');
   const [dueDate, setDueDate] = useState<Date | null>(
     existingTask?.dueDate ? new Date(existingTask.dueDate) : null
   );

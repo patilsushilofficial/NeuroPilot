@@ -5,8 +5,7 @@ let mockState: { active: { status: 'idle' | 'running' | 'paused' } } = {
 };
 
 jest.mock('../../store', () => ({
-  useAppStore: (selector: any) =>
-    selector ? selector(mockState) : mockState,
+  useAppStore: (selector: any) => (selector ? selector(mockState) : mockState),
 }));
 
 import { useIsFocusRunning } from '../useIsFocusRunning';

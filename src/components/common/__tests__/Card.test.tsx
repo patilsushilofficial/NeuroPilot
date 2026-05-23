@@ -32,7 +32,7 @@ describe('Card', () => {
         <Text>Test Content</Text>
       </Card>
     );
-    
+
     const button = getByRole('button');
     fireEvent.press(button);
     expect(onPress).toHaveBeenCalled();
@@ -45,7 +45,7 @@ describe('Card', () => {
       </Card>
     );
     expect(getByText('Surface')).toBeTruthy();
-    
+
     rerender(
       <Card variant="glass">
         <Text>Glass</Text>

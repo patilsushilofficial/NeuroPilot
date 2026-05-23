@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -18,19 +12,8 @@ import { Icon, type IconName } from './Icon';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import type { Theme } from '../../theme';
 import { borderRadius, shadows, spacing } from '../../theme/spacing';
-import {
-  borderWidths,
-  durations,
-  iconSizes,
-  opacity,
-  springs,
-  zIndex,
-} from '../../theme/tokens';
-import {
-  fontSizes,
-  fontWeights,
-  letterSpacings,
-} from '../../theme/typography';
+import { borderWidths, durations, iconSizes, opacity, springs, zIndex } from '../../theme/tokens';
+import { fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
 import type { ToastInstance, ToastVariant } from '../../services/toast';
 
 interface VariantConfig {
@@ -112,14 +95,9 @@ export const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
     };
   }, [insets.top, insets.bottom, toast.position]);
 
-  const accentBorderStyle = useMemo<ViewStyle>(
-    () => ({ borderLeftColor: accent }),
-    [accent]
-  );
+  const accentBorderStyle = useMemo<ViewStyle>(() => ({ borderLeftColor: accent }), [accent]);
 
-  const accessibilityLabel = toast.title
-    ? `${toast.title}: ${toast.message}`
-    : toast.message;
+  const accessibilityLabel = toast.title ? `${toast.title}: ${toast.message}` : toast.message;
 
   return (
     <Animated.View
@@ -143,10 +121,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
 
         <View style={styles.body}>
           {!!toast.title && (
-            <Text
-              numberOfLines={1}
-              style={[theme.text.labelLarge, styles.title]}
-            >
+            <Text numberOfLines={1} style={[theme.text.labelLarge, styles.title]}>
               {toast.title}
             </Text>
           )}

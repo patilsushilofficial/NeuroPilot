@@ -59,12 +59,7 @@ describe('HabitsProgressCard', () => {
     expect(queryByText(/Perfect day/)).toBeNull();
 
     rerender(
-      <HabitsProgressCard
-        completedCount={2}
-        totalCount={2}
-        completionRate={1}
-        isPerfectDay
-      />
+      <HabitsProgressCard completedCount={2} totalCount={2} completionRate={1} isPerfectDay />
     );
     expect(queryByText(/Perfect day/)).toBeTruthy();
   });

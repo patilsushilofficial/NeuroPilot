@@ -126,7 +126,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'habit_66day',
     title: 'Automaticity',
-    description: '66 days — the science says it\'s automatic now.',
+    description: "66 days — the science says it's automatic now.",
     emoji: '✨',
     category: 'habits',
     xpReward: 3000,
@@ -175,7 +175,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'level_20',
     title: 'Senior Navigator',
-    description: 'Level 20 — you\'ve mastered the system.',
+    description: "Level 20 — you've mastered the system.",
     emoji: '🌟',
     category: 'milestone',
     xpReward: 1500,
@@ -193,6 +193,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
 ];
 
-export const ACHIEVEMENT_MAP = Object.fromEntries(
-  ACHIEVEMENTS.map((a) => [a.id, a])
-) as Record<string, Achievement>;
+export const ACHIEVEMENT_MAP = Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, a])) as Record<
+  string,
+  Achievement
+>;

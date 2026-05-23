@@ -127,20 +127,10 @@ export const useHabitsScreen = () => {
         haptics.success();
       }
     },
-    [
-      completeHabit,
-      uncompleteHabit,
-      isHabitCompletedToday,
-      addXP,
-      recordHabitComplete,
-      haptics,
-    ]
+    [completeHabit, uncompleteHabit, isHabitCompletedToday, addXP, recordHabitComplete, haptics]
   );
 
-  const openAddHabit = useCallback(
-    () => navigation.navigate('AddHabit'),
-    [navigation]
-  );
+  const openAddHabit = useCallback(() => navigation.navigate('AddHabit'), [navigation]);
 
   const openHabitDetail = useCallback(
     (habitId: string) => navigation.navigate('AddHabit', { habitId }),

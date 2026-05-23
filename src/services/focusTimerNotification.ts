@@ -129,9 +129,7 @@ export const buildFocusTimerNotificationContent = (
     priority: Notifications.AndroidNotificationPriority.HIGH,
     sticky: true,
     autoDismiss: false,
-    categoryIdentifier: isRunning
-      ? FOCUS_TIMER_CATEGORY_RUNNING
-      : FOCUS_TIMER_CATEGORY_PAUSED,
+    categoryIdentifier: isRunning ? FOCUS_TIMER_CATEGORY_RUNNING : FOCUS_TIMER_CATEGORY_PAUSED,
     ...(Platform.OS === 'android' ? { channelId: FOCUS_TIMER_CHANNEL_ID } : {}),
   };
 };
@@ -144,8 +142,7 @@ const presentAndroidNotificationWithNotifee = async (
 
   const { active } = snapshot;
   const title = buildFocusTimerNotificationLine(active, Date.now(), false);
-  const endsAt =
-    active.runningEndsAt ?? computeRunningEndsAt(getEffectiveSecondsRemaining(active));
+  const endsAt = active.runningEndsAt ?? computeRunningEndsAt(getEffectiveSecondsRemaining(active));
 
   const androidBase = {
     channelId: FOCUS_TIMER_CHANNEL_ID,

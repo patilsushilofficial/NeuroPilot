@@ -37,39 +37,31 @@ export const useFocusShieldActions = ({
   const requestToggle = useCallback(() => {
     haptics.heavy();
     if (!isActive) {
-      Alert.alert(
-        FOCUS_SHIELD_ACTIVATE_PROMPT.title,
-        FOCUS_SHIELD_ACTIVATE_PROMPT.message,
-        [
-          { text: FOCUS_SHIELD_ACTIVATE_PROMPT.cancelLabel, style: 'cancel' },
-          {
-            text: FOCUS_SHIELD_ACTIVATE_PROMPT.confirmLabel,
-            onPress: async () => {
-              haptics.achievement();
-              onToggle(true);
-              await focusShieldService.activate();
-            },
-          },
-        ]
-      );
-      return;
-    }
-    Alert.alert(
-      FOCUS_SHIELD_DEACTIVATE_PROMPT.title,
-      FOCUS_SHIELD_DEACTIVATE_PROMPT.message,
-      [
-        { text: FOCUS_SHIELD_DEACTIVATE_PROMPT.cancelLabel, style: 'cancel' },
+      Alert.alert(FOCUS_SHIELD_ACTIVATE_PROMPT.title, FOCUS_SHIELD_ACTIVATE_PROMPT.message, [
+        { text: FOCUS_SHIELD_ACTIVATE_PROMPT.cancelLabel, style: 'cancel' },
         {
-          text: FOCUS_SHIELD_DEACTIVATE_PROMPT.confirmLabel,
-          style: 'destructive',
+          text: FOCUS_SHIELD_ACTIVATE_PROMPT.confirmLabel,
           onPress: async () => {
-            haptics.medium();
-            onToggle(false);
-            await focusShieldService.deactivate();
+            haptics.achievement();
+            onToggle(true);
+            await focusShieldService.activate();
           },
         },
-      ]
-    );
+      ]);
+      return;
+    }
+    Alert.alert(FOCUS_SHIELD_DEACTIVATE_PROMPT.title, FOCUS_SHIELD_DEACTIVATE_PROMPT.message, [
+      { text: FOCUS_SHIELD_DEACTIVATE_PROMPT.cancelLabel, style: 'cancel' },
+      {
+        text: FOCUS_SHIELD_DEACTIVATE_PROMPT.confirmLabel,
+        style: 'destructive',
+        onPress: async () => {
+          haptics.medium();
+          onToggle(false);
+          await focusShieldService.deactivate();
+        },
+      },
+    ]);
   }, [isActive, onToggle, haptics]);
 
   const openDNDSettings = useCallback(async () => {

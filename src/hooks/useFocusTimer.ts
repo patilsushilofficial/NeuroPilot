@@ -45,12 +45,8 @@ export const useFocusTimer = () => {
   // was last running (or the default on first launch). Derive the displayed
   // timer from the *selected* preset so picking "Deep Work" instantly shows
   // 50:00 instead of staying at the previous preset's duration.
-  const displaySecondsRemaining = isIdle
-    ? preset.focusMinutes * 60
-    : active.secondsRemaining;
-  const displayTotalSeconds = isIdle
-    ? preset.focusMinutes * 60
-    : active.totalSeconds;
+  const displaySecondsRemaining = isIdle ? preset.focusMinutes * 60 : active.secondsRemaining;
+  const displayTotalSeconds = isIdle ? preset.focusMinutes * 60 : active.totalSeconds;
 
   // The countdown interval lives in `useGlobalFocusTicker` (mounted at the
   // app root) so the timer keeps progressing even when the user is on the
@@ -106,10 +102,7 @@ export const useFocusTimer = () => {
   }, [haptics, skipPhase]);
 
   const todaySessions = getSessionsToday();
-  const todayFocusMinutes = todaySessions.reduce(
-    (acc, s) => acc + s.totalFocusMinutes,
-    0
-  );
+  const todayFocusMinutes = todaySessions.reduce((acc, s) => acc + s.totalFocusMinutes, 0);
 
   /** ADHD tip rotates with the active phase. Pulled from constants so copy
    *  edits don't require touching the screen. */

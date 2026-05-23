@@ -35,9 +35,9 @@ describe('applyLexendDefaults', () => {
   it('does not override an explicit fontFamily already set on the element', () => {
     const TextAny = Text as any;
     const explicitStyle = { fontFamily: 'CustomFont', fontWeight: '700' };
-    TextAny.render = jest.fn().mockReturnValue(
-      React.createElement('Text', { style: explicitStyle })
-    );
+    TextAny.render = jest
+      .fn()
+      .mockReturnValue(React.createElement('Text', { style: explicitStyle }));
 
     applyLexendDefaults();
     const result = (Text as any).render({});
@@ -47,9 +47,9 @@ describe('applyLexendDefaults', () => {
   it('also patches TextInput.prototype.render', () => {
     const InputAny = TextInput as any;
     const inputStyle = { fontWeight: '500' };
-    InputAny.prototype.render = jest.fn().mockReturnValue(
-      React.createElement('TextInput', { style: inputStyle })
-    );
+    InputAny.prototype.render = jest
+      .fn()
+      .mockReturnValue(React.createElement('TextInput', { style: inputStyle }));
 
     applyLexendDefaults();
 

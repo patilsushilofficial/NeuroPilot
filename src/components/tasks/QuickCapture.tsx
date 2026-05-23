@@ -1,11 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useQuickCaptureForm } from '../../hooks/useQuickCaptureForm';

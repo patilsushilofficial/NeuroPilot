@@ -6,8 +6,21 @@ import { UserMode } from '../types';
  */
 
 export const PROFILE_AVATARS = [
-  '🧠', '🚀', '⚡', '🎯', '🌊', '🦋', '🔥', '✨', '🎮', '🌟',
-  '🦁', '🐬', '🦅', '🌈', '💎',
+  '🧠',
+  '🚀',
+  '⚡',
+  '🎯',
+  '🌊',
+  '🦋',
+  '🔥',
+  '✨',
+  '🎮',
+  '🌟',
+  '🦁',
+  '🐬',
+  '🦅',
+  '🌈',
+  '💎',
 ] as const;
 
 /** Fewer options surfaced during onboarding to reduce decision fatigue. */

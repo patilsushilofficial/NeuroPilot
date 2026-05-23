@@ -54,7 +54,9 @@ export const FocusTimerPanel: React.FC<FocusTimerPanelProps> = ({
       <View style={styles.phaseHeader}>
         <Badge
           label={phaseLabel}
-          variant={phase === 'focus' ? 'primary' : phase === 'short_break' ? 'secondary' : 'success'}
+          variant={
+            phase === 'focus' ? 'primary' : phase === 'short_break' ? 'secondary' : 'success'
+          }
           emoji={phase === 'focus' ? '🧠' : phase === 'short_break' ? '☕' : '🌿'}
         />
         <Text style={[theme.text.bodySmall, styles.phaseMeta]}>{presetName} preset</Text>
@@ -108,7 +110,10 @@ export const FocusTimerPanel: React.FC<FocusTimerPanelProps> = ({
               return (
                 <View
                   key={i}
-                  style={[styles.pomodoroDot, filled ? styles.pomodoroDotOn : styles.pomodoroDotOff]}
+                  style={[
+                    styles.pomodoroDot,
+                    filled ? styles.pomodoroDotOn : styles.pomodoroDotOff,
+                  ]}
                 />
               );
             })}

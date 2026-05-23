@@ -33,20 +33,14 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const lastNDates = useMemo(() => getLastNDates(days), [days]);
   const completionSet = useMemo(() => new Set(completions), [completions]);
-  const completedFill = useMemo<ViewStyle>(
-    () => ({ backgroundColor: color }),
-    [color]
-  );
+  const completedFill = useMemo<ViewStyle>(() => ({ backgroundColor: color }), [color]);
 
   return (
     <View style={styles.row}>
       {lastNDates.map((date) => (
         <View
           key={date}
-          style={[
-            styles.dot,
-            completionSet.has(date) ? completedFill : styles.dotEmpty,
-          ]}
+          style={[styles.dot, completionSet.has(date) ? completedFill : styles.dotEmpty]}
         />
       ))}
     </View>

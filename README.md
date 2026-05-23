@@ -1,4 +1,5 @@
 # NeuroPilot 🧠
+
 ### The Definitive Neuro-Inclusive ADHD Companion App
 
 > Built entirely on clinical ADHD research. Fully offline. Zero data collection.
@@ -17,18 +18,18 @@ NeuroPilot is a production-ready React Native (Expo) app for ADHD management, de
 
 ## Features
 
-| Feature | ADHD Principle Applied |
-|---|---|
-| ⚡ Quick Capture | Sub-60s task entry — prevents "out of sight, out of mind" |
-| ⏱️ Visual Circular Timer | Makes time tangible (counter to time blindness) |
-| 🎯 5 Focus Presets | ADHD Starter (10m) → Flow State (90m) |
-| 🔥 Habit Streaks | Dopamine reward loop via visual chain |
-| ✅ Animated Checkboxes | Haptic + visual completion feedback |
-| 🏆 XP + Level System | Variable reward schedule combats reward deficiency |
-| 🥇 20+ Achievements | Long-term motivation through milestone celebration |
-| 📊 Weekly Charts | Visual progress tracking |
-| 🌙 Dark Mode (Default) | Reduces sensory overload |
-| 📱 Progressive Disclosure | Only shows complexity when needed |
+| Feature                   | ADHD Principle Applied                                    |
+| ------------------------- | --------------------------------------------------------- |
+| ⚡ Quick Capture          | Sub-60s task entry — prevents "out of sight, out of mind" |
+| ⏱️ Visual Circular Timer  | Makes time tangible (counter to time blindness)           |
+| 🎯 5 Focus Presets        | ADHD Starter (10m) → Flow State (90m)                     |
+| 🔥 Habit Streaks          | Dopamine reward loop via visual chain                     |
+| ✅ Animated Checkboxes    | Haptic + visual completion feedback                       |
+| 🏆 XP + Level System      | Variable reward schedule combats reward deficiency        |
+| 🥇 20+ Achievements       | Long-term motivation through milestone celebration        |
+| 📊 Weekly Charts          | Visual progress tracking                                  |
+| 🌙 Dark Mode (Default)    | Reduces sensory overload                                  |
+| 📱 Progressive Disclosure | Only shows complexity when needed                         |
 
 ---
 
@@ -106,6 +107,7 @@ NeuroPilot/
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - Expo CLI: `npm install -g expo-cli`
 - EAS CLI (for builds): `npm install -g eas-cli`

@@ -21,11 +21,7 @@ interface QuoteCardProps {
  * the corner. Sits in the primary container tint so it harmonises with
  * the rest of the home screen without competing for attention.
  */
-export const QuoteCard: React.FC<QuoteCardProps> = ({
-  text,
-  author,
-  onRefresh,
-}) => {
+export const QuoteCard: React.FC<QuoteCardProps> = ({ text, author, onRefresh }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
@@ -44,11 +40,7 @@ export const QuoteCard: React.FC<QuoteCardProps> = ({
           accessibilityRole="button"
           accessibilityLabel="Show another quote"
         >
-          <Icon
-            name="refresh-cw"
-            size={iconSizes.md}
-            color={theme.colors.primary}
-          />
+          <Icon name="refresh-cw" size={iconSizes.md} color={theme.colors.primary} />
         </TouchableOpacity>
       )}
 

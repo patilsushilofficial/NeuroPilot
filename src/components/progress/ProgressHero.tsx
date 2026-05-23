@@ -4,11 +4,7 @@ import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { Theme } from '../../theme';
 import { spacing, borderRadius, shadows } from '../../theme/spacing';
-import {
-  avatarSizes,
-  borderWidths,
-  iconSizes,
-} from '../../theme/tokens';
+import { avatarSizes, borderWidths, iconSizes } from '../../theme/tokens';
 import { letterSpacings } from '../../theme/typography';
 import { getLevelTitle } from '../../utils/dateUtils';
 import { moderateScale } from '../../utils/responsive';
@@ -105,24 +101,14 @@ export const ProgressHero: React.FC<ProgressHeroProps> = ({
 
       <View style={styles.xpBlock}>
         <View style={styles.xpHeader}>
-          <Text style={[theme.text.labelSmall, styles.xpHeaderLabel]}>
-            LEVEL {level} PROGRESS
-          </Text>
+          <Text style={[theme.text.labelSmall, styles.xpHeaderLabel]}>LEVEL {level} PROGRESS</Text>
           <Text style={[theme.text.labelMedium, styles.xpHeaderValue]}>
             {xpInLevel.toLocaleString()} / {xpForLevel.toLocaleString()} XP
           </Text>
         </View>
-        <ProgressBar
-          progress={xpProgress}
-          color={theme.colors.primary}
-          style={styles.xpBar}
-        />
+        <ProgressBar progress={xpProgress} color={theme.colors.primary} style={styles.xpBar} />
         <View style={styles.xpFooter}>
-          <Icon
-            name="trending-up"
-            size={iconSizes.sm}
-            color={theme.colors.textSecondary}
-          />
+          <Icon name="trending-up" size={iconSizes.sm} color={theme.colors.textSecondary} />
           <Text style={[theme.text.bodySmall, styles.xpFooterText]}>
             {xpToNextLevel.toLocaleString()} XP to Level {level + 1}
           </Text>

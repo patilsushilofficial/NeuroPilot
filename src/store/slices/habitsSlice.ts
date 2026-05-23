@@ -10,7 +10,19 @@ const newId = () => `habit_${++habitIdCounter}_${Math.random().toString(36).slic
 export interface HabitsSlice {
   habits: Habit[];
 
-  addHabit: (payload: Pick<Habit, 'title' | 'description' | 'emoji' | 'category' | 'frequency' | 'customDays' | 'reminderTime' | 'color'>) => string;
+  addHabit: (
+    payload: Pick<
+      Habit,
+      | 'title'
+      | 'description'
+      | 'emoji'
+      | 'category'
+      | 'frequency'
+      | 'customDays'
+      | 'reminderTime'
+      | 'color'
+    >
+  ) => string;
   updateHabit: (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt'>>) => void;
   deleteHabit: (id: string) => void;
   archiveHabit: (id: string) => void;
@@ -84,11 +96,13 @@ export const createHabitsSlice: StateCreator<HabitsSlice, [], [], HabitsSlice> =
     // Schedule Notification if enabled
     const state = get() as any;
     if (state.settings?.notificationsEnabled && payload.reminderTime) {
-      scheduleHabitReminder(id, payload.title, payload.emoji, payload.reminderTime).then((notifId) => {
-        if (notifId) {
-          get().updateHabit(id, { notificationId: notifId });
+      scheduleHabitReminder(id, payload.title, payload.emoji, payload.reminderTime).then(
+        (notifId) => {
+          if (notifId) {
+            get().updateHabit(id, { notificationId: notifId });
+          }
         }
-      });
+      );
     }
 
     return id;
@@ -103,7 +117,12 @@ export const createHabitsSlice: StateCreator<HabitsSlice, [], [], HabitsSlice> =
       if (habit.notificationId) {
         cancelNotification(habit.notificationId);
       }
-      scheduleHabitReminder(id, updates.title || habit.title, updates.emoji || habit.emoji, updates.reminderTime).then((notifId) => {
+      scheduleHabitReminder(
+        id,
+        updates.title || habit.title,
+        updates.emoji || habit.emoji,
+        updates.reminderTime
+      ).then((notifId) => {
         if (notifId) {
           set((s) => ({
             habits: s.habits.map((h) => (h.id === id ? { ...h, notificationId: notifId } : h)),
@@ -131,7 +150,9 @@ export const createHabitsSlice: StateCreator<HabitsSlice, [], [], HabitsSlice> =
       cancelNotification(habit.notificationId);
     }
     set((s) => ({
-      habits: s.habits.map((h) => (h.id === id ? { ...h, archived: true, notificationId: undefined } : h)),
+      habits: s.habits.map((h) =>
+        h.id === id ? { ...h, archived: true, notificationId: undefined } : h
+      ),
     }));
   },
 

@@ -76,9 +76,9 @@ describe('gamificationSlice', () => {
   it('should unlock achievements when requirements are met', () => {
     const state = get();
     state.stats.tasksCompleted = 1; // Requirement for first_task is 1
-    
+
     const newlyUnlocked = slice.checkAndUnlockAchievements();
-    
+
     expect(newlyUnlocked).toContain('first_task');
     expect(set).toHaveBeenCalled();
   });

@@ -59,7 +59,10 @@ export const FocusPresetPicker: React.FC<FocusPresetPickerProps> = ({
             <TouchableOpacity
               key={preset.id}
               onPress={() => onSelectPreset(preset.id)}
-              style={[styles.presetCard, selected ? styles.presetCardActive : styles.presetCardInactive]}
+              style={[
+                styles.presetCard,
+                selected ? styles.presetCardActive : styles.presetCardInactive,
+              ]}
               accessible
               accessibilityRole="radio"
               accessibilityState={{ selected }}
@@ -67,7 +70,12 @@ export const FocusPresetPicker: React.FC<FocusPresetPickerProps> = ({
             >
               <View style={styles.cardInner}>
                 <View style={styles.cardHead}>
-                  <View style={[styles.iconWrap, selected ? styles.iconWrapActive : styles.iconWrapIdle]}>
+                  <View
+                    style={[
+                      styles.iconWrap,
+                      selected ? styles.iconWrapActive : styles.iconWrapIdle,
+                    ]}
+                  >
                     <Text style={styles.presetEmoji}>{preset.icon}</Text>
                   </View>
                   <Text

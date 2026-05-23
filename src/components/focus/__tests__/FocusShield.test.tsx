@@ -84,19 +84,19 @@ describe('FocusShield', () => {
   it('handles toggle to active', () => {
     const onToggle = jest.fn();
     const { getByRole } = render(<FocusShield isActive={false} onToggle={onToggle} />);
-    
+
     const switch_comp = getByRole('switch');
-    
+
     const spy = jest.spyOn(Alert, 'alert');
-    
+
     fireEvent.press(switch_comp);
-    
+
     expect(spy).toHaveBeenCalled();
-    
+
     const buttons = spy.mock.calls[0][2];
-    const activateButton = buttons?.find(b => b.text === 'Activate Shield');
+    const activateButton = buttons?.find((b) => b.text === 'Activate Shield');
     activateButton?.onPress?.();
-    
+
     expect(onToggle).toHaveBeenCalledWith(true);
     expect(focusShieldService.activate).toHaveBeenCalled();
   });
@@ -104,19 +104,19 @@ describe('FocusShield', () => {
   it('handles toggle to inactive', () => {
     const onToggle = jest.fn();
     const { getByRole } = render(<FocusShield isActive={true} onToggle={onToggle} />);
-    
+
     const switch_comp = getByRole('switch');
-    
+
     const spy = jest.spyOn(Alert, 'alert');
-    
+
     fireEvent.press(switch_comp);
-    
+
     expect(spy).toHaveBeenCalled();
-    
+
     const buttons = spy.mock.calls[0][2];
-    const deactivateButton = buttons?.find(b => b.text === 'Deactivate');
+    const deactivateButton = buttons?.find((b) => b.text === 'Deactivate');
     deactivateButton?.onPress?.();
-    
+
     expect(onToggle).toHaveBeenCalledWith(false);
     expect(focusShieldService.deactivate).toHaveBeenCalled();
   });
@@ -124,10 +124,10 @@ describe('FocusShield', () => {
   it('opens DND settings', () => {
     const onToggle = jest.fn();
     const { getByLabelText } = render(<FocusShield isActive={true} onToggle={onToggle} />);
-    
+
     const button = getByLabelText('Open Do Not Disturb settings');
     fireEvent.press(button);
-    
+
     expect(focusShieldService.openDNDSettings).toHaveBeenCalled();
   });
 });

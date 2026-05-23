@@ -59,10 +59,7 @@ export const ProgressScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.duration(durations.base).delay(nextDelay())}>
           <ProgressHero
             profileName={profile?.name}
@@ -108,10 +105,7 @@ export const ProgressScreen: React.FC = () => {
             title="Achievements"
             actionLabel={`${achievementsUnlockedCount} / ${achievementsTotal}`}
           />
-          <AchievementsSection
-            unlocked={unlockedAchievements}
-            locked={lockedAchievements}
-          />
+          <AchievementsSection unlocked={unlockedAchievements} locked={lockedAchievements} />
         </Animated.View>
 
         <View style={styles.bottomSpacer} />

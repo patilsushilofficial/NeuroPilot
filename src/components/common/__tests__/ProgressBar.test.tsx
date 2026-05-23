@@ -39,7 +39,7 @@ describe('ProgressBar', () => {
   it('clamps progress value', () => {
     const { getByRole, rerender } = render(<ProgressBar progress={1.5} />);
     expect(getByRole('progressbar').props.accessibilityValue.now).toBe(100);
-    
+
     rerender(<ProgressBar progress={-0.5} />);
     expect(getByRole('progressbar').props.accessibilityValue.now).toBe(0);
   });

@@ -20,9 +20,7 @@ const EMOJI_WRAP_SIZE = controlSizes.buttonHeight.md;
  * unit — receives the domain entity, decides nothing about layout above
  * itself (the parent grid sizes the column).
  */
-export const AchievementCard: React.FC<AchievementCardProps> = ({
-  achievement,
-}) => {
+export const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
@@ -35,16 +33,10 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
       <View style={styles.emojiWrap}>
         <Text style={styles.emoji}>{achievement.emoji}</Text>
       </View>
-      <Text
-        style={[theme.text.labelMedium, styles.title]}
-        numberOfLines={2}
-      >
+      <Text style={[theme.text.labelMedium, styles.title]} numberOfLines={2}>
         {achievement.title}
       </Text>
-      <Text
-        style={[theme.text.bodySmall, styles.description]}
-        numberOfLines={2}
-      >
+      <Text style={[theme.text.bodySmall, styles.description]} numberOfLines={2}>
         {achievement.description}
       </Text>
       <Badge label={`+${achievement.xpReward} XP`} variant="primary" />

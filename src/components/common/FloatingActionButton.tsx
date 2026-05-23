@@ -1,23 +1,12 @@
 import React, { useMemo } from 'react';
-import {
-  StyleSheet,
-  StyleProp,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { StyleSheet, StyleProp, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { Theme } from '../../theme';
 import { borderRadius, shadows, spacing } from '../../theme/spacing';
 import { controlSizes, opacity, zIndex } from '../../theme/tokens';
-import {
-  fontSizes,
-  fontWeights,
-  letterSpacings,
-} from '../../theme/typography';
+import { fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
 
 interface FloatingActionButtonProps {
   /** Ionicons glyph name — defaults to a "+" `add`. */
@@ -78,11 +67,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       ]}
     >
       <View style={styles.content}>
-        <Ionicons
-          name={icon}
-          size={controlSizes.fab * 0.5}
-          color={theme.colors.textOnPrimary}
-        />
+        <Ionicons name={icon} size={controlSizes.fab * 0.5} color={theme.colors.textOnPrimary} />
         {isExtended && (
           <Text
             numberOfLines={1}

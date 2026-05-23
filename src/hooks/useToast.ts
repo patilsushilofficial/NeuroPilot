@@ -1,10 +1,6 @@
 import { useMemo } from 'react';
 
-import {
-  toastService,
-  type ToastOptions,
-  type ToastVariant,
-} from '../services/toast';
+import { toastService, type ToastOptions, type ToastVariant } from '../services/toast';
 
 /** Variant shorthand options exclude the keys we set ourselves. */
 type VariantShorthandOptions = Omit<ToastOptions, 'message' | 'variant'>;

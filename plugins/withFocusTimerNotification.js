@@ -67,17 +67,21 @@ const withFocusTimerNotification = (config) =>
         }
       }
 
-      const manifestPath = path.join(projectRoot, 'android', 'app', 'src', 'main', 'AndroidManifest.xml');
+      const manifestPath = path.join(
+        projectRoot,
+        'android',
+        'app',
+        'src',
+        'main',
+        'AndroidManifest.xml'
+      );
       if (fs.existsSync(manifestPath)) {
         let manifest = fs.readFileSync(manifestPath, 'utf8');
         const receiver =
           '<receiver android:name=".focus.FocusTimerActionReceiver" android:exported="false"/>';
 
         if (!manifest.includes('FocusTimerActionReceiver')) {
-          manifest = manifest.replace(
-            '</application>',
-            `    ${receiver}\n  </application>`
-          );
+          manifest = manifest.replace('</application>', `    ${receiver}\n  </application>`);
           fs.writeFileSync(manifestPath, manifest);
         }
       }

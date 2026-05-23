@@ -1,11 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { useAppTheme } from '../../hooks/useAppTheme';
@@ -19,11 +13,7 @@ import {
   hitSlop,
 } from '../../theme/tokens';
 import { letterSpacings } from '../../theme/typography';
-import {
-  formatHomeHeaderDate,
-  getTimeGreeting,
-  getLevelTitle,
-} from '../../utils/dateUtils';
+import { formatHomeHeaderDate, getTimeGreeting, getLevelTitle } from '../../utils/dateUtils';
 import { moderateScale } from '../../utils/responsive';
 
 import { Icon } from '../common/Icon';
@@ -77,13 +67,8 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
     <View style={styles.container}>
       <View style={styles.topRow}>
         <View style={styles.greetingBlock}>
-          <Text style={[theme.text.labelSmall, styles.dateLabel]}>
-            {formatHomeHeaderDate()}
-          </Text>
-          <Text
-            style={[theme.text.displayMedium, styles.greeting]}
-            accessibilityRole="header"
-          >
+          <Text style={[theme.text.labelSmall, styles.dateLabel]}>{formatHomeHeaderDate()}</Text>
+          <Text style={[theme.text.displayMedium, styles.greeting]} accessibilityRole="header">
             {getTimeGreeting(profileName)}
           </Text>
         </View>
@@ -134,9 +119,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
           <Text style={[theme.text.xpDisplay, styles.xpDisplay]}>
             {totalXP.toLocaleString()} <Text style={styles.xpUnit}>XP</Text>
           </Text>
-          <Text style={[theme.text.labelSmall, styles.xpToGo]}>
-            {xpToNextLevel} TO NEXT LEVEL
-          </Text>
+          <Text style={[theme.text.labelSmall, styles.xpToGo]}>{xpToNextLevel} TO NEXT LEVEL</Text>
         </View>
 
         <View style={styles.streakChip} accessibilityLabel={`${currentStreak} day streak`}>

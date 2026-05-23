@@ -121,10 +121,7 @@ describe('useFocusTimerNotification', () => {
       appStateHandler?.('background');
     });
 
-    expect(BackgroundTimer.runBackgroundTimer).toHaveBeenCalledWith(
-      expect.any(Function),
-      1000
-    );
+    expect(BackgroundTimer.runBackgroundTimer).toHaveBeenCalledWith(expect.any(Function), 1000);
   });
 
   it('starts an Android background sync timer when the native countdown is available', () => {
@@ -137,10 +134,7 @@ describe('useFocusTimerNotification', () => {
       appStateHandler?.('background');
     });
 
-    expect(BackgroundTimer.runBackgroundTimer).toHaveBeenCalledWith(
-      expect.any(Function),
-      15000
-    );
+    expect(BackgroundTimer.runBackgroundTimer).toHaveBeenCalledWith(expect.any(Function), 15000);
   });
 
   it('dismisses the notification when returning to the foreground', () => {

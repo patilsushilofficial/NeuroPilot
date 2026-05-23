@@ -53,7 +53,9 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
         >
           {label}
         </Text>
-        {description && <Text style={[theme.text.bodySmall, styles.rowDescription]}>{description}</Text>}
+        {description && (
+          <Text style={[theme.text.bodySmall, styles.rowDescription]}>{description}</Text>
+        )}
         {showInlineValue && (
           <Text style={[theme.text.bodySmall, styles.rowInlineValue]} numberOfLines={1}>
             {rightText}
@@ -75,7 +77,11 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
       ) : onPress ? (
         <Text style={[theme.text.bodySmall, styles.rowChevron]}>›</Text>
       ) : (
-        <Text style={[theme.text.bodySmall, styles.rowRightText]} numberOfLines={1} ellipsizeMode="tail">
+        <Text
+          style={[theme.text.bodySmall, styles.rowRightText]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {showInlineValue ? '' : (rightText ?? '')}
         </Text>
       )}

@@ -1,8 +1,4 @@
-import {
-  DEFAULT_TOAST_DURATION_MS,
-  toastService,
-  type ToastInstance,
-} from '../toast';
+import { DEFAULT_TOAST_DURATION_MS, toastService, type ToastInstance } from '../toast';
 
 describe('toastService', () => {
   beforeEach(() => {

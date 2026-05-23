@@ -60,20 +60,20 @@ export const palette = {
   green600: '#16A34A',
 
   // Neutrals Dark
-  dark0: '#0D0D1A',   // Background
-  dark1: '#12121F',   // Surface
-  dark2: '#16162A',   // Card
-  dark3: '#1E1E38',   // Card elevated
-  dark4: '#26264A',   // Border
-  dark5: '#333360',   // Divider
+  dark0: '#0D0D1A', // Background
+  dark1: '#12121F', // Surface
+  dark2: '#16162A', // Card
+  dark3: '#1E1E38', // Card elevated
+  dark4: '#26264A', // Border
+  dark5: '#333360', // Divider
 
   // Neutrals Light
-  light0: '#F7F6FF',  // Background
-  light1: '#F0EFFE',  // Surface
-  light2: '#E8E5FF',  // Card
-  light3: '#DDDAFF',  // Card elevated
-  light4: '#C8C4F0',  // Border
-  light5: '#B0ABDE',  // Divider
+  light0: '#F7F6FF', // Background
+  light1: '#F0EFFE', // Surface
+  light2: '#E8E5FF', // Card
+  light3: '#DDDAFF', // Card elevated
+  light4: '#C8C4F0', // Border
+  light5: '#B0ABDE', // Divider
 
   // Text
   textPrimaryDark: '#F0EFFE',
@@ -96,19 +96,19 @@ export type PaletteKey = keyof typeof palette;
 
 /** Dark theme semantic tokens — Deep Navy × Teal gradient */
 export const darkColors = {
-  background: '#091520',   // Deep navy-black (top of gradient)
-  surface: '#0D1F30',      // Slightly lighter navy
-  card: '#112840',         // Mid navy with teal hint
+  background: '#091520', // Deep navy-black (top of gradient)
+  surface: '#0D1F30', // Slightly lighter navy
+  card: '#112840', // Mid navy with teal hint
   cardElevated: '#163350', // Elevated card — teal-navy
-  border: '#1E4060',       // Subtle teal-navy border
-  divider: '#172E45',      // Thin divider
+  border: '#1E4060', // Subtle teal-navy border
+  divider: '#172E45', // Thin divider
 
-  primary: '#2A9DB5',      // Bright teal — primary actions
+  primary: '#2A9DB5', // Bright teal — primary actions
   primaryLight: '#5BBFCF',
   primaryDark: '#1A7A8C',
   primaryContainer: 'rgba(42, 157, 181, 0.15)',
 
-  secondary: '#4DD9E0',    // Lighter cyan accent
+  secondary: '#4DD9E0', // Lighter cyan accent
   secondaryLight: '#8EEEF3',
   secondaryDark: '#2AACB8',
   secondaryContainer: 'rgba(77, 217, 224, 0.15)',
@@ -117,13 +117,13 @@ export const darkColors = {
   errorContainer: 'rgba(255, 82, 82, 0.15)',
   warning: '#FFB74D',
   warningContainer: 'rgba(255, 183, 77, 0.15)',
-  success: '#4DD9A0',      // Teal-green success
+  success: '#4DD9A0', // Teal-green success
   successContainer: 'rgba(77, 217, 160, 0.15)',
 
-  textPrimary: '#E8F4F8',        // Soft ice-white
-  textSecondary: '#A8CBDA',      // Muted teal-white
-  textTertiary: '#5E8FA8',       // Dimmed teal
-  textDisabled: '#2E5A70',       // Very muted
+  textPrimary: '#E8F4F8', // Soft ice-white
+  textSecondary: '#A8CBDA', // Muted teal-white
+  textTertiary: '#5E8FA8', // Dimmed teal
+  textDisabled: '#2E5A70', // Very muted
   textOnPrimary: '#FFFFFF',
   textOnSecondary: '#091520',
 
@@ -188,19 +188,19 @@ export type ThemeColors = {
  * Gentle on the eyes when users are just waking up.
  */
 export const dawnColors: ThemeColors = {
-  background: '#FFF8F0',   // Warm off-white sunrise
+  background: '#FFF8F0', // Warm off-white sunrise
   surface: '#FFF0E0',
   card: '#FFFFFF',
   cardElevated: '#FEF3E8',
   border: '#F0D9C8',
   divider: '#E8CBBA',
 
-  primary: '#E8761A',      // Warm amber-orange sunrise
+  primary: '#E8761A', // Warm amber-orange sunrise
   primaryLight: '#F5A55E',
   primaryDark: '#C05A0A',
   primaryContainer: 'rgba(232, 118, 26, 0.12)',
 
-  secondary: '#D4439A',    // Rosy morning pink
+  secondary: '#D4439A', // Rosy morning pink
   secondaryLight: '#E87DBE',
   secondaryDark: '#A8207A',
   secondaryContainer: 'rgba(212, 67, 154, 0.12)',
@@ -233,19 +233,19 @@ export const dawnColors: ThemeColors = {
  * A warmer, richer variant of the navy theme for evening wind-down.
  */
 export const duskColors: ThemeColors = {
-  background: '#060F1A',   // Deepest navy twilight
+  background: '#060F1A', // Deepest navy twilight
   surface: '#0A1828',
   card: '#0E2035',
   cardElevated: '#122642',
   border: '#1A3550',
   divider: '#112840',
 
-  primary: '#C77DFF',      // Soft violet dusk accent
+  primary: '#C77DFF', // Soft violet dusk accent
   primaryLight: '#E0B3FF',
   primaryDark: '#9B51D4',
   primaryContainer: 'rgba(199, 125, 255, 0.15)',
 
-  secondary: '#4DD9E0',    // Teal-cyan consistent with brand
+  secondary: '#4DD9E0', // Teal-cyan consistent with brand
   secondaryLight: '#8EEEF3',
   secondaryDark: '#2AACB8',
   secondaryContainer: 'rgba(77, 217, 224, 0.15)',

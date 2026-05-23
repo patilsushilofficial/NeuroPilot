@@ -106,8 +106,7 @@ const mockUseAppStore = {
   ),
   getOverdueTasks: jest.fn(() =>
     mockUseAppStore.tasks.filter(
-      (t: any) =>
-        t.status !== 'completed' && t.dueDate && t.dueDate < NOW - DAY
+      (t: any) => t.status !== 'completed' && t.dueDate && t.dueDate < NOW - DAY
     )
   ),
   getPendingTasks: jest.fn(() =>
@@ -122,8 +121,7 @@ const mockUseAppStore = {
 };
 
 jest.mock('../../../store', () => ({
-  useAppStore: (selector: any) =>
-    selector ? selector(mockUseAppStore) : mockUseAppStore,
+  useAppStore: (selector: any) => (selector ? selector(mockUseAppStore) : mockUseAppStore),
 }));
 
 describe('TasksScreen', () => {

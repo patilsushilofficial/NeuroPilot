@@ -29,9 +29,7 @@ describe('TabBarItem', () => {
   });
 
   it('reports selected state via accessibilityState when focused', () => {
-    const { getByLabelText } = render(
-      <TabBarItem item={HOME_ITEM} focused onPress={jest.fn()} />
-    );
+    const { getByLabelText } = render(<TabBarItem item={HOME_ITEM} focused onPress={jest.fn()} />);
     expect(getByLabelText('Home').props.accessibilityState).toEqual({
       selected: true,
     });
@@ -58,22 +56,13 @@ describe('TabBarItem', () => {
   it('renders the running indicator when the prop is set', () => {
     // The dot itself is decorative (no accessible name) — snapshot the tree
     // with and without the cue and assert they differ in node count.
-    const without = render(
-      <TabBarItem item={FOCUS_ITEM} focused onPress={jest.fn()} />
-    ).toJSON();
+    const without = render(<TabBarItem item={FOCUS_ITEM} focused onPress={jest.fn()} />).toJSON();
     const withCue = render(
-      <TabBarItem
-        item={FOCUS_ITEM}
-        focused
-        onPress={jest.fn()}
-        showRunningIndicator
-      />
+      <TabBarItem item={FOCUS_ITEM} focused onPress={jest.fn()} showRunningIndicator />
     ).toJSON();
 
     // `JSON.stringify` length is a coarse but sufficient signal that the
     // running indicator subtree is being rendered in addition to the icon.
-    expect(JSON.stringify(withCue).length).toBeGreaterThan(
-      JSON.stringify(without).length
-    );
+    expect(JSON.stringify(withCue).length).toBeGreaterThan(JSON.stringify(without).length);
   });
 });

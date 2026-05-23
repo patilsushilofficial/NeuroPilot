@@ -98,9 +98,7 @@ export const TodayList: React.FC<TodayListProps> = ({
             <AnimatedCheckbox
               checked={item.completed}
               onToggle={() =>
-                item.type === 'task'
-                  ? onToggleTask(item.id)
-                  : onToggleHabit(item.id)
+                item.type === 'task' ? onToggleTask(item.id) : onToggleHabit(item.id)
               }
             />
             <View style={styles.rowBody}>
@@ -124,9 +122,7 @@ export const TodayList: React.FC<TodayListProps> = ({
             ) : (
               <View style={styles.habitTag}>
                 <Text style={styles.habitTagEmoji}>{item.emoji}</Text>
-                <Text style={[theme.text.labelSmall, styles.habitTagLabel]}>
-                  HABIT
-                </Text>
+                <Text style={[theme.text.labelSmall, styles.habitTagLabel]}>HABIT</Text>
               </View>
             )}
           </Animated.View>
@@ -142,14 +138,8 @@ export const TodayList: React.FC<TodayListProps> = ({
           accessibilityRole="button"
           accessibilityLabel={`View ${remaining} more items`}
         >
-          <Text style={[theme.text.labelMedium, styles.moreLabel]}>
-            +{remaining} more
-          </Text>
-          <Icon
-            name="chevron-right"
-            size={iconSizes.md}
-            color={theme.colors.primary}
-          />
+          <Text style={[theme.text.labelMedium, styles.moreLabel]}>+{remaining} more</Text>
+          <Icon name="chevron-right" size={iconSizes.md} color={theme.colors.primary} />
         </TouchableOpacity>
       )}
     </Card>

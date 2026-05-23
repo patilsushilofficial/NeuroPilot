@@ -55,7 +55,7 @@ export const getPresetById = (id: string): FocusPreset =>
 
 /** XP Calculations */
 export const XP_REWARDS = {
-  focusMinute: 2,           // per minute of focus
+  focusMinute: 2, // per minute of focus
   taskComplete: {
     high: 50,
     medium: 30,
@@ -66,8 +66,7 @@ export const XP_REWARDS = {
 } as const;
 
 /** Level thresholds — XP required to reach each level */
-export const getLevelThreshold = (level: number): number =>
-  Math.floor(100 * Math.pow(level, 1.5));
+export const getLevelThreshold = (level: number): number => Math.floor(100 * Math.pow(level, 1.5));
 
 export const getLevelFromXP = (xp: number): number => {
   let level = 1;

@@ -54,9 +54,7 @@ export const useDebugScreen = () => {
 
   const testImmediateNotification = useCallback(async () => {
     haptics.light();
-    await triggerImmediateFocusAlert(
-      'This is a test notification from the Debug menu! 🚀'
-    );
+    await triggerImmediateFocusAlert('This is a test notification from the Debug menu! 🚀');
   }, [haptics]);
 
   const testScheduledNotification = useCallback(async () => {

@@ -1,8 +1,5 @@
 import { focusTransitionAlerts } from '../focusTransitionAlerts';
-import {
-  cancelNotification,
-  scheduleFocusTransitionAlert,
-} from '../../utils/notifications';
+import { cancelNotification, scheduleFocusTransitionAlert } from '../../utils/notifications';
 
 jest.mock('../../utils/notifications', () => ({
   scheduleFocusTransitionAlert: jest.fn(),

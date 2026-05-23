@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Toast } from './Toast';
-import {
-  toastService,
-  type ToastInstance,
-} from '../../services/toast';
+import { toastService, type ToastInstance } from '../../services/toast';
 
 /**
  * Bridges the imperative `toastService` to the React tree. Mount once
@@ -29,10 +26,7 @@ export const ToastHost: React.FC = () => {
     if (!active) return undefined;
     // Pass the id so service.dismiss() ignores us if a newer toast has
     // since replaced this one (race avoidance).
-    const handle = setTimeout(
-      () => toastService.dismiss(active.id),
-      active.durationMs
-    );
+    const handle = setTimeout(() => toastService.dismiss(active.id), active.durationMs);
     return () => clearTimeout(handle);
   }, [active]);
 
