@@ -1,3 +1,4 @@
+declare const global: any;
 import { renderHook } from '@testing-library/react-native';
 import { useAppTheme } from '../useAppTheme';
 import { useAppStore } from '../../store';
