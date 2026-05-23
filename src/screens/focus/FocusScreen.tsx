@@ -77,14 +77,13 @@ export const FocusScreen: React.FC = () => {
         </View>
 
         <View style={styles.sectionStack}>
-          <Text style={[theme.text.labelSmall, styles.sectionHeading]}>SESSION BREAKDOWN</Text>
+          <Text style={[theme.text.labelSmall, styles.sectionHeading]}>THIS PRESET</Text>
           <FocusSessionSummary items={infoItems} />
         </View>
 
         <View style={styles.sectionStack}>
-          <Text style={[theme.text.labelSmall, styles.sectionHeading]}>COACH NOTE</Text>
+          <Text style={[theme.text.labelSmall, styles.sectionHeading]}>ADHD TIP</Text>
           <Card style={styles.tipCard}>
-            <Text style={[theme.text.labelSmall, styles.tipHeader]}>💡 ADHD TIP</Text>
             <Text style={[theme.text.bodySmall, styles.tipBody]}>{tipText}</Text>
           </Card>
         </View>
@@ -116,9 +115,7 @@ const makeStyles = (theme: Theme) =>
       borderLeftColor: theme.colors.secondary,
       borderLeftWidth: borderWidths.extraThick,
     },
-    tipHeader: { color: theme.colors.secondary },
     tipBody: {
       color: theme.colors.textSecondary,
-      marginTop: spacing['2xs'],
     },
   });

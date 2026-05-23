@@ -17,7 +17,7 @@ import {
   iconSizes,
   opacity,
 } from '../../theme/tokens';
-import { fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
+import { fontSizes, fontWeights } from '../../theme/typography';
 
 interface FocusShieldProps {
   isActive: boolean;
@@ -37,9 +37,7 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>FOCUS SHIELD</Text>
-
+    <View>
       <TouchableOpacity
         onPress={handlePress}
         activeOpacity={opacity.hover}
@@ -97,16 +95,6 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
 
 const makeStyles = (theme: Theme) =>
   StyleSheet.create({
-    container: {
-      gap: spacing['2xs'],
-    },
-    label: {
-      fontSize: fontSizes.xs,
-      fontWeight: fontWeights.bold,
-      letterSpacing: letterSpacings.widest,
-      paddingHorizontal: spacing['2xs'],
-      color: theme.colors.textTertiary,
-    },
     card: {
       flexDirection: 'row',
       alignItems: 'center',

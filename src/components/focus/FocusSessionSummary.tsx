@@ -25,7 +25,7 @@ const ICON_WELL = moderateScale(40);
 /**
  * Read-only grid summarising the active focus preset (durations + XP).
  * Separated from `FocusScreen` so spacing, dividers, and type scale can
- * evolve without bloating the screen file.
+ * evolve without bloating the screen file. Section title lives on FocusScreen.
  */
 export const FocusSessionSummary: React.FC<FocusSessionSummaryProps> = ({ items }) => {
   const theme = useAppTheme();
@@ -34,7 +34,6 @@ export const FocusSessionSummary: React.FC<FocusSessionSummaryProps> = ({ items 
   return (
     <Card variant="surface" noPadding style={styles.card}>
       <View style={styles.inner}>
-        <Text style={[theme.text.labelSmall, styles.eyebrow]}>THIS PRESET</Text>
         <View style={styles.row}>
           {items.map((item, index) => (
             <React.Fragment key={item.id}>
@@ -66,12 +65,6 @@ const makeStyles = (theme: Theme) =>
     inner: {
       paddingVertical: spacing.sm,
       paddingHorizontal: spacing.xs,
-    },
-    eyebrow: {
-      color: theme.colors.textTertiary,
-      letterSpacing: letterSpacings.wider,
-      marginBottom: spacing.sm,
-      marginLeft: spacing['2xs'],
     },
     row: {
       flexDirection: 'row',

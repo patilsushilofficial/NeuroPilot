@@ -87,7 +87,10 @@ export const controlSizes = {
   emojiCircle: moderateScale(80),
   emojiChip: moderateScale(48),
   colorDot: moderateScale(32),
-  presetCard: moderateScale(120),
+  /** Fixed width for each preset chip in `FocusPresetPicker` (height follows content). */
+  presetPickerCardWidth: moderateScale(156),
+  /** Emoji ring inside each preset tile. */
+  presetPickerIconRing: moderateScale(36),
   pomodoroDot: moderateScale(10),
   shieldIcon: moderateScale(52),
 } as const;

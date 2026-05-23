@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { FOCUS_PRESETS } from '../../constants/focusPresets';
+import { FocusPreset } from '../../types';
 import { Theme } from '../../theme';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { borderWidths, controlSizes, iconSizes } from '../../theme/tokens';
@@ -12,6 +13,23 @@ interface FocusPresetPickerProps {
   onSelectPreset: (id: string) => void;
 }
 
+function rhythmLine(preset: FocusPreset): string {
+  const n = preset.sessionsBeforeLongBreak;
+  if (n === 1) {
+    return 'Big break after 1 work time';
+  }
+  return `Big break after ${n} work times`;
+}
+
+function accessibilityDescription(preset: FocusPreset): string {
+  return (
+    `${preset.name}. Work ${preset.focusMinutes} minutes, ` +
+    `little break ${preset.shortBreakMinutes} minutes, ` +
+    `big break ${preset.longBreakMinutes} minutes, ` +
+    `${preset.sessionsBeforeLongBreak} work times before the big break.`
+  );
+}
+
 export const FocusPresetPicker: React.FC<FocusPresetPickerProps> = ({
   selectedPresetId,
   onSelectPreset,
@@ -19,14 +37,21 @@ export const FocusPresetPicker: React.FC<FocusPresetPickerProps> = ({
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
+  const lineTextStyle = (selected: boolean) => [
+    theme.text.bodySmall,
+    styles.summaryLine,
+    selected ? styles.summaryActive : styles.summaryIdle,
+  ];
+
   return (
     <View style={styles.section}>
-      <Text style={[theme.text.labelSmall, styles.sectionLabel]}>CHOOSE A MODE</Text>
+      <Text style={[theme.text.labelSmall, styles.sectionLabel]}>PICK YOUR TIMER</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.presetScroll}
         contentContainerStyle={styles.presetContent}
+        nestedScrollEnabled
       >
         {FOCUS_PRESETS.map((preset) => {
           const selected = selectedPresetId === preset.id;
@@ -38,30 +63,61 @@ export const FocusPresetPicker: React.FC<FocusPresetPickerProps> = ({
               accessible
               accessibilityRole="radio"
               accessibilityState={{ selected }}
+              accessibilityLabel={accessibilityDescription(preset)}
             >
-              <View style={styles.headerRow}>
-                <View style={[styles.iconWrap, selected ? styles.iconWrapActive : styles.iconWrapIdle]}>
-                  <Text style={styles.presetEmoji}>{preset.icon}</Text>
+              <View style={styles.cardInner}>
+                <View style={styles.cardHead}>
+                  <View style={[styles.iconWrap, selected ? styles.iconWrapActive : styles.iconWrapIdle]}>
+                    <Text style={styles.presetEmoji}>{preset.icon}</Text>
+                  </View>
+                  <Text
+                    style={[
+                      theme.text.labelMedium,
+                      styles.presetName,
+                      selected ? styles.presetNameActive : styles.presetNameInactive,
+                    ]}
+                    numberOfLines={2}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.82}
+                  >
+                    {preset.name}
+                  </Text>
                 </View>
-                <Text
-                  style={[
-                    theme.text.labelMedium,
-                    styles.presetName,
-                    selected ? styles.presetNameActive : styles.presetNameInactive,
-                  ]}
-                  numberOfLines={2}
-                >
-                  {preset.name}
-                </Text>
-              </View>
 
-              <View style={styles.metaRow}>
-                <Text style={[theme.text.bodySmall, styles.metaPrimary]}>
-                  {preset.focusMinutes}m / {preset.shortBreakMinutes}m
-                </Text>
-                <Text style={[theme.text.bodySmall, styles.metaSecondary]}>
-                  LB x{preset.sessionsBeforeLongBreak}
-                </Text>
+                <View style={styles.summaryLines}>
+                  <Text
+                    style={lineTextStyle(selected)}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.72}
+                  >
+                    {`Work ${preset.focusMinutes} min`}
+                  </Text>
+                  <Text
+                    style={lineTextStyle(selected)}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.72}
+                  >
+                    {`Little break ${preset.shortBreakMinutes} min`}
+                  </Text>
+                  <Text
+                    style={lineTextStyle(selected)}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.72}
+                  >
+                    {`Big break ${preset.longBreakMinutes} min`}
+                  </Text>
+                  <Text
+                    style={lineTextStyle(selected)}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.72}
+                  >
+                    {rhythmLine(preset)}
+                  </Text>
+                </View>
               </View>
             </TouchableOpacity>
           );
@@ -78,54 +134,59 @@ const makeStyles = (theme: Theme) =>
       borderRadius: borderRadius['2xl'],
       borderWidth: borderWidths.thin,
       borderColor: theme.colors.border,
-      paddingVertical: spacing.md,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.md,
+      paddingHorizontal: spacing.md,
       gap: spacing.xs,
-      overflow: 'hidden',
     },
     sectionLabel: {
       color: theme.colors.textTertiary,
-      marginHorizontal: spacing.md,
+      marginLeft: spacing['2xs'],
     },
-    presetScroll: {},
+    presetScroll: {
+      overflow: 'visible',
+    },
     presetContent: {
-      paddingHorizontal: spacing.md,
-      paddingRight: spacing.md + spacing.xs,
+      paddingTop: spacing['2xs'],
+      paddingBottom: spacing['2xs'],
+      paddingLeft: spacing['2xs'],
+      paddingRight: spacing.lg,
+      alignItems: 'stretch',
     },
     presetCard: {
-      alignItems: 'stretch',
-      justifyContent: 'flex-start',
-      paddingVertical: spacing.sm,
-      paddingHorizontal: spacing.sm,
+      width: controlSizes.presetPickerCardWidth,
       borderRadius: borderRadius.lg,
       borderWidth: borderWidths.thin,
-      width: controlSizes.presetCard + spacing.sm,
-      gap: spacing.sm,
-      minHeight: controlSizes.presetCard + spacing.sm,
-      marginRight: spacing.xs,
+      borderColor: theme.colors.border,
+      marginRight: spacing.sm,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.xs,
+      overflow: 'hidden',
     },
     presetCardActive: {
       backgroundColor: theme.colors.primaryContainer,
       borderColor: theme.colors.primary,
+      borderWidth: borderWidths.base,
     },
     presetCardInactive: {
       backgroundColor: theme.colors.card,
-      borderColor: theme.colors.border,
     },
-    headerRow: {
-      flexDirection: 'row',
+    cardInner: {
+      gap: spacing.sm,
+    },
+    cardHead: {
       alignItems: 'center',
-      gap: spacing.xs,
-      minHeight: spacing['3xl'],
-    },
-    presetEmoji: {
-      fontSize: iconSizes.lg,
+      gap: spacing['2xs'],
     },
     iconWrap: {
-      width: spacing['3xl'],
-      height: spacing['3xl'],
+      width: controlSizes.presetPickerIconRing,
+      height: controlSizes.presetPickerIconRing,
       borderRadius: borderRadius.full,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    presetEmoji: {
+      fontSize: iconSizes.lg,
     },
     iconWrapActive: {
       backgroundColor: theme.colors.primary,
@@ -134,26 +195,25 @@ const makeStyles = (theme: Theme) =>
       backgroundColor: theme.colors.cardElevated ?? theme.colors.card,
     },
     presetName: {
-      flex: 1,
-      textAlign: 'left',
-      color: theme.colors.textPrimary,
+      textAlign: 'center',
+      width: '100%',
     },
-    presetNameActive: { color: theme.colors.primaryLight, fontWeight: '700' },
+    presetNameActive: { color: theme.colors.primaryLight },
     presetNameInactive: { color: theme.colors.textPrimary },
-    metaRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      borderTopWidth: borderWidths.hairline,
-      borderTopColor: theme.colors.border,
-      paddingTop: spacing.xs,
+    summaryLines: {
+      width: '100%',
+      gap: spacing['3xs'],
     },
-    metaPrimary: {
-      color: theme.colors.textSecondary,
+    summaryLine: {
+      textAlign: 'center',
+      width: '100%',
+    },
+    summaryActive: {
+      color: theme.colors.primaryLight,
       fontWeight: '600',
     },
-    metaSecondary: {
-      color: theme.colors.textTertiary,
-      opacity: 0.8,
+    summaryIdle: {
+      color: theme.colors.textSecondary,
+      fontWeight: '500',
     },
   });
