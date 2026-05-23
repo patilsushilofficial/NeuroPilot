@@ -10,15 +10,13 @@ jest.mock('../../store', () => ({
 }));
 
 jest.mock('../useHaptics', () => ({
-  useHaptics: jest
-    .fn()
-    .mockReturnValue({
-      light: jest.fn(),
-      medium: jest.fn(),
-      heavy: jest.fn(),
-      warning: jest.fn(),
-      focusComplete: jest.fn(),
-    }),
+  useHaptics: jest.fn().mockReturnValue({
+    light: jest.fn(),
+    medium: jest.fn(),
+    heavy: jest.fn(),
+    warning: jest.fn(),
+    focusComplete: jest.fn(),
+  }),
 }));
 
 describe('useFocusTimer', () => {
