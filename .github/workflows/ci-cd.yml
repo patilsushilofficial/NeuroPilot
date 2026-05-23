@@ -32,7 +32,7 @@ jobs:
         run: npm run lint
 
   format:
-    name: Formatting Check
+    name: Prettier Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
@@ -128,7 +128,7 @@ jobs:
             *Author*: ${{ github.actor }}
             *Workflow Status*: ${{ (needs.lint.result == 'success' && needs.format.result == 'success' && needs.type-check.result == 'success' && needs.test.result == 'success' && needs.build-android.result == 'success') && 'SUCCESS 🎉' || 'FAILURE 🔴' }}
             *Lint Check*: ${{ needs.lint.result }}
-            *Formatting Check*: ${{ needs.format.result }}
+            *Prettier Check*: ${{ needs.format.result }}
             *TypeScript Check*: ${{ needs.type-check.result }}
             *Unit Tests Status*: ${{ needs.test.result }}
             *Android Build Status*: ${{ needs.build-android.result }}
