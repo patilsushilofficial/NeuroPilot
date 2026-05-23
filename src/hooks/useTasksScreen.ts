@@ -62,10 +62,7 @@ export const useTasksScreen = () => {
     [filteredTasks]
   );
 
-  const pendingCount = useMemo(
-    () => tasks.filter((t) => t.status !== 'completed').length,
-    [tasks]
-  );
+  const pendingCount = useMemo(() => tasks.filter((t) => t.status !== 'completed').length, [tasks]);
 
   const overdueTasks = useMemo(() => getOverdueTasks(), [getOverdueTasks]);
   const overdueCount = overdueTasks.length;
@@ -83,9 +80,7 @@ export const useTasksScreen = () => {
     }
     if (filter === 'completed') {
       if (sortedTasks.length === 0) return [];
-      return [
-        { id: 'completed', title: 'Completed', accent: 'success', data: sortedTasks },
-      ];
+      return [{ id: 'completed', title: 'Completed', accent: 'success', data: sortedTasks }];
     }
     // 'all' — split overdue from the rest. We rely on `getOverdueTasks`
     // (the store's authoritative definition) to decide membership rather

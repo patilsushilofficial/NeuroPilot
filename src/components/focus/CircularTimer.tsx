@@ -10,11 +10,7 @@ import { fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
 import { iconSizes } from '../../theme/tokens';
 import { spacing } from '../../theme/spacing';
 import { moderateScale } from '../../utils/responsive';
-import {
-  FOCUS_PHASE_EMOJIS,
-  FOCUS_PHASE_LABELS,
-  getFocusPhaseColor,
-} from '../../constants/focus';
+import { FOCUS_PHASE_EMOJIS, FOCUS_PHASE_LABELS, getFocusPhaseColor } from '../../constants/focus';
 
 import { ProgressRing } from '../common/ProgressRing';
 
@@ -42,10 +38,7 @@ export const CircularTimer: React.FC<CircularTimerProps> = ({
   const phaseColor = getFocusPhaseColor(phase, theme);
   const phaseLabelStyle = styles[PHASE_LABEL_KEYS[phase]];
 
-  const sizeStyle = useMemo<ViewStyle>(
-    () => ({ width: size, height: size }),
-    [size]
-  );
+  const sizeStyle = useMemo<ViewStyle>(() => ({ width: size, height: size }), [size]);
 
   const progress = remainingProgress(secondsRemaining, totalSeconds);
   const isPaused = !isRunning && secondsRemaining < totalSeconds;

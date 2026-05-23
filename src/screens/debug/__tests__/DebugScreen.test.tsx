@@ -66,7 +66,7 @@ describe('DebugScreen', () => {
   it('triggers immediate notification on press', () => {
     const { getByText } = render(<DebugScreen />);
     const { triggerImmediateFocusAlert } = require('../../../utils/notifications');
-    
+
     fireEvent.press(getByText('Immediate Notif'));
     expect(mockHaptics.light).toHaveBeenCalled();
     expect(triggerImmediateFocusAlert).toHaveBeenCalled();
@@ -76,14 +76,17 @@ describe('DebugScreen', () => {
     const { getByText } = render(<DebugScreen />);
     const { scheduleTaskReminder } = require('../../../utils/notifications');
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
-    
+
     fireEvent.press(getByText('In 5 Seconds'));
     expect(mockHaptics.light).toHaveBeenCalled();
     expect(scheduleTaskReminder).toHaveBeenCalled();
-    
+
     // Wait for the async mock to resolve
     await Promise.resolve();
-    expect(alertSpy).toHaveBeenCalledWith('Success', 'Notification scheduled for 5 seconds from now!');
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Success',
+      'Notification scheduled for 5 seconds from now!'
+    );
   });
 
   it('shows error alert if scheduling fails', async () => {
@@ -91,12 +94,15 @@ describe('DebugScreen', () => {
     const { scheduleTaskReminder } = require('../../../utils/notifications');
     scheduleTaskReminder.mockResolvedValueOnce(null);
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
-    
+
     fireEvent.press(getByText('In 5 Seconds'));
-    
+
     // Wait for the async mock to resolve
     await Promise.resolve();
-    expect(alertSpy).toHaveBeenCalledWith('Error', 'Failed to schedule notification. Check permissions.');
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Error',
+      'Failed to schedule notification. Check permissions.'
+    );
   });
 
   it('triggers success haptics', () => {

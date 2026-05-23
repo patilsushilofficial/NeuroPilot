@@ -28,8 +28,7 @@ jest.mock('expo-notifications', () => ({
 }));
 
 // Capture the handler installed at module load before any clearAllMocks() runs.
-const installedHandler =
-  (Notifications.setNotificationHandler as jest.Mock).mock.calls[0]?.[0];
+const installedHandler = (Notifications.setNotificationHandler as jest.Mock).mock.calls[0]?.[0];
 
 describe('notifications', () => {
   beforeEach(() => {
@@ -44,13 +43,17 @@ describe('notifications', () => {
     });
 
     it('requests permission when not yet granted', async () => {
-      (Notifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'undetermined' });
+      (Notifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+        status: 'undetermined',
+      });
       (Notifications.requestPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
       await expect(requestNotificationPermissions()).resolves.toBe(true);
     });
 
     it('returns false when the user denies', async () => {
-      (Notifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'undetermined' });
+      (Notifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+        status: 'undetermined',
+      });
       (Notifications.requestPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'denied' });
       await expect(requestNotificationPermissions()).resolves.toBe(false);
     });

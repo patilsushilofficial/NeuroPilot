@@ -14,10 +14,7 @@ import { FloatingActionButton } from '../../components/common/FloatingActionButt
 import { Theme } from '../../theme';
 import { spacing } from '../../theme/spacing';
 import { durations } from '../../theme/tokens';
-import {
-  HABIT_FILTER_TABS,
-  HABIT_FILTER_EMPTY_STATE,
-} from '../../constants/habitsUi';
+import { HABIT_FILTER_TABS, HABIT_FILTER_EMPTY_STATE } from '../../constants/habitsUi';
 import type { Habit } from '../../types';
 
 /**
@@ -83,9 +80,7 @@ export const HabitsScreen: React.FC = () => {
   // celebration is visible even before the user scrolls down to the
   // progress card. Pure presentation decision — the hook only tells us
   // *whether* the day is perfect.
-  const subtitleColor = isPerfectDay
-    ? theme.colors.success
-    : theme.colors.textSecondary;
+  const subtitleColor = isPerfectDay ? theme.colors.success : theme.colors.textSecondary;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -94,9 +89,7 @@ export const HabitsScreen: React.FC = () => {
           {activeFilterLabel.toUpperCase()}
         </Text>
         <Text style={[theme.text.h1, styles.title]}>Habits</Text>
-        <Text
-          style={[theme.text.bodySmall, styles.subtitle, { color: subtitleColor }]}
-        >
+        <Text style={[theme.text.bodySmall, styles.subtitle, { color: subtitleColor }]}>
           {completedCount} of {totalCount} done today
         </Text>
       </View>
@@ -131,11 +124,7 @@ export const HabitsScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         stickySectionHeadersEnabled={false}
         ListEmptyComponent={
-          <EmptyState
-            emoji={empty.emoji}
-            title={empty.title}
-            subtitle={empty.subtitle}
-          />
+          <EmptyState emoji={empty.emoji} title={empty.title} subtitle={empty.subtitle} />
         }
       />
 

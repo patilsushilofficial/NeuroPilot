@@ -3,14 +3,20 @@ import { syncService } from './SyncService';
 import { XP_REWARDS } from '../constants/focusPresets';
 
 let taskIdCounter = Date.now();
-const generateId = (prefix: string) => `${prefix}_${++taskIdCounter}_${Math.random().toString(36).slice(2, 7)}`;
+const generateId = (prefix: string) =>
+  `${prefix}_${++taskIdCounter}_${Math.random().toString(36).slice(2, 7)}`;
 
 /**
  * TaskService encapsulates all complex business logic and syncing
  * for tasks, keeping the Zustand slice pure and fast.
  */
 class TaskService {
-  createTask(payload: Pick<Task, 'title' | 'description' | 'priority' | 'dueDate' | 'estimatedMinutes' | 'tags'> & { subtasks?: Pick<SubTask, 'title'>[] }): Task {
+  createTask(
+    payload: Pick<
+      Task,
+      'title' | 'description' | 'priority' | 'dueDate' | 'estimatedMinutes' | 'tags'
+    > & { subtasks?: Pick<SubTask, 'title'>[] }
+  ): Task {
     const id = generateId('task');
     const xpReward = XP_REWARDS.taskComplete[payload.priority];
     const subtasks: SubTask[] = (payload.subtasks ?? []).map((s) => ({

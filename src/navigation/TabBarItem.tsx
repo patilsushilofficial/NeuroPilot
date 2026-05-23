@@ -15,19 +15,8 @@ import { Icon } from '../components/common/Icon';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { Theme } from '../theme';
 import { spacing, borderRadius } from '../theme/spacing';
-import {
-  borderWidths,
-  durations,
-  hitSlop,
-  iconSizes,
-  opacity,
-  springs,
-} from '../theme/tokens';
-import {
-  fontSizes,
-  fontWeights,
-  letterSpacings,
-} from '../theme/typography';
+import { borderWidths, durations, hitSlop, iconSizes, opacity, springs } from '../theme/tokens';
+import { fontSizes, fontWeights, letterSpacings } from '../theme/typography';
 import { moderateScale } from '../utils/responsive';
 import type { TabItem } from '../constants/tabBar';
 
@@ -88,10 +77,7 @@ export const TabBarItem: React.FC<TabBarItemProps> = ({
       hitSlop={hitSlop.sm}
     >
       <View style={styles.iconWrap}>
-        <Animated.View
-          pointerEvents="none"
-          style={[styles.iconPill, pillStyle]}
-        />
+        <Animated.View pointerEvents="none" style={[styles.iconPill, pillStyle]} />
         <Icon
           name={item.icon}
           size={iconSizes.lg}
@@ -102,10 +88,7 @@ export const TabBarItem: React.FC<TabBarItemProps> = ({
       <Text
         numberOfLines={1}
         allowFontScaling={false}
-        style={[
-          styles.label,
-          focused ? styles.labelActive : styles.labelInactive,
-        ]}
+        style={[styles.label, focused ? styles.labelActive : styles.labelInactive]}
       >
         {item.label}
       </Text>
@@ -167,11 +150,7 @@ const RunningIndicator: React.FC<{ theme: Theme }> = ({ theme }) => {
       accessible={false}
     >
       <Animated.View
-        style={[
-          styles.runningHalo,
-          { backgroundColor: theme.colors.primary },
-          haloStyle,
-        ]}
+        style={[styles.runningHalo, { backgroundColor: theme.colors.primary }, haloStyle]}
       />
       <View
         style={[

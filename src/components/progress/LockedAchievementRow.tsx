@@ -26,9 +26,7 @@ const EMOJI_WRAP_SIZE = controlSizes.buttonHeight.md;
  * than `AchievementCard` so the locked list stays scannable without
  * competing with the celebratory unlocked grid.
  */
-export const LockedAchievementRow: React.FC<LockedAchievementRowProps> = ({
-  achievement,
-}) => {
+export const LockedAchievementRow: React.FC<LockedAchievementRowProps> = ({ achievement }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
@@ -45,10 +43,7 @@ export const LockedAchievementRow: React.FC<LockedAchievementRowProps> = ({
         <Text style={[theme.text.labelMedium, styles.title]} numberOfLines={1}>
           {achievement.title}
         </Text>
-        <Text
-          style={[theme.text.bodySmall, styles.description]}
-          numberOfLines={2}
-        >
+        <Text style={[theme.text.bodySmall, styles.description]} numberOfLines={2}>
           {achievement.description}
         </Text>
       </View>

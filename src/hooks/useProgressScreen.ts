@@ -2,10 +2,7 @@ import { useMemo } from 'react';
 
 import { useAppStore, selectStats } from '../store';
 import { ACHIEVEMENTS } from '../constants/achievements';
-import {
-  getXPProgressInLevel,
-  getLevelThreshold,
-} from '../constants/focusPresets';
+import { getXPProgressInLevel, getLevelThreshold } from '../constants/focusPresets';
 import { Achievement } from '../types';
 import { formatFocusTime } from '../utils/dateUtils';
 
@@ -57,8 +54,7 @@ export const useProgressScreen = (): ProgressViewModel => {
 
   const xpProgress = getXPProgressInLevel(stats.totalXP);
   const xpInLevel = stats.totalXP - getLevelThreshold(stats.level);
-  const xpForLevel =
-    getLevelThreshold(stats.level + 1) - getLevelThreshold(stats.level);
+  const xpForLevel = getLevelThreshold(stats.level + 1) - getLevelThreshold(stats.level);
 
   const unlockedAchievements = useMemo(
     () => ACHIEVEMENTS.filter((a) => stats.unlockedAchievements.includes(a.id)),
@@ -66,20 +62,14 @@ export const useProgressScreen = (): ProgressViewModel => {
   );
 
   const lockedAchievements = useMemo(
-    () =>
-      ACHIEVEMENTS.filter(
-        (a) => !stats.unlockedAchievements.includes(a.id) && !a.secret
-      ),
+    () => ACHIEVEMENTS.filter((a) => !stats.unlockedAchievements.includes(a.id) && !a.secret),
     [stats.unlockedAchievements]
   );
 
   // Visible total excludes `secret` achievements so the count the user
   // sees ("3 / 17") matches the cards we actually render. Including
   // secrets would make the denominator drift mysteriously.
-  const achievementsTotal = useMemo(
-    () => ACHIEVEMENTS.filter((a) => !a.secret).length,
-    []
-  );
+  const achievementsTotal = useMemo(() => ACHIEVEMENTS.filter((a) => !a.secret).length, []);
 
   const weeklyXPTotal = useMemo(
     () => stats.weeklyXP.reduce((sum, v) => sum + v, 0),

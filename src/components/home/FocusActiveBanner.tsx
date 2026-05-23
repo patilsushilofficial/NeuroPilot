@@ -18,10 +18,7 @@ import { formatTimerDisplay } from '../../utils/dateUtils';
 import { remainingProgress } from '../../utils/svgGeometry';
 import { ActiveFocusState } from '../../types';
 import { moderateScale } from '../../utils/responsive';
-import {
-  FOCUS_PHASE_LABELS,
-  getFocusPhaseColor,
-} from '../../constants/focus';
+import { FOCUS_PHASE_LABELS, getFocusPhaseColor } from '../../constants/focus';
 
 import { ProgressRing } from '../common/ProgressRing';
 import { Icon } from '../common/Icon';
@@ -43,10 +40,7 @@ const PULSE_DURATION = durations.long * 1.5;
  * The border subtly pulses while the session is running to draw the eye
  * back to the unfinished work.
  */
-export const FocusActiveBanner: React.FC<FocusActiveBannerProps> = ({
-  active,
-  onPress,
-}) => {
+export const FocusActiveBanner: React.FC<FocusActiveBannerProps> = ({ active, onPress }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
@@ -104,11 +98,7 @@ export const FocusActiveBanner: React.FC<FocusActiveBannerProps> = ({
         </Text>
       </View>
 
-      <Icon
-        name="chevron-right"
-        size={iconSizes.lg}
-        color={theme.colors.primary}
-      />
+      <Icon name="chevron-right" size={iconSizes.lg} color={theme.colors.primary} />
     </TouchableOpacity>
   );
 };

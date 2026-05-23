@@ -47,9 +47,7 @@ const mockStore = {
     )
   ),
   getOverdueTasks: jest.fn(() =>
-    mockTasks.filter(
-      (t) => t.status !== 'completed' && t.dueDate && t.dueDate < NOW - DAY
-    )
+    mockTasks.filter((t) => t.status !== 'completed' && t.dueDate && t.dueDate < NOW - DAY)
   ),
 };
 
@@ -73,16 +71,9 @@ describe('useTasksScreen', () => {
         buildTask({ id: 'today', dueDate: NOW }),
       ];
       const { result } = renderHook(() => useTasksScreen());
-      expect(result.current.sections.map((s) => s.id)).toEqual([
-        'overdue',
-        'pending',
-      ]);
-      expect(result.current.sections[0].data.map((t) => t.id)).toContain(
-        'overdue'
-      );
-      expect(result.current.sections[1].data.map((t) => t.id)).toContain(
-        'today'
-      );
+      expect(result.current.sections.map((s) => s.id)).toEqual(['overdue', 'pending']);
+      expect(result.current.sections[0].data.map((t) => t.id)).toContain('overdue');
+      expect(result.current.sections[1].data.map((t) => t.id)).toContain('today');
     });
 
     it('omits the Overdue section when there are no overdue tasks', () => {
@@ -163,7 +154,7 @@ describe('useTasksScreen', () => {
 
       expect(spy).toHaveBeenCalled();
       const buttons = spy.mock.calls[0][2];
-      const confirm = buttons?.find((b: any) => b.text === 'Delete');
+      const confirm = (buttons as any)?.find((b: any) => b.text === 'Delete');
       confirm?.onPress?.();
 
       expect(mockStore.deleteTask).toHaveBeenCalledWith('t1');

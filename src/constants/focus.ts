@@ -44,12 +44,11 @@ export const FOCUS_PHASE_TIPS: Record<FocusPhase, string> = {
     'Remove distractions: phone face-down, notifications off. Your brain needs one input at a time.',
   short_break:
     "Move your body! A 5-minute walk resets your prefrontal cortex's attention capacity.",
-  long_break:
-    'Long break earned! Hydrate, stretch, or do something you genuinely enjoy.',
+  long_break: 'Long break earned! Hydrate, stretch, or do something you genuinely enjoy.',
 };
 
 export interface FocusInfoTile {
-  /** Short label (uppercased at render time, e.g. "FOCUS"). */
+  /** Short label (shown with `labelSmall` typography, uppercased by theme). */
   label: string;
   /** Function used by the screen to compute the displayed value from the
    *  selected preset. We store the function rather than a literal so the
@@ -60,8 +59,8 @@ export interface FocusInfoTile {
 }
 
 export const FOCUS_INFO_TILES: readonly FocusInfoTile[] = [
-  { id: 'focus', label: 'Focus', emoji: '🧠' },
-  { id: 'shortBreak', label: 'Short Break', emoji: '☕' },
-  { id: 'longBreak', label: 'Long Break', emoji: '🌿' },
-  { id: 'xp', label: 'Per session', emoji: '⚡' },
+  { id: 'focus', label: 'Work', emoji: '🧠' },
+  { id: 'shortBreak', label: 'Little break', emoji: '☕' },
+  { id: 'longBreak', label: 'Big break', emoji: '🌿' },
+  { id: 'xp', label: 'Bonus', emoji: '⚡' },
 ] as const;

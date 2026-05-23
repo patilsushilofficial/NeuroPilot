@@ -74,7 +74,7 @@ describe('ToastHost', () => {
     expect(queryByText('Tap me')).toBeNull();
   });
 
-  it("the auto-dismiss timer of an old toast does not close the toast that replaced it", () => {
+  it('the auto-dismiss timer of an old toast does not close the toast that replaced it', () => {
     // Race scenario: toast A's 1s timer is in-flight when toast B is
     // shown. When A's timer fires it must not close B. The host
     // achieves this by passing the id to dismiss().
@@ -103,8 +103,6 @@ describe('ToastHost', () => {
     // showing a toast after unmount throws no errors.
     const { unmount } = render(<ToastHost />);
     unmount();
-    expect(() =>
-      toastService.show({ message: 'after unmount' })
-    ).not.toThrow();
+    expect(() => toastService.show({ message: 'after unmount' })).not.toThrow();
   });
 });

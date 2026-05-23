@@ -28,9 +28,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     <View style={styles.container}>
       <Text style={styles.emoji}>{emoji}</Text>
       <Text style={[theme.text.h3, styles.title]}>{title}</Text>
-      {subtitle && (
-        <Text style={[theme.text.bodyMedium, styles.subtitle]}>{subtitle}</Text>
-      )}
+      {subtitle && <Text style={[theme.text.bodyMedium, styles.subtitle]}>{subtitle}</Text>}
       {actionLabel && onAction && (
         <Button
           label={actionLabel}

@@ -54,7 +54,9 @@ export const FocusTimerPanel: React.FC<FocusTimerPanelProps> = ({
       <View style={styles.phaseHeader}>
         <Badge
           label={phaseLabel}
-          variant={phase === 'focus' ? 'primary' : phase === 'short_break' ? 'secondary' : 'success'}
+          variant={
+            phase === 'focus' ? 'primary' : phase === 'short_break' ? 'secondary' : 'success'
+          }
           emoji={phase === 'focus' ? '🧠' : phase === 'short_break' ? '☕' : '🌿'}
         />
         <Text style={[theme.text.bodySmall, styles.phaseMeta]}>{presetName} preset</Text>
@@ -62,13 +64,34 @@ export const FocusTimerPanel: React.FC<FocusTimerPanelProps> = ({
 
       <View style={styles.phasePillRow}>
         <View style={[styles.phasePill, phase === 'focus' && styles.phasePillActive]}>
-          <Text style={[theme.text.labelSmall, styles.phasePillText]}>FOCUS</Text>
+          <Text
+            style={[theme.text.labelSmall, styles.phasePillText]}
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
+          >
+            FOCUS
+          </Text>
         </View>
         <View style={[styles.phasePill, phase === 'short_break' && styles.phasePillActive]}>
-          <Text style={[theme.text.labelSmall, styles.phasePillText]}>SHORT BREAK</Text>
+          <Text
+            style={[theme.text.labelSmall, styles.phasePillText]}
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
+          >
+            SHORT BREAK
+          </Text>
         </View>
         <View style={[styles.phasePill, phase === 'long_break' && styles.phasePillActive]}>
-          <Text style={[theme.text.labelSmall, styles.phasePillText]}>LONG BREAK</Text>
+          <Text
+            style={[theme.text.labelSmall, styles.phasePillText]}
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
+          >
+            LONG BREAK
+          </Text>
         </View>
       </View>
 
@@ -87,7 +110,10 @@ export const FocusTimerPanel: React.FC<FocusTimerPanelProps> = ({
               return (
                 <View
                   key={i}
-                  style={[styles.pomodoroDot, filled ? styles.pomodoroDotOn : styles.pomodoroDotOff]}
+                  style={[
+                    styles.pomodoroDot,
+                    filled ? styles.pomodoroDotOn : styles.pomodoroDotOff,
+                  ]}
                 />
               );
             })}
@@ -110,14 +136,14 @@ export const FocusTimerPanel: React.FC<FocusTimerPanelProps> = ({
                 onPress={onPauseResume}
                 variant={isRunning ? 'outline' : 'primary'}
                 size="lg"
-                style={styles.pauseBtn}
+                fullWidth
               />
               <Button
                 label="Skip to next phase"
                 onPress={onSkipPhase}
-                variant="ghost"
-                size="md"
-                style={styles.skipBtn}
+                variant="outline"
+                size="lg"
+                fullWidth
               />
             </View>
           )}
@@ -157,16 +183,20 @@ const makeStyles = (theme: Theme) =>
     phasePillRow: {
       flexDirection: 'row',
       gap: spacing['2xs'],
+      alignSelf: 'stretch',
     },
     phasePill: {
       flex: 1,
+      minWidth: 0,
       alignItems: 'center',
       justifyContent: 'center',
+      minHeight: controlSizes.buttonHeight.md,
       borderRadius: borderRadius.md,
       borderWidth: borderWidths.thin,
       borderColor: theme.colors.border,
       backgroundColor: theme.colors.card,
       paddingVertical: spacing['2xs'],
+      paddingHorizontal: spacing['3xs'],
     },
     phasePillActive: {
       backgroundColor: theme.colors.primaryContainer,
@@ -174,6 +204,7 @@ const makeStyles = (theme: Theme) =>
     },
     phasePillText: {
       color: theme.colors.textSecondary,
+      textAlign: 'center',
     },
     timerSection: {
       alignItems: 'center',
@@ -194,13 +225,10 @@ const makeStyles = (theme: Theme) =>
       width: '100%',
     },
     activeControls: {
-      flexDirection: 'row',
-      gap: spacing.xs,
-      alignItems: 'stretch',
-    },
-    pauseBtn: { flex: 1 },
-    skipBtn: {
-      minWidth: controlSizes.presetCard,
+      flexDirection: 'column',
+      alignSelf: 'stretch',
+      width: '100%',
+      gap: spacing.sm,
     },
     abandonBtn: {
       paddingVertical: spacing.xs,

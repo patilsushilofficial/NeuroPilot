@@ -30,9 +30,9 @@ describe('useSettings', () => {
       updateSettings: jest.fn(),
       toggleHaptics: jest.fn(),
     });
-    
+
     const { result } = renderHook(() => useSettings());
-    
+
     expect(result.current.settings).toBe(mockSettings);
     expect(result.current.profile).toBe(mockProfile);
     expect(result.current.themeLabel).toBe('Dark (Recommended)');
@@ -45,19 +45,19 @@ describe('useSettings', () => {
       settings: { theme: 'dark' },
       updateSettings,
     });
-    
+
     const { result } = renderHook(() => useSettings());
-    
+
     act(() => {
       result.current.handleThemeChange();
     });
-    
+
     expect(spy).toHaveBeenCalled();
-    
+
     // Simulate pressing the second option (Light)
     const buttons = spy.mock.calls[0][2];
     if (buttons) {
-      buttons[1].onPress();
+      buttons[1].onPress?.();
       expect(updateSettings).toHaveBeenCalledWith({ theme: 'light' });
     }
   });
@@ -76,11 +76,7 @@ describe('useSettings', () => {
       result.current.handleResetData();
     });
 
-    expect(spy).toHaveBeenCalledWith(
-      '⚠️ Reset All Data',
-      expect.any(String),
-      expect.any(Array)
-    );
+    expect(spy).toHaveBeenCalledWith('⚠️ Reset All Data', expect.any(String), expect.any(Array));
 
     const buttons = spy.mock.calls[0][2];
     expect(buttons).toBeDefined();

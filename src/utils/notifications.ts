@@ -130,7 +130,6 @@ export const triggerImmediateFocusAlert = async (message: string): Promise<strin
   return id;
 };
 
-
 export const cancelNotification = async (id: string): Promise<void> => {
   await Notifications.cancelScheduledNotificationAsync(id);
 };

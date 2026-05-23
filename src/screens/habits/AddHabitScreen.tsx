@@ -77,7 +77,13 @@ export const AddHabitScreen: React.FC = () => {
           <Text style={[theme.text.h4, styles.headerTitle]}>
             {isEditing ? 'Edit Habit' : 'New Habit'}
           </Text>
-          <Button label="Save" onPress={handleSave} variant="primary" size="sm" disabled={!canSave} />
+          <Button
+            label="Save"
+            onPress={handleSave}
+            variant="primary"
+            size="sm"
+            disabled={!canSave}
+          />
         </View>
 
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -179,10 +185,7 @@ export const AddHabitScreen: React.FC = () => {
                   <TouchableOpacity
                     key={opt.key}
                     onPress={() => handleSelectFrequency(opt.key)}
-                    style={[
-                      styles.freqChip,
-                      selected ? styles.chipActive : styles.chipInactive,
-                    ]}
+                    style={[styles.freqChip, selected ? styles.chipActive : styles.chipInactive]}
                   >
                     <Text
                       style={[

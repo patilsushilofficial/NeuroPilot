@@ -79,10 +79,10 @@ const buildTipForPhase = (phase: string): string => {
 };
 
 const buildInfoItems = (preset: any) => [
-  { id: 'focus', label: 'Focus', emoji: '🧠', value: `${preset.focusMinutes}m` },
-  { id: 'shortBreak', label: 'Short Break', emoji: '☕', value: `${preset.shortBreakMinutes}m` },
-  { id: 'longBreak', label: 'Long Break', emoji: '🌿', value: `${preset.longBreakMinutes}m` },
-  { id: 'xp', label: 'XP/session', emoji: '⚡', value: `+${preset.focusMinutes * 2}` },
+  { id: 'focus', label: 'Work', emoji: '🧠', value: `${preset.focusMinutes}m` },
+  { id: 'shortBreak', label: 'Little break', emoji: '☕', value: `${preset.shortBreakMinutes}m` },
+  { id: 'longBreak', label: 'Big break', emoji: '🌿', value: `${preset.longBreakMinutes}m` },
+  { id: 'xp', label: 'Bonus', emoji: '⚡', value: `+${preset.focusMinutes * 2}` },
 ];
 
 const basePreset = {
@@ -136,8 +136,8 @@ describe('FocusScreen', () => {
 
   it('renders idle state with preset picker', () => {
     const { getByText } = render(<FocusScreen />);
-    expect(getByText('Focus')).toBeTruthy();
-    expect(getByText('CHOOSE A MODE')).toBeTruthy();
+    expect(getByText(/One task\. One timer/)).toBeTruthy();
+    expect(getByText('PICK YOUR TIMER')).toBeTruthy();
     expect(getByText(/Start Classic/)).toBeTruthy();
   });
 

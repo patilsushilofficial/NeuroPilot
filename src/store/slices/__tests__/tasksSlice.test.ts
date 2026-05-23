@@ -22,22 +22,21 @@ describe('tasksSlice', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     const state = {
       tasks: [],
       settings: { notificationsEnabled: true },
       updateTask: jest.fn(),
     };
-    
+
     set = jest.fn((fn) => {
       const updates = typeof fn === 'function' ? fn(state) : fn;
       Object.assign(state, updates);
     });
-    
-    get = jest.fn(() => state);
-    
-    slice = createTasksSlice(set, get, {} as any);
 
+    get = jest.fn(() => state);
+
+    slice = createTasksSlice(set, get, {} as any);
   });
 
   it('should add a task', () => {
@@ -51,7 +50,13 @@ describe('tasksSlice', () => {
   });
 
   it('should complete a task', () => {
-    const mockTask1 = { id: 'task_1', title: 'Test 1', status: 'pending', xpReward: 10, notificationId: 'notif_1' };
+    const mockTask1 = {
+      id: 'task_1',
+      title: 'Test 1',
+      status: 'pending',
+      xpReward: 10,
+      notificationId: 'notif_1',
+    };
     const mockTask2 = { id: 'task_2', title: 'Test 2', status: 'pending', xpReward: 5 };
     const state = get();
     state.tasks = [mockTask1, mockTask2];
@@ -84,18 +89,23 @@ describe('tasksSlice', () => {
   });
 
   it('should reschedule notification if dueDate changes', async () => {
-    const mockTask1 = { id: 'task_1', title: 'Test 1', status: 'pending', notificationId: 'notif_1' };
+    const mockTask1 = {
+      id: 'task_1',
+      title: 'Test 1',
+      status: 'pending',
+      notificationId: 'notif_1',
+    };
     const mockTask2 = { id: 'task_2', title: 'Test 2', status: 'pending' };
     const state = get();
     state.tasks = [mockTask1, mockTask2];
 
     const { cancelNotification, scheduleTaskReminder } = require('../../../utils/notifications');
-    
+
     slice.updateTask('task_1', { dueDate: Date.now() + 100000, title: 'Updated Title' });
 
     expect(cancelNotification).toHaveBeenCalledWith('notif_1');
     expect(scheduleTaskReminder).toHaveBeenCalled();
-    
+
     await Promise.resolve(); // Flush promises
     expect(set).toHaveBeenCalled();
   });
@@ -104,25 +114,33 @@ describe('tasksSlice', () => {
     const mockTask = { id: 'task_1', title: 'Test', subtasks: [] };
     const state = get();
     state.tasks = [mockTask];
-    
+
     slice.addSubtask('task_1', 'Subtask 1');
     expect(set).toHaveBeenCalled();
   });
 
   it('should toggle a subtask', () => {
-    const mockTask = { id: 'task_1', title: 'Test', subtasks: [{ id: 'sub_1', title: 'Subtask 1', completed: false }] };
+    const mockTask = {
+      id: 'task_1',
+      title: 'Test',
+      subtasks: [{ id: 'sub_1', title: 'Subtask 1', completed: false }],
+    };
     const state = get();
     state.tasks = [mockTask];
-    
+
     slice.toggleSubtask('task_1', 'sub_1');
     expect(set).toHaveBeenCalled();
   });
 
   it('should delete a subtask', () => {
-    const mockTask = { id: 'task_1', title: 'Test', subtasks: [{ id: 'sub_1', title: 'Subtask 1', completed: false }] };
+    const mockTask = {
+      id: 'task_1',
+      title: 'Test',
+      subtasks: [{ id: 'sub_1', title: 'Subtask 1', completed: false }],
+    };
     const state = get();
     state.tasks = [mockTask];
-    
+
     slice.deleteSubtask('task_1', 'sub_1');
     expect(set).toHaveBeenCalled();
   });
@@ -131,7 +149,7 @@ describe('tasksSlice', () => {
     const mockTask = { id: 'task_1', title: 'Test' };
     const state = get();
     state.tasks = [mockTask];
-    
+
     const task = slice.getTaskById('task_1');
     expect(task).toEqual(mockTask);
   });
@@ -140,16 +158,21 @@ describe('tasksSlice', () => {
     const mockTask = { id: 'task_1', title: 'Test', status: 'pending', dueDate: Date.now() };
     const state = get();
     state.tasks = [mockTask];
-    
+
     const todayTasks = slice.getTodaysTasks();
     expect(todayTasks.length).toBe(1);
   });
 
   it('should get overdue tasks', () => {
-    const mockTask = { id: 'task_1', title: 'Test', status: 'pending', dueDate: Date.now() - 86400000 };
+    const mockTask = {
+      id: 'task_1',
+      title: 'Test',
+      status: 'pending',
+      dueDate: Date.now() - 86400000,
+    };
     const state = get();
     state.tasks = [mockTask];
-    
+
     const overdueTasks = slice.getOverdueTasks();
     expect(overdueTasks.length).toBe(1);
   });
@@ -158,7 +181,7 @@ describe('tasksSlice', () => {
     const mockTask = { id: 'task_1', title: 'Test', status: 'pending' };
     const state = get();
     state.tasks = [mockTask];
-    
+
     const pendingTasks = slice.getPendingTasks();
     expect(pendingTasks.length).toBe(1);
   });
@@ -254,11 +277,7 @@ describe('tasksSlice', () => {
     scheduleTaskReminder.mockClear();
     slice.updateTask('task_1', { dueDate: Date.now() + 86_400_000 });
     await Promise.resolve();
-    expect(scheduleTaskReminder).toHaveBeenCalledWith(
-      'task_1',
-      'Existing',
-      expect.any(Date)
-    );
+    expect(scheduleTaskReminder).toHaveBeenCalledWith('task_1', 'Existing', expect.any(Date));
   });
 
   it('completeTask leaves notification cancellation alone if there is no notificationId', () => {

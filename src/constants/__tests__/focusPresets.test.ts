@@ -1,4 +1,11 @@
-import { getPresetById, getLevelThreshold, getLevelFromXP, getXPToNextLevel, getXPProgressInLevel, XP_REWARDS } from '../focusPresets';
+import {
+  getPresetById,
+  getLevelThreshold,
+  getLevelFromXP,
+  getXPToNextLevel,
+  getXPProgressInLevel,
+  XP_REWARDS,
+} from '../focusPresets';
 
 describe('focusPresets', () => {
   describe('getPresetById', () => {

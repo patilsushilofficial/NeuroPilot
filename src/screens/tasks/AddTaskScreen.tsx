@@ -80,7 +80,13 @@ export const AddTaskScreen: React.FC = () => {
           <Text style={[theme.text.h4, styles.headerTitle]}>
             {isEditing ? 'Edit Task' : 'New Task'}
           </Text>
-          <Button label="Save" onPress={handleSave} variant="primary" size="sm" disabled={!canSave} />
+          <Button
+            label="Save"
+            onPress={handleSave}
+            variant="primary"
+            size="sm"
+            disabled={!canSave}
+          />
         </View>
 
         <ScrollView
@@ -126,7 +132,9 @@ export const AddTaskScreen: React.FC = () => {
                         accessibilityState={{ selected }}
                       >
                         <Text style={styles.priorityEmoji}>{opt.emoji}</Text>
-                        <Text style={[theme.text.labelMedium, styles.priorityLabel]}>{opt.label}</Text>
+                        <Text style={[theme.text.labelMedium, styles.priorityLabel]}>
+                          {opt.label}
+                        </Text>
                         <Text style={[theme.text.bodySmall, styles.priorityDesc]}>
                           {opt.description}
                         </Text>

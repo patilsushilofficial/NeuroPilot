@@ -35,8 +35,7 @@ const COLOR_SCHEME_BY_MODE: Record<ThemeMode, ColorScheme> = {
   dawn: 'light',
 };
 
-export const getColorScheme = (mode: ThemeMode): ColorScheme =>
-  COLOR_SCHEME_BY_MODE[mode];
+export const getColorScheme = (mode: ThemeMode): ColorScheme => COLOR_SCHEME_BY_MODE[mode];
 
 export interface Theme {
   mode: ThemeMode;
@@ -66,10 +65,13 @@ const buildTheme = (mode: ThemeMode): Theme => ({
   mode,
   colorScheme: getColorScheme(mode),
   colors:
-    mode === 'dark' ? darkColors :
-    mode === 'dawn' ? dawnColors :
-    mode === 'dusk' ? duskColors :
-    lightColors,
+    mode === 'dark'
+      ? darkColors
+      : mode === 'dawn'
+        ? dawnColors
+        : mode === 'dusk'
+          ? duskColors
+          : lightColors,
   text: textStyles,
   fontSizes,
   fontWeights,

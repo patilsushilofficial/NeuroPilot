@@ -8,10 +8,7 @@ import {
   selectTodaysHabits,
   selectActiveFocus,
 } from '../store';
-import {
-  getXPProgressInLevel,
-  MOTIVATIONAL_QUOTES,
-} from '../constants/focusPresets';
+import { getXPProgressInLevel, MOTIVATIONAL_QUOTES } from '../constants/focusPresets';
 import { useQuickCapture } from './useQuickCapture';
 import { useHaptics } from './useHaptics';
 import { TaskPriority } from '../types';
@@ -65,12 +62,8 @@ export const useHome = () => {
     });
   }, [haptics]);
 
-  const completedTodayTasks = todaysTasks.filter(
-    (t) => t.status === 'completed'
-  ).length;
-  const completedHabits = todaysHabits.filter((h) =>
-    isHabitCompletedToday(h.id)
-  ).length;
+  const completedTodayTasks = todaysTasks.filter((t) => t.status === 'completed').length;
+  const completedHabits = todaysHabits.filter((h) => isHabitCompletedToday(h.id)).length;
   const xpProgress = getXPProgressInLevel(stats.totalXP);
 
   // Build the unified "today" feed: incomplete tasks first (by priority),
@@ -102,10 +95,7 @@ export const useHome = () => {
   }, [todaysTasks, todaysHabits, isHabitCompletedToday]);
 
   const todayTotalCount = todayItems.length;
-  const topTodayItems = useMemo(
-    () => todayItems.slice(0, TODAY_VISIBLE_LIMIT),
-    [todayItems]
-  );
+  const topTodayItems = useMemo(() => todayItems.slice(0, TODAY_VISIBLE_LIMIT), [todayItems]);
 
   const { handleQuickCapture } = useQuickCapture();
 
@@ -152,14 +142,7 @@ export const useHome = () => {
         haptics.success();
       }
     },
-    [
-      completeHabit,
-      uncompleteHabit,
-      isHabitCompletedToday,
-      addXP,
-      recordHabitComplete,
-      haptics,
-    ]
+    [completeHabit, uncompleteHabit, isHabitCompletedToday, addXP, recordHabitComplete, haptics]
   );
 
   const handleViewAllTasks = useCallback(() => {

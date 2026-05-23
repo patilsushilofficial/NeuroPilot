@@ -40,7 +40,9 @@ export const FocusHeader: React.FC<FocusHeaderProps> = ({
       <View style={styles.statsGrid}>
         <View style={styles.statsTile}>
           <Text style={[theme.text.labelSmall, styles.statsLabel]}>TODAY</Text>
-          <Text style={[theme.text.h4, styles.statsValue]}>{formatFocusTime(todayFocusMinutes)}</Text>
+          <Text style={[theme.text.h4, styles.statsValue]}>
+            {formatFocusTime(todayFocusMinutes)}
+          </Text>
           <Text style={[theme.text.bodySmall, styles.statsMeta]}>Focused Time</Text>
         </View>
         <View style={styles.statsTile}>

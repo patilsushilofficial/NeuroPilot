@@ -10,5 +10,4 @@ import { useAppStore } from '../store';
  * options, so the badge was invisible. Returning a plain boolean lets the
  * custom bar pull the cue down to the exact icon that needs it.
  */
-export const useIsFocusRunning = (): boolean =>
-  useAppStore((s) => s.active.status === 'running');
+export const useIsFocusRunning = (): boolean => useAppStore((s) => s.active.status === 'running');

@@ -138,52 +138,52 @@ export const SettingsScreen: React.FC = () => {
 
 const makeStyles = (theme: Theme) => {
   return StyleSheet.create({
-      container: {
-        flex: 1,
-        backgroundColor: theme.colors.background,
-      },
-      content: {
-        padding: spacing.md,
-        gap: spacing.lg,
-        paddingBottom: spacing['7xl'],
-      },
-      screenTitle: { color: theme.colors.textPrimary },
-      screenSubtitle: {
-        color: theme.colors.textSecondary,
-        marginTop: spacing['3xs'],
-      },
-      hero: {
-        gap: spacing.xs,
-      },
-      profileCard: {
-        borderRadius: borderRadius['2xl'],
-      },
-      profileRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.sm,
-      },
-      avatarCircle: {
-        width: avatarSizes.lg,
-        height: avatarSizes.lg,
-        borderRadius: avatarSizes.lg / 2,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: theme.colors.primaryContainer,
-        borderWidth: borderWidths.thin,
-        borderColor: theme.colors.primary,
-      },
-      avatarEmoji: { fontSize: iconSizes['2xl'] },
-      profileCopy: { flex: 1, gap: spacing['3xs'] },
-      profileName: { color: theme.colors.textPrimary },
-      profileMode: { color: theme.colors.textSecondary },
-      cardSpaced: { marginTop: spacing.xs },
-      footerText: {
-        color: theme.colors.textDisabled,
-        textAlign: 'center',
-      },
-      footerCard: {
-        borderRadius: borderRadius.xl,
-      },
-    });
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      padding: spacing.md,
+      gap: spacing.lg,
+      paddingBottom: spacing['7xl'],
+    },
+    screenTitle: { color: theme.colors.textPrimary },
+    screenSubtitle: {
+      color: theme.colors.textSecondary,
+      marginTop: spacing['3xs'],
+    },
+    hero: {
+      gap: spacing.xs,
+    },
+    profileCard: {
+      borderRadius: borderRadius['2xl'],
+    },
+    profileRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    avatarCircle: {
+      width: avatarSizes.lg,
+      height: avatarSizes.lg,
+      borderRadius: avatarSizes.lg / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.primaryContainer,
+      borderWidth: borderWidths.thin,
+      borderColor: theme.colors.primary,
+    },
+    avatarEmoji: { fontSize: iconSizes['2xl'] },
+    profileCopy: { flex: 1, gap: spacing['3xs'] },
+    profileName: { color: theme.colors.textPrimary },
+    profileMode: { color: theme.colors.textSecondary },
+    cardSpaced: { marginTop: spacing.xs },
+    footerText: {
+      color: theme.colors.textDisabled,
+      textAlign: 'center',
+    },
+    footerCard: {
+      borderRadius: borderRadius.xl,
+    },
+  });
 };

@@ -37,10 +37,10 @@ describe('Badge', () => {
   it('renders with different variants', () => {
     const { rerender, getByText } = render(<Badge label="Success" variant="success" />);
     expect(getByText('Success')).toBeTruthy();
-    
+
     rerender(<Badge label="Warning" variant="warning" />);
     expect(getByText('Warning')).toBeTruthy();
-    
+
     rerender(<Badge label="Error" variant="error" />);
     expect(getByText('Error')).toBeTruthy();
   });
@@ -48,7 +48,7 @@ describe('Badge', () => {
   it('renders with different sizes', () => {
     const { rerender, getByText } = render(<Badge label="Small" size="sm" />);
     expect(getByText('Small')).toBeTruthy();
-    
+
     rerender(<Badge label="Medium" size="md" />);
     expect(getByText('Medium')).toBeTruthy();
   });

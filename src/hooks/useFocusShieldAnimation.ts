@@ -24,15 +24,11 @@ interface UseFocusShieldAnimationArgs {
  * and the toggle-thumb travel. The component itself only consumes the
  * resulting style objects and the `pressShield` trigger.
  */
-export const useFocusShieldAnimation = ({
-  isActive,
-}: UseFocusShieldAnimationArgs) => {
+export const useFocusShieldAnimation = ({ isActive }: UseFocusShieldAnimationArgs) => {
   const glowScale = useSharedValue(1);
   const glowOpacity = useSharedValue(0);
   const shieldScale = useSharedValue(1);
-  const thumbTranslateX = useSharedValue(
-    isActive ? controlSizes.toggleThumbTravel : 0
-  );
+  const thumbTranslateX = useSharedValue(isActive ? controlSizes.toggleThumbTravel : 0);
 
   useEffect(() => {
     if (isActive) {
@@ -56,10 +52,9 @@ export const useFocusShieldAnimation = ({
       glowScale.value = withSpring(1);
       glowOpacity.value = withTiming(0, { duration: durations.base });
     }
-    thumbTranslateX.value = withTiming(
-      isActive ? controlSizes.toggleThumbTravel : 0,
-      { duration: durations.base }
-    );
+    thumbTranslateX.value = withTiming(isActive ? controlSizes.toggleThumbTravel : 0, {
+      duration: durations.base,
+    });
   }, [isActive]);
 
   const glowAnimStyle = useAnimatedStyle(() => ({

@@ -21,11 +21,7 @@ interface SectionHeaderProps {
  * Standardises the spacing, type ramp, and chevron treatment used across
  * Home, Progress, and (eventually) the Tasks/Habits screens.
  */
-export const SectionHeader: React.FC<SectionHeaderProps> = ({
-  title,
-  actionLabel,
-  onAction,
-}) => {
+export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, actionLabel, onAction }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
@@ -41,22 +37,12 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           accessibilityRole="button"
           accessibilityLabel={actionLabel}
         >
-          <Text style={[theme.text.labelMedium, styles.actionLabel]}>
-            {actionLabel}
-          </Text>
-          <Icon
-            name="chevron-right"
-            size={iconSizes.md}
-            color={theme.colors.primary}
-          />
+          <Text style={[theme.text.labelMedium, styles.actionLabel]}>{actionLabel}</Text>
+          <Icon name="chevron-right" size={iconSizes.md} color={theme.colors.primary} />
         </TouchableOpacity>
       );
     }
-    return (
-      <Text style={[theme.text.labelMedium, styles.indicatorLabel]}>
-        {actionLabel}
-      </Text>
-    );
+    return <Text style={[theme.text.labelMedium, styles.indicatorLabel]}>{actionLabel}</Text>;
   };
 
   return (

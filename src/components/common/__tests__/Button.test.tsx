@@ -41,7 +41,7 @@ describe('Button', () => {
   it('handles press', () => {
     const onPress = jest.fn();
     const { getByRole } = render(<Button label="Test Button" onPress={onPress} />);
-    
+
     const button = getByRole('button');
     fireEvent.press(button);
     expect(onPress).toHaveBeenCalled();
@@ -50,7 +50,7 @@ describe('Button', () => {
   it('does not press when disabled', () => {
     const onPress = jest.fn();
     const { getByRole } = render(<Button label="Test Button" onPress={onPress} disabled />);
-    
+
     const button = getByRole('button');
     fireEvent.press(button);
     expect(onPress).not.toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe('Button', () => {
   it('shows loading indicator', () => {
     const onPress = jest.fn();
     const { getByRole } = render(<Button label="Test Button" onPress={onPress} loading />);
-    
+
     expect(getByRole('button').props.accessibilityState.busy).toBe(true);
   });
 
@@ -69,10 +69,10 @@ describe('Button', () => {
       <Button label="Outline" onPress={onPress} variant="outline" size="sm" />
     );
     expect(getByText('Outline')).toBeTruthy();
-    
+
     rerender(<Button label="Ghost" onPress={onPress} variant="ghost" size="lg" />);
     expect(getByText('Ghost')).toBeTruthy();
-    
+
     rerender(<Button label="Danger" onPress={onPress} variant="danger" />);
     expect(getByText('Danger')).toBeTruthy();
   });
@@ -80,7 +80,7 @@ describe('Button', () => {
   it('handles pressIn and pressOut', () => {
     const onPress = jest.fn();
     const { getByRole } = render(<Button label="Test Button" onPress={onPress} />);
-    
+
     const button = getByRole('button');
     fireEvent(button, 'pressIn');
     fireEvent(button, 'pressOut');

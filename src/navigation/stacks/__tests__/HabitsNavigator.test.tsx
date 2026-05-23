@@ -3,13 +3,15 @@ import { render } from '@testing-library/react-native';
 import { HabitsNavigator } from '../HabitsNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 
+import { View } from 'react-native';
+
 // Mock screens to avoid complex rendering
 jest.mock('../../../screens/habits/HabitsScreen', () => ({
-  HabitsScreen: () => <mock-habits-screen />,
+  HabitsScreen: () => <View />,
 }));
 
 jest.mock('../../../screens/habits/AddHabitScreen', () => ({
-  AddHabitScreen: () => <mock-add-habit-screen />,
+  AddHabitScreen: () => <View />,
 }));
 
 describe('HabitsNavigator', () => {

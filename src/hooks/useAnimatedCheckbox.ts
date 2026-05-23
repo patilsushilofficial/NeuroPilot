@@ -69,16 +69,8 @@ export const useAnimatedCheckbox = ({
   const bgProgress = useDerivedValue(() => progress.value);
 
   const circleStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      bgProgress.value,
-      [0, 1],
-      ['transparent', checkColor]
-    ),
-    borderColor: interpolateColor(
-      bgProgress.value,
-      [0, 1],
-      [uncheckedBorderColor, checkColor]
-    ),
+    backgroundColor: interpolateColor(bgProgress.value, [0, 1], ['transparent', checkColor]),
+    borderColor: interpolateColor(bgProgress.value, [0, 1], [uncheckedBorderColor, checkColor]),
   }));
 
   return { containerStyle, circleStyle, handlePress };

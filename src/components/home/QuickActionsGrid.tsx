@@ -60,11 +60,7 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
         accessibilityLabel="Start Focus"
       >
         <View style={styles.primaryIconWrap}>
-          <Icon
-            name="target"
-            size={iconSizes.xl}
-            color={theme.colors.textOnPrimary}
-          />
+          <Icon name="target" size={iconSizes.xl} color={theme.colors.textOnPrimary} />
         </View>
         <View style={styles.primaryBody}>
           <Text style={[theme.text.h4, styles.primaryTitle]}>Start Focus</Text>
@@ -72,11 +68,7 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
             Pick a preset and dive in
           </Text>
         </View>
-        <Icon
-          name="arrow-right"
-          size={iconSizes.lg}
-          color={theme.colors.textOnPrimary}
-        />
+        <Icon name="arrow-right" size={iconSizes.lg} color={theme.colors.textOnPrimary} />
       </TouchableOpacity>
 
       <View style={styles.secondaryRow}>
@@ -90,14 +82,8 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
             accessibilityRole="button"
             accessibilityLabel={tile.label}
           >
-            <Icon
-              name={tile.icon}
-              size={iconSizes.lg}
-              color={theme.colors.primary}
-            />
-            <Text style={[theme.text.labelMedium, styles.secondaryLabel]}>
-              {tile.label}
-            </Text>
+            <Icon name={tile.icon} size={iconSizes.lg} color={theme.colors.primary} />
+            <Text style={[theme.text.labelMedium, styles.secondaryLabel]}>{tile.label}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -110,19 +96,9 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
         accessibilityRole="button"
         accessibilityLabel="Progress"
       >
-        <Icon
-          name="trending-up"
-          size={iconSizes.md}
-          color={theme.colors.textSecondary}
-        />
-        <Text style={[theme.text.labelMedium, styles.tertiaryLabel]}>
-          See your progress
-        </Text>
-        <Icon
-          name="chevron-right"
-          size={iconSizes.md}
-          color={theme.colors.textSecondary}
-        />
+        <Icon name="trending-up" size={iconSizes.md} color={theme.colors.textSecondary} />
+        <Text style={[theme.text.labelMedium, styles.tertiaryLabel]}>See your progress</Text>
+        <Icon name="chevron-right" size={iconSizes.md} color={theme.colors.textSecondary} />
       </TouchableOpacity>
     </View>
   );

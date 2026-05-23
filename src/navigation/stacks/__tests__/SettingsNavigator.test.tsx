@@ -3,13 +3,15 @@ import { render } from '@testing-library/react-native';
 import { SettingsNavigator } from '../SettingsNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 
+import { View } from 'react-native';
+
 // Mock screens to avoid complex rendering
 jest.mock('../../../screens/settings/SettingsScreen', () => ({
-  SettingsScreen: () => <mock-settings-screen />,
+  SettingsScreen: () => <View />,
 }));
 
 jest.mock('../../../screens/settings/EditProfileScreen', () => ({
-  EditProfileScreen: () => <mock-edit-profile-screen />,
+  EditProfileScreen: () => <View />,
 }));
 
 describe('SettingsNavigator', () => {

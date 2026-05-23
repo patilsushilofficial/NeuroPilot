@@ -20,9 +20,7 @@ jest.mock('../../../hooks/useAppTheme', () => ({
 
 describe('ListSectionHeader', () => {
   it('renders title and count', () => {
-    const { getByText } = render(
-      <ListSectionHeader title="Overdue" count={3} accent="error" />
-    );
+    const { getByText } = render(<ListSectionHeader title="Overdue" count={3} accent="error" />);
     expect(getByText('Overdue')).toBeTruthy();
     expect(getByText('3')).toBeTruthy();
   });
@@ -32,9 +30,7 @@ describe('ListSectionHeader', () => {
     (accent) => {
       // The chip's background is set inline from a theme key; render
       // each accent so the lookup table is exercised end-to-end.
-      const { getByText } = render(
-        <ListSectionHeader title="Section" count={1} accent={accent} />
-      );
+      const { getByText } = render(<ListSectionHeader title="Section" count={1} accent={accent} />);
       expect(getByText('1')).toBeTruthy();
     }
   );
@@ -42,9 +38,7 @@ describe('ListSectionHeader', () => {
   it('handles a zero-count section without crashing', () => {
     // Defensive: the screen filters out empty sections, but the header
     // should still render a sensible "0" if a caller forgets.
-    const { getByText } = render(
-      <ListSectionHeader title="Pending" count={0} accent="primary" />
-    );
+    const { getByText } = render(<ListSectionHeader title="Pending" count={0} accent="primary" />);
     expect(getByText('0')).toBeTruthy();
   });
 });

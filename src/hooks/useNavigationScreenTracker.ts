@@ -46,8 +46,7 @@ export const useNavigationScreenTracker = (): NavigationScreenTracker => {
   const theme = useAppTheme();
   const haptics = useHaptics();
 
-  const navigationRef =
-    useRef<NavigationContainerRefWithCurrent<RootStackParamList> | null>(null);
+  const navigationRef = useRef<NavigationContainerRefWithCurrent<RootStackParamList> | null>(null);
   const [currentScreen, setCurrentScreen] = useState<string | undefined>('Home');
 
   const navigationTheme = useMemo(

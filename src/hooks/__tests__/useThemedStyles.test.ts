@@ -43,7 +43,7 @@ describe('useThemedStyles', () => {
     const factoryA = jest.fn((theme) => ({ a: { color: theme.colors.primary } }));
     const factoryB = jest.fn((theme) => ({ b: { color: theme.colors.secondary } }));
 
-    const { result, rerender } = renderHook(({ factory }) => useThemedStyles(factory), {
+    const { result, rerender } = renderHook(({ factory }: { factory: any }) => useThemedStyles(factory), {
       initialProps: { factory: factoryA as any },
     });
     const first = result.current;

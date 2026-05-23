@@ -44,10 +44,7 @@ export const EditProfileScreen: React.FC = () => {
   } = useEditProfileScreen();
 
   // Theme-derived glow shared by the hero avatar and the selected mode card.
-  const previewGlowStyle = useMemo<ViewStyle>(
-    () => shadows.glow(theme.colors.primary),
-    [theme]
-  );
+  const previewGlowStyle = useMemo<ViewStyle>(() => shadows.glow(theme.colors.primary), [theme]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -86,14 +83,10 @@ export const EditProfileScreen: React.FC = () => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.avatarPreviewSection}>
-          <Animated.View
-            style={[styles.avatarPreviewCircle, previewGlowStyle, avatarAnimStyle]}
-          >
+          <Animated.View style={[styles.avatarPreviewCircle, previewGlowStyle, avatarAnimStyle]}>
             <Text style={styles.avatarPreviewEmoji}>{avatar}</Text>
           </Animated.View>
-          <Text style={[theme.text.h3, styles.previewName]}>
-            {name.trim() || 'Your Name'}
-          </Text>
+          <Text style={[theme.text.h3, styles.previewName]}>{name.trim() || 'Your Name'}</Text>
           <Text style={[theme.text.bodySmall, styles.previewMode]}>
             {mode === 'child' ? '👶 Child Mode' : '💼 Adult Mode'}
           </Text>
@@ -103,10 +96,7 @@ export const EditProfileScreen: React.FC = () => {
           <Text style={[theme.text.labelSmall, styles.sectionHeader]}>DISPLAY NAME</Text>
           <Card noPadding>
             <TextInput
-              style={[
-                styles.nameInput,
-                name ? styles.nameInputActive : styles.nameInputInactive,
-              ]}
+              style={[styles.nameInput, name ? styles.nameInputActive : styles.nameInputInactive]}
               value={name}
               onChangeText={setName}
               placeholder="Your name or nickname…"
@@ -153,11 +143,7 @@ export const EditProfileScreen: React.FC = () => {
                   </Text>
                   {isSelected && (
                     <View style={styles.checkBadge}>
-                      <Ionicons
-                        name="checkmark"
-                        size={CHECK_BADGE_SIZE * 0.7}
-                        color="#FFF"
-                      />
+                      <Ionicons name="checkmark" size={CHECK_BADGE_SIZE * 0.7} color="#FFF" />
                     </View>
                   )}
                 </TouchableOpacity>

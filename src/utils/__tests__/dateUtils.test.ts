@@ -1,4 +1,16 @@
-import { formatDueDate, formatTimerDisplay, formatFocusTime, getTimeGreeting, getPriorityConfig, getLevelTitle, getTodayStr, getWeekDayLabels, getLastNDates } from '../dateUtils';
+import {
+  formatDueDate,
+  formatTimerDisplay,
+  formatFocusTime,
+  getTimeGreeting,
+  getPriorityConfig,
+  getLevelTitle,
+  getTodayStr,
+  getWeekDayLabels,
+  getLastNDates,
+} from '../dateUtils';
+
+declare const global: any;
 
 describe('dateUtils', () => {
   describe('formatDueDate', () => {

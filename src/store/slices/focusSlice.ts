@@ -3,10 +3,7 @@ import { ActiveFocusState, FocusPhase, FocusSession } from '../../types';
 import { DEFAULT_PRESET_ID, getPresetById, XP_REWARDS } from '../../constants/focusPresets';
 import { triggerImmediateFocusAlert } from '../../utils/notifications';
 import { focusTransitionAlerts } from '../../services/focusTransitionAlerts';
-import {
-  computeRunningEndsAt,
-  getEffectiveSecondsRemaining,
-} from '../../utils/focusTimerClock';
+import { computeRunningEndsAt, getEffectiveSecondsRemaining } from '../../utils/focusTimerClock';
 
 /**
  * Schedule the "wrap up — phase ending in 3 minutes" heads-up for a
@@ -17,11 +14,7 @@ import {
  * still triggers a `cancel()` so any heads-up scheduled before the
  * user toggled the switch is cleaned up rather than left dangling.
  */
-const scheduleHeadsUp = (
-  state: any,
-  phase: FocusPhase,
-  secondsRemaining: number
-) => {
+const scheduleHeadsUp = (state: any, phase: FocusPhase, secondsRemaining: number) => {
   if (state.settings?.notificationsEnabled) {
     focusTransitionAlerts.scheduleFor(phase, secondsRemaining);
   } else {
@@ -177,9 +170,10 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
     // Trigger notification if enabled
     const state = get() as any;
     if (state.settings?.notificationsEnabled) {
-      const message = active.phase === 'focus'
-        ? 'Great job! Focus session completed. Time for a break.'
-        : 'Break is over. Ready to dive back in?';
+      const message =
+        active.phase === 'focus'
+          ? 'Great job! Focus session completed. Time for a break.'
+          : 'Break is over. Ready to dive back in?';
       triggerImmediateFocusAlert(message);
     }
 
@@ -244,9 +238,7 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
     const preset = getPresetById(active.presetId);
     const nextPhase: FocusPhase = active.phase === 'focus' ? 'short_break' : 'focus';
     const nextSeconds =
-      nextPhase === 'focus'
-        ? preset.focusMinutes * 60
-        : preset.shortBreakMinutes * 60;
+      nextPhase === 'focus' ? preset.focusMinutes * 60 : preset.shortBreakMinutes * 60;
 
     set((s) => ({
       active: {
@@ -309,14 +301,11 @@ export const createFocusSlice: StateCreator<FocusSlice, [], [], FocusSlice> = (s
     focusTransitionAlerts.cancel();
   },
 
-  getTotalFocusMinutes: () =>
-    get().focusSessions.reduce((acc, s) => acc + s.totalFocusMinutes, 0),
+  getTotalFocusMinutes: () => get().focusSessions.reduce((acc, s) => acc + s.totalFocusMinutes, 0),
 
   getSessionsToday: () => {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
-    return get().focusSessions.filter(
-      (s) => s.startedAt && s.startedAt >= startOfDay.getTime()
-    );
+    return get().focusSessions.filter((s) => s.startedAt && s.startedAt >= startOfDay.getTime());
   },
 });

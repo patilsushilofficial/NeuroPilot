@@ -4,11 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { Theme } from '../../theme';
 import { spacing, borderRadius } from '../../theme/spacing';
-import {
-  borderWidths,
-  controlSizes,
-  iconSizes,
-} from '../../theme/tokens';
+import { borderWidths, controlSizes, iconSizes } from '../../theme/tokens';
 import { letterSpacings } from '../../theme/typography';
 
 import { Icon, IconName } from '../common/Icon';
@@ -39,9 +35,27 @@ const ICON_WRAP_SIZE = controlSizes.buttonHeight.sm;
  * future add/reorder is a one-line change.
  */
 const TILE_BLUEPRINT: StatTile[] = [
-  { key: 'tasks', icon: 'check-circle', label: 'Tasks', accentKey: 'success', tintKey: 'successContainer' },
-  { key: 'habits', icon: 'repeat', label: 'Habits', accentKey: 'streakFire', tintKey: 'warningContainer' },
-  { key: 'focus', icon: 'clock', label: 'Focus', accentKey: 'primary', tintKey: 'primaryContainer' },
+  {
+    key: 'tasks',
+    icon: 'check-circle',
+    label: 'Tasks',
+    accentKey: 'success',
+    tintKey: 'successContainer',
+  },
+  {
+    key: 'habits',
+    icon: 'repeat',
+    label: 'Habits',
+    accentKey: 'streakFire',
+    tintKey: 'warningContainer',
+  },
+  {
+    key: 'focus',
+    icon: 'clock',
+    label: 'Focus',
+    accentKey: 'primary',
+    tintKey: 'primaryContainer',
+  },
 ];
 
 /**
@@ -50,11 +64,7 @@ const TILE_BLUEPRINT: StatTile[] = [
  * any unit-formatting (minutes → "4h 30m") happens upstream and this
  * component never touches the domain.
  */
-export const HeadlineStats: React.FC<HeadlineStatsProps> = ({
-  tasks,
-  habits,
-  focus,
-}) => {
+export const HeadlineStats: React.FC<HeadlineStatsProps> = ({ tasks, habits, focus }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
@@ -79,9 +89,7 @@ export const HeadlineStats: React.FC<HeadlineStatsProps> = ({
             <Text style={[theme.text.h3, { color: accent }]} numberOfLines={1}>
               {value}
             </Text>
-            <Text style={[theme.text.labelSmall, styles.label]}>
-              {tile.label.toUpperCase()}
-            </Text>
+            <Text style={[theme.text.labelSmall, styles.label]}>{tile.label.toUpperCase()}</Text>
           </View>
         );
       })}

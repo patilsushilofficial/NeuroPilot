@@ -129,9 +129,7 @@ describe('HabitsScreen', () => {
   });
 
   it('groups habits under To do / Completed when both exist', () => {
-    mockUseAppStore.isHabitCompletedToday.mockImplementation(
-      (id: string) => id === 'habit_2'
-    );
+    mockUseAppStore.isHabitCompletedToday.mockImplementation((id: string) => id === 'habit_2');
     const { getAllByText, getByText } = render(<HabitsScreen />);
     // "To do" appears in BOTH the segmented control's filter button and
     // the section header — both are valid renderings of this state.
@@ -142,9 +140,7 @@ describe('HabitsScreen', () => {
   });
 
   it('switches to the Done filter via the segmented control', () => {
-    mockUseAppStore.isHabitCompletedToday.mockImplementation(
-      (id: string) => id === 'habit_2'
-    );
+    mockUseAppStore.isHabitCompletedToday.mockImplementation((id: string) => id === 'habit_2');
     const { getByLabelText, getAllByText, queryByText } = render(<HabitsScreen />);
     fireEvent.press(getByLabelText('Show completed habits'));
     // After switching to Done: the "Completed" section header is

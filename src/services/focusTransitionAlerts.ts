@@ -1,7 +1,4 @@
-import {
-  cancelNotification,
-  scheduleFocusTransitionAlert,
-} from '../utils/notifications';
+import { cancelNotification, scheduleFocusTransitionAlert } from '../utils/notifications';
 import type { FocusPhase } from '../types';
 
 /**
@@ -47,8 +44,7 @@ class FocusTransitionAlerts {
     if (secondsRemaining <= HEADS_UP_LEAD_SECONDS) return;
 
     const minutesUntil = secondsRemaining / 60;
-    const alertPhase: 'focus' | 'break' =
-      phase === 'focus' ? 'focus' : 'break';
+    const alertPhase: 'focus' | 'break' = phase === 'focus' ? 'focus' : 'break';
 
     this.currentId = await scheduleFocusTransitionAlert(alertPhase, minutesUntil);
   }

@@ -12,19 +12,19 @@ describe('habitsSlice', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     const state = {
       habits: [],
       settings: { notificationsEnabled: true },
     };
-    
+
     set = jest.fn((fn) => {
       const updates = typeof fn === 'function' ? fn(state) : fn;
       Object.assign(state, updates);
     });
-    
+
     get = jest.fn(() => state);
-    
+
     slice = createHabitsSlice(set, get, {} as any);
     Object.assign(state, slice);
   });
@@ -41,7 +41,7 @@ describe('habitsSlice', () => {
 
     expect(habitId).toBeDefined();
     expect(set).toHaveBeenCalled();
-    
+
     await Promise.resolve(); // Flush promises
     expect(set).toHaveBeenCalled();
   });
@@ -49,22 +49,34 @@ describe('habitsSlice', () => {
   it('should calculate streak with breaks', () => {
     const { getTodayStr } = require('../../../utils/dateUtils');
     const todayStr = getTodayStr();
-    const mockHabit = { 
-      id: 'habit_1', 
-      title: 'Exercise', 
+    const mockHabit = {
+      id: 'habit_1',
+      title: 'Exercise',
       completions: [{ date: todayStr }, { date: '2026-05-06' }], // Break on 2026-05-07
-      longestStreak: 0 
+      longestStreak: 0,
     };
     const state = get();
     state.habits = [mockHabit];
-    
+
     slice.recalculateStreak('habit_1');
     expect(set).toHaveBeenCalled();
   });
 
   it('should complete a habit', () => {
-    const mockHabit1 = { id: 'habit_1', title: 'Exercise', completions: [], xpPerCompletion: 20, longestStreak: 0 };
-    const mockHabit2 = { id: 'habit_2', title: 'Read', completions: [], xpPerCompletion: 10, longestStreak: 0 };
+    const mockHabit1 = {
+      id: 'habit_1',
+      title: 'Exercise',
+      completions: [],
+      xpPerCompletion: 20,
+      longestStreak: 0,
+    };
+    const mockHabit2 = {
+      id: 'habit_2',
+      title: 'Read',
+      completions: [],
+      xpPerCompletion: 10,
+      longestStreak: 0,
+    };
     const state = get();
     state.habits = [mockHabit1, mockHabit2];
 
@@ -90,12 +102,12 @@ describe('habitsSlice', () => {
     state.habits = [mockHabit1, mockHabit2];
 
     const { cancelNotification, scheduleHabitReminder } = require('../../../utils/notifications');
-    
+
     slice.updateHabit('habit_1', { reminderTime: '08:00' });
 
     expect(cancelNotification).toHaveBeenCalledWith('notif_1');
     expect(scheduleHabitReminder).toHaveBeenCalled();
-    
+
     await Promise.resolve(); // Flush promises
     expect(set).toHaveBeenCalled();
   });
@@ -103,7 +115,7 @@ describe('habitsSlice', () => {
   it('should delete a habit', () => {
     const mockHabit = { id: 'habit_1', title: 'Exercise', notificationId: 'notif_1' };
     get.mockReturnValue({ habits: [mockHabit] });
-    
+
     slice.deleteHabit('habit_1');
     expect(set).toHaveBeenCalled();
   });
@@ -113,7 +125,7 @@ describe('habitsSlice', () => {
     const mockHabit2 = { id: 'habit_2', title: 'Read', notificationId: 'notif_2' };
     const state = get();
     state.habits = [mockHabit1, mockHabit2];
-    
+
     slice.archiveHabit('habit_1');
     expect(set).toHaveBeenCalled();
   });
@@ -121,11 +133,15 @@ describe('habitsSlice', () => {
   it('should uncomplete a habit', () => {
     const { getTodayStr } = require('../../../utils/dateUtils');
     const todayStr = getTodayStr();
-    const mockHabit1 = { id: 'habit_1', title: 'Exercise', completions: [{ date: todayStr }, { date: '2026-05-07' }] };
+    const mockHabit1 = {
+      id: 'habit_1',
+      title: 'Exercise',
+      completions: [{ date: todayStr }, { date: '2026-05-07' }],
+    };
     const mockHabit2 = { id: 'habit_2', title: 'Read', completions: [] };
     const state = get();
     state.habits = [mockHabit1, mockHabit2];
-    
+
     slice.uncompleteHabit('habit_1');
     expect(set).toHaveBeenCalled();
   });
@@ -140,7 +156,7 @@ describe('habitsSlice', () => {
       { id: '4', title: 'Custom', frequency: 'custom', customDays: [today], archived: false },
       { id: '5', title: 'Invalid', frequency: 'monthly' as any, archived: false },
     ];
-    
+
     const todaysHabits = slice.getTodaysHabits();
     expect(todaysHabits.length).toBeGreaterThan(0);
   });
@@ -148,7 +164,7 @@ describe('habitsSlice', () => {
   it('should get habit by id', () => {
     const mockHabit = { id: 'habit_1', title: 'Exercise' };
     get.mockReturnValue({ habits: [mockHabit] });
-    
+
     const habit = slice.getHabitById('habit_1');
     expect(habit).toEqual(mockHabit);
   });
@@ -158,7 +174,7 @@ describe('habitsSlice', () => {
     const mockHabit2 = { id: 'habit_2', title: 'Read', completions: [], longestStreak: 0 };
     const state = get();
     state.habits = [mockHabit1, mockHabit2];
-    
+
     slice.recalculateStreak('habit_1');
     expect(set).toHaveBeenCalled();
   });
@@ -166,7 +182,7 @@ describe('habitsSlice', () => {
   it('should check if habit is completed today', () => {
     const mockHabit = { id: 'habit_1', title: 'Exercise', completions: [] };
     get.mockReturnValue({ habits: [mockHabit] });
-    
+
     expect(slice.isHabitCompletedToday('habit_1')).toBe(false);
   });
 

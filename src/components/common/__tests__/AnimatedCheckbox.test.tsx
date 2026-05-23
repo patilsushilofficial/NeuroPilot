@@ -53,7 +53,7 @@ describe('AnimatedCheckbox', () => {
   it('handles toggle when unchecked', () => {
     const onToggle = jest.fn();
     const { getByRole } = render(<AnimatedCheckbox checked={false} onToggle={onToggle} />);
-    
+
     const checkbox = getByRole('checkbox');
     fireEvent.press(checkbox);
     expect(onToggle).toHaveBeenCalled();
@@ -62,7 +62,7 @@ describe('AnimatedCheckbox', () => {
   it('handles toggle when checked', () => {
     const onToggle = jest.fn();
     const { getByRole } = render(<AnimatedCheckbox checked={true} onToggle={onToggle} />);
-    
+
     const checkbox = getByRole('checkbox');
     fireEvent.press(checkbox);
     expect(onToggle).toHaveBeenCalled();
@@ -71,7 +71,7 @@ describe('AnimatedCheckbox', () => {
   it('does not toggle when disabled', () => {
     const onToggle = jest.fn();
     const { getByRole } = render(<AnimatedCheckbox checked={false} onToggle={onToggle} disabled />);
-    
+
     const checkbox = getByRole('checkbox');
     fireEvent.press(checkbox);
     expect(onToggle).not.toHaveBeenCalled();

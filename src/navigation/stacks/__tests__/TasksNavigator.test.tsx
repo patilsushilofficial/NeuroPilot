@@ -3,13 +3,15 @@ import { render } from '@testing-library/react-native';
 import { TasksNavigator } from '../TasksNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 
+import { View } from 'react-native';
+
 // Mock screens to avoid complex rendering
 jest.mock('../../../screens/tasks/TasksScreen', () => ({
-  TasksScreen: () => <mock-tasks-screen />,
+  TasksScreen: () => <View />,
 }));
 
 jest.mock('../../../screens/tasks/AddTaskScreen', () => ({
-  AddTaskScreen: () => <mock-add-task-screen />,
+  AddTaskScreen: () => <View />,
 }));
 
 describe('TasksNavigator', () => {

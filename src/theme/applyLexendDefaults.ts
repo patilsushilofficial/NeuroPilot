@@ -39,10 +39,7 @@ const applyDefaultPropsBaseline = (Component: AnyComponent) => {
   Component.defaultProps = Component.defaultProps ?? {};
   // Prepend our default; user-provided styles still win because they come
   // after Component's defaultProps.style during merge.
-  Component.defaultProps.style = [
-    { fontFamily: defaultFontFamily },
-    Component.defaultProps.style,
-  ];
+  Component.defaultProps.style = [{ fontFamily: defaultFontFamily }, Component.defaultProps.style];
 };
 
 /**

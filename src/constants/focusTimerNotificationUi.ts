@@ -34,10 +34,7 @@ export interface FocusTimerNotificationDisplayModel {
 }
 
 /** Four quartile segments — fills at 25%, 50%, 75%, and 100% elapsed. */
-export const computeFilledSegments = (
-  totalSeconds: number,
-  secondsRemaining: number
-): number => {
+export const computeFilledSegments = (totalSeconds: number, secondsRemaining: number): number => {
   const total = Math.max(totalSeconds, 1);
   const remaining = Math.min(Math.max(secondsRemaining, 0), total);
   const elapsed = total - remaining;
@@ -45,10 +42,7 @@ export const computeFilledSegments = (
 };
 
 const computeFilledSegmentsFromActive = (active: ActiveFocusState, now: number): number =>
-  computeFilledSegments(
-    active.totalSeconds,
-    getEffectiveSecondsRemaining(active, now)
-  );
+  computeFilledSegments(active.totalSeconds, getEffectiveSecondsRemaining(active, now));
 
 export const buildFocusTimerNotificationDisplayModel = (
   active: ActiveFocusState,
@@ -60,8 +54,7 @@ export const buildFocusTimerNotificationDisplayModel = (
   const phaseLabel = FOCUS_PHASE_LABELS[active.phase];
   const isRunning = active.status === 'running';
   const secondsRemaining = getEffectiveSecondsRemaining(active, now);
-  const endsAt =
-    active.runningEndsAt ?? computeRunningEndsAt(secondsRemaining, now);
+  const endsAt = active.runningEndsAt ?? computeRunningEndsAt(secondsRemaining, now);
 
   return {
     channelId: FOCUS_TIMER_CHANNEL_ID,

@@ -82,7 +82,7 @@ describe('SettingsScreen', () => {
   it('toggles notifications', () => {
     const { getByTestId } = render(<SettingsScreen />);
     const sw = getByTestId('switch-Enable Notifications');
-    
+
     fireEvent(sw, 'valueChange', false);
     expect(mockUseSettings.updateSettings).toHaveBeenCalledWith({ notificationsEnabled: false });
   });
@@ -90,7 +90,7 @@ describe('SettingsScreen', () => {
   it('toggles haptics', () => {
     const { getByTestId } = render(<SettingsScreen />);
     const sw = getByTestId('switch-Haptic Feedback');
-    
+
     fireEvent(sw, 'valueChange', false);
     expect(mockUseSettings.toggleHaptics).toHaveBeenCalled();
   });
@@ -98,7 +98,7 @@ describe('SettingsScreen', () => {
   it('toggles reduced motion', () => {
     const { getByTestId } = render(<SettingsScreen />);
     const sw = getByTestId('switch-Reduced Motion');
-    
+
     fireEvent(sw, 'valueChange', true);
     expect(mockUseSettings.updateSettings).toHaveBeenCalledWith({ reducedMotion: true });
   });
@@ -106,7 +106,7 @@ describe('SettingsScreen', () => {
   it('toggles motivational quotes', () => {
     const { getByTestId } = render(<SettingsScreen />);
     const sw = getByTestId('switch-Motivational Quotes');
-    
+
     fireEvent(sw, 'valueChange', false);
     expect(mockUseSettings.updateSettings).toHaveBeenCalledWith({ showMotivationalQuotes: false });
   });

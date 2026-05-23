@@ -30,15 +30,15 @@ export const initialStats: UserStats = {
   weeklyTasks: [0, 0, 0, 0, 0, 0, 0],
 };
 
-export const initialGamificationState: Pick<
-  GamificationSlice,
-  'stats' | 'pendingAchievements'
-> = {
+export const initialGamificationState: Pick<GamificationSlice, 'stats' | 'pendingAchievements'> = {
   stats: initialStats,
   pendingAchievements: [],
 };
 
-export const createGamificationSlice: StateCreator<GamificationSlice, [], [], GamificationSlice> = (set, get) => ({
+export const createGamificationSlice: StateCreator<GamificationSlice, [], [], GamificationSlice> = (
+  set,
+  get
+) => ({
   ...initialGamificationState,
 
   addXP: (amount) => {

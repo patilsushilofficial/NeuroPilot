@@ -8,12 +8,7 @@ import { useAppTheme } from '../../hooks/useAppTheme';
 import { Theme } from '../../theme';
 import { spacing } from '../../theme/spacing';
 import { iconSizes } from '../../theme/tokens';
-import {
-  fontFamilies,
-  fontSizes,
-  fontWeights,
-  letterSpacings,
-} from '../../theme/typography';
+import { fontFamilies, fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
 
 interface HabitsProgressCardProps {
   /** Number of completed habits today. */
@@ -48,15 +43,9 @@ export const HabitsProgressCard: React.FC<HabitsProgressCardProps> = ({
     <Card>
       <View style={styles.headRow}>
         <View style={styles.titleGroup}>
-          <Text style={[theme.text.labelSmall, styles.eyebrow]}>
-            DAILY PROGRESS
-          </Text>
+          <Text style={[theme.text.labelSmall, styles.eyebrow]}>DAILY PROGRESS</Text>
           <View style={styles.countRow}>
-            <Text
-              style={styles.percentNumber}
-              numberOfLines={1}
-              allowFontScaling={false}
-            >
+            <Text style={styles.percentNumber} numberOfLines={1} allowFontScaling={false}>
               {percent}
             </Text>
             <Text style={styles.percentSuffix}>%</Text>

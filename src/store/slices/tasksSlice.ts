@@ -8,7 +8,12 @@ export interface TasksSlice {
   tasks: Task[];
 
   // CRUD
-  addTask: (payload: Pick<Task, 'title' | 'description' | 'priority' | 'dueDate' | 'estimatedMinutes' | 'tags'> & { subtasks?: Pick<SubTask, 'title'>[] }) => string;
+  addTask: (
+    payload: Pick<
+      Task,
+      'title' | 'description' | 'priority' | 'dueDate' | 'estimatedMinutes' | 'tags'
+    > & { subtasks?: Pick<SubTask, 'title'>[] }
+  ) => string;
   updateTask: (id: string, updates: Partial<Omit<Task, 'id' | 'createdAt'>>) => void;
   deleteTask: (id: string) => void;
   completeTask: (id: string) => number; // returns xp earned
@@ -54,20 +59,22 @@ export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (s
 
   updateTask: (id, updates) => {
     const task = get().tasks.find((t) => t.id === id);
-    
+
     // If due date is changing, reschedule notification
     const state = get() as any;
     if (updates.dueDate && task && state.settings?.notificationsEnabled) {
       if (task.notificationId) {
         cancelNotification(task.notificationId);
       }
-      scheduleTaskReminder(id, updates.title || task.title, new Date(updates.dueDate)).then((notifId) => {
-        if (notifId) {
-          set((s) => ({
-            tasks: s.tasks.map((t) => t.id === id ? { ...t, notificationId: notifId } : t),
-          }));
+      scheduleTaskReminder(id, updates.title || task.title, new Date(updates.dueDate)).then(
+        (notifId) => {
+          if (notifId) {
+            set((s) => ({
+              tasks: s.tasks.map((t) => (t.id === id ? { ...t, notificationId: notifId } : t)),
+            }));
+          }
         }
-      });
+      );
     }
 
     // 1. Service handles sending to backend in the background
@@ -75,9 +82,7 @@ export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (s
 
     // 2. Zustand handles the instant UI update
     set((s) => ({
-      tasks: s.tasks.map((t) =>
-        t.id === id ? { ...t, ...updates, updatedAt: Date.now() } : t
-      ),
+      tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...updates, updatedAt: Date.now() } : t)),
     }));
   },
 
@@ -108,7 +113,13 @@ export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (s
     set((s) => ({
       tasks: s.tasks.map((t) =>
         t.id === id
-          ? { ...t, status: 'completed', completedAt: Date.now(), updatedAt: Date.now(), notificationId: undefined }
+          ? {
+              ...t,
+              status: 'completed',
+              completedAt: Date.now(),
+              updatedAt: Date.now(),
+              notificationId: undefined,
+            }
           : t
       ),
     }));
@@ -120,9 +131,7 @@ export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (s
     const sub: SubTask = { id: taskService.generateSubtaskId(), title, completed: false };
     set((s) => ({
       tasks: s.tasks.map((t) =>
-        t.id === taskId
-          ? { ...t, subtasks: [...t.subtasks, sub], updatedAt: Date.now() }
-          : t
+        t.id === taskId ? { ...t, subtasks: [...t.subtasks, sub], updatedAt: Date.now() } : t
       ),
     }));
   },
@@ -177,6 +186,5 @@ export const createTasksSlice: StateCreator<TasksSlice, [], [], TasksSlice> = (s
     );
   },
 
-  getPendingTasks: () =>
-    get().tasks.filter((t) => t.status !== 'completed'),
+  getPendingTasks: () => get().tasks.filter((t) => t.status !== 'completed'),
 });

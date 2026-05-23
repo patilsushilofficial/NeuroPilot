@@ -94,7 +94,13 @@ const baseHomeReturn = {
   avatarAnimStyle: {},
   navigation: { navigate: mockNavigate },
   topTodayItems: [
-    { type: 'task' as const, id: 't1', title: 'Write report', priority: 'high' as const, completed: false },
+    {
+      type: 'task' as const,
+      id: 't1',
+      title: 'Write report',
+      priority: 'high' as const,
+      completed: false,
+    },
     { type: 'habit' as const, id: 'h1', title: 'Meditate', emoji: '🧘', completed: false },
   ],
   todayTotalCount: 2,

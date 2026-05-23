@@ -48,12 +48,32 @@ export const DebugScreen: React.FC = () => {
         <Card style={styles.section}>
           <Text style={[theme.text.h4, styles.sectionTitle]}>Haptics (Vibration)</Text>
           <View style={styles.buttonRow}>
-            <Button label="Success" onPress={() => testHaptic('success')} variant="outline" style={styles.button} />
-            <Button label="Warning" onPress={() => testHaptic('warning')} variant="outline" style={styles.button} />
+            <Button
+              label="Success"
+              onPress={() => testHaptic('success')}
+              variant="outline"
+              style={styles.button}
+            />
+            <Button
+              label="Warning"
+              onPress={() => testHaptic('warning')}
+              variant="outline"
+              style={styles.button}
+            />
           </View>
           <View style={[styles.buttonRow, styles.buttonRowSpaced]}>
-            <Button label="Error" onPress={() => testHaptic('error')} variant="outline" style={styles.button} />
-            <Button label="Heavy" onPress={() => testHaptic('heavy')} variant="outline" style={styles.button} />
+            <Button
+              label="Error"
+              onPress={() => testHaptic('error')}
+              variant="outline"
+              style={styles.button}
+            />
+            <Button
+              label="Heavy"
+              onPress={() => testHaptic('heavy')}
+              variant="outline"
+              style={styles.button}
+            />
           </View>
         </Card>
 

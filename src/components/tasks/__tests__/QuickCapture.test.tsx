@@ -53,64 +53,64 @@ describe('QuickCapture', () => {
   it('handles input and submit', () => {
     const onCapture = jest.fn();
     const { getByPlaceholderText, getByText } = render(<QuickCapture onCapture={onCapture} />);
-    
+
     const input = getByPlaceholderText('Capture a thought or task…');
     fireEvent.changeText(input, 'New Task');
-    
+
     const addButton = getByText('+');
     fireEvent.press(addButton);
-    
+
     expect(onCapture).toHaveBeenCalledWith('New Task', 'medium');
   });
 
   it('handles priority selection', () => {
     const onCapture = jest.fn();
     const { getByPlaceholderText, getByText } = render(<QuickCapture onCapture={onCapture} />);
-    
+
     const input = getByPlaceholderText('Capture a thought or task…');
     fireEvent.changeText(input, 'New Task');
     fireEvent(input, 'focus');
-    
+
     const highPriority = getByText('High');
     fireEvent.press(highPriority);
-    
+
     const submitButton = getByText('+');
     fireEvent.press(submitButton);
-    
+
     expect(onCapture).toHaveBeenCalledWith('New Task', 'high');
   });
 
   it('does not submit empty text', () => {
     const onCapture = jest.fn();
     const { getByPlaceholderText, getByText } = render(<QuickCapture onCapture={onCapture} />);
-    
+
     const input = getByPlaceholderText('Capture a thought or task…');
     fireEvent.changeText(input, '   ');
-    
+
     const addButton = getByText('+');
     fireEvent.press(addButton);
-    
+
     expect(onCapture).not.toHaveBeenCalled();
   });
 
   it('handles blur with text', () => {
     const { getByPlaceholderText } = render(<QuickCapture onCapture={jest.fn()} />);
-    
+
     const input = getByPlaceholderText('Capture a thought or task…');
     fireEvent.changeText(input, 'New Task');
     fireEvent(input, 'blur');
-    
+
     // Should still be expanded or have text
     expect(input.props.value).toBe('New Task');
   });
 
   it('handles blur without text', () => {
     const { getByPlaceholderText } = render(<QuickCapture onCapture={jest.fn()} />);
-    
+
     const input = getByPlaceholderText('Capture a thought or task…');
     fireEvent(input, 'focus');
     fireEvent(input, 'blur');
-    
+
     // Should be collapsed
     expect(input.props.value).toBe('');
   });

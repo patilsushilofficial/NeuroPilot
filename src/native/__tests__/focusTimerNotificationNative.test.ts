@@ -9,8 +9,10 @@ describe('focusTimerNotificationNative', () => {
     NativeModules.FocusTimerNotification = undefined as never;
     Object.defineProperty(Platform, 'OS', { value: 'android', configurable: true });
 
-    const { isFocusTimerNativeAvailable, subscribeFocusTimerNotificationActions } =
-      require('../focusTimerNotificationNative');
+    const {
+      isFocusTimerNativeAvailable,
+      subscribeFocusTimerNotificationActions,
+    } = require('../focusTimerNotificationNative');
 
     expect(isFocusTimerNativeAvailable).toBe(false);
     expect(subscribeFocusTimerNotificationActions(jest.fn())).toEqual(expect.any(Function));

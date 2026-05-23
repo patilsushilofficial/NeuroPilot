@@ -4,11 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { Theme } from '../../theme';
 import { borderRadius, spacing } from '../../theme/spacing';
-import {
-  fontSizes,
-  fontWeights,
-  letterSpacings,
-} from '../../theme/typography';
+import { fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
 
 export type SectionAccent = 'error' | 'primary' | 'success';
 
@@ -30,11 +26,7 @@ interface ListSectionHeaderProps {
  * view-model. Used by both the Tasks and Habits screens; the visual
  * vocabulary stays identical so users only learn the pattern once.
  */
-export const ListSectionHeader: React.FC<ListSectionHeaderProps> = ({
-  title,
-  count,
-  accent,
-}) => {
+export const ListSectionHeader: React.FC<ListSectionHeaderProps> = ({ title, count, accent }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
@@ -47,9 +39,7 @@ export const ListSectionHeader: React.FC<ListSectionHeaderProps> = ({
         <View style={[styles.dot, { backgroundColor: tint }]} />
         <Text style={[theme.text.labelLarge, styles.title]}>{title}</Text>
       </View>
-      <View
-        style={[styles.countChip, { backgroundColor: theme.colors[CHIP_BG_KEY[accent]] }]}
-      >
+      <View style={[styles.countChip, { backgroundColor: theme.colors[CHIP_BG_KEY[accent]] }]}>
         <Text style={[styles.countText, { color: tint }]}>{count}</Text>
       </View>
     </View>
@@ -64,7 +54,10 @@ const ACCENT_TO_COLOR_KEY: Record<SectionAccent, 'error' | 'primary' | 'success'
   success: 'success',
 };
 
-const CHIP_BG_KEY: Record<SectionAccent, 'errorContainer' | 'primaryContainer' | 'successContainer'> = {
+const CHIP_BG_KEY: Record<
+  SectionAccent,
+  'errorContainer' | 'primaryContainer' | 'successContainer'
+> = {
   error: 'errorContainer',
   primary: 'primaryContainer',
   success: 'successContainer',

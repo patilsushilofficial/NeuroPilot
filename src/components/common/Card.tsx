@@ -31,10 +31,10 @@ export const Card: React.FC<CardProps> = ({
     variant === 'surface'
       ? styles.cardSurface
       : variant === 'glass'
-      ? styles.cardGlass
-      : elevated
-      ? styles.cardElevated
-      : styles.cardDefault;
+        ? styles.cardGlass
+        : elevated
+          ? styles.cardElevated
+          : styles.cardDefault;
 
   const composedStyle = [
     styles.card,

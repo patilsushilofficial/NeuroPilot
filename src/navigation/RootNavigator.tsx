@@ -102,8 +102,7 @@ const makeStyles = (theme: Theme) =>
       zIndex: zIndex.toast,
       borderWidth: borderWidths.thin,
       borderColor: 'rgba(255,255,255,0.2)',
-      backgroundColor:
-        theme.colorScheme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.6)',
+      backgroundColor: theme.colorScheme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.6)',
     },
     debugBadgeIdle: { opacity: opacity.full },
     debugBadgePressed: { opacity: opacity.ghost },

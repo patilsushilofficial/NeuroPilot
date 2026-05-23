@@ -13,8 +13,7 @@ export interface CreateProfileInput {
   avatar?: string;
 }
 
-const generateProfileId = () =>
-  `user_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+const generateProfileId = () => `user_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
 class ProfileService {
   /**

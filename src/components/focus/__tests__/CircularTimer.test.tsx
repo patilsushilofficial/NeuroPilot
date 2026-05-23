@@ -41,12 +41,7 @@ jest.mock('react-native-reanimated', () => {
 describe('CircularTimer', () => {
   it('renders correctly', () => {
     const { getByText } = render(
-      <CircularTimer
-        secondsRemaining={1500}
-        totalSeconds={1500}
-        phase="focus"
-        isRunning={true}
-      />
+      <CircularTimer secondsRemaining={1500} totalSeconds={1500} phase="focus" isRunning={true} />
     );
     expect(getByText('25:00')).toBeTruthy();
     expect(getByText('FOCUS')).toBeTruthy();
@@ -54,12 +49,7 @@ describe('CircularTimer', () => {
 
   it('renders paused state', () => {
     const { getByText } = render(
-      <CircularTimer
-        secondsRemaining={1000}
-        totalSeconds={1500}
-        phase="focus"
-        isRunning={false}
-      />
+      <CircularTimer secondsRemaining={1000} totalSeconds={1500} phase="focus" isRunning={false} />
     );
     expect(getByText('PAUSED')).toBeTruthy();
   });
@@ -75,7 +65,7 @@ describe('CircularTimer', () => {
     );
     expect(getByText('05:00')).toBeTruthy();
     expect(getByText('SHORT BREAK')).toBeTruthy();
-    
+
     rerender(
       <CircularTimer
         secondsRemaining={900}

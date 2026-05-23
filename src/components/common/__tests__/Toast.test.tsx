@@ -41,18 +41,13 @@ const buildToast = (overrides: Partial<ToastInstance> = {}): ToastInstance => ({
 
 describe('Toast', () => {
   it('renders the message', () => {
-    const { getByText } = render(
-      <Toast toast={buildToast()} onDismiss={jest.fn()} />
-    );
+    const { getByText } = render(<Toast toast={buildToast()} onDismiss={jest.fn()} />);
     expect(getByText('Hello world')).toBeTruthy();
   });
 
   it('renders the title above the message when provided', () => {
     const { getByText } = render(
-      <Toast
-        toast={buildToast({ title: 'Saved' })}
-        onDismiss={jest.fn()}
-      />
+      <Toast toast={buildToast({ title: 'Saved' })} onDismiss={jest.fn()} />
     );
     expect(getByText('Saved')).toBeTruthy();
     expect(getByText('Hello world')).toBeTruthy();
@@ -70,27 +65,20 @@ describe('Toast', () => {
 
   it('exposes an alert role with title + message in the a11y label', () => {
     const { getByRole } = render(
-      <Toast
-        toast={buildToast({ title: 'Saved' })}
-        onDismiss={jest.fn()}
-      />
+      <Toast toast={buildToast({ title: 'Saved' })} onDismiss={jest.fn()} />
     );
     const alert = getByRole('alert');
     expect(alert.props.accessibilityLabel).toBe('Saved: Hello world');
   });
 
   it('falls back to the message alone when no title is set', () => {
-    const { getByRole } = render(
-      <Toast toast={buildToast()} onDismiss={jest.fn()} />
-    );
+    const { getByRole } = render(<Toast toast={buildToast()} onDismiss={jest.fn()} />);
     expect(getByRole('alert').props.accessibilityLabel).toBe('Hello world');
   });
 
   it('invokes onDismiss when tapped', () => {
     const onDismiss = jest.fn();
-    const { getByRole } = render(
-      <Toast toast={buildToast()} onDismiss={onDismiss} />
-    );
+    const { getByRole } = render(<Toast toast={buildToast()} onDismiss={onDismiss} />);
     fireEvent.press(getByRole('alert'));
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
@@ -103,10 +91,7 @@ describe('Toast', () => {
     (variant) => {
       it('renders without throwing and stays accessible', () => {
         const { getByRole } = render(
-          <Toast
-            toast={buildToast({ variant })}
-            onDismiss={jest.fn()}
-          />
+          <Toast toast={buildToast({ variant })} onDismiss={jest.fn()} />
         );
         expect(getByRole('alert')).toBeTruthy();
       });
@@ -119,10 +104,7 @@ describe('Toast', () => {
   describe.each(['top', 'bottom'] as const)('position=%s', (position) => {
     it('renders the toast at the requested position', () => {
       const { getByRole } = render(
-        <Toast
-          toast={buildToast({ position })}
-          onDismiss={jest.fn()}
-        />
+        <Toast toast={buildToast({ position })} onDismiss={jest.fn()} />
       );
       expect(getByRole('alert')).toBeTruthy();
     });

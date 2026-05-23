@@ -10,7 +10,13 @@ jest.mock('../../store', () => ({
 }));
 
 jest.mock('../useHaptics', () => ({
-  useHaptics: jest.fn().mockReturnValue({ light: jest.fn(), medium: jest.fn(), heavy: jest.fn(), warning: jest.fn(), focusComplete: jest.fn() }),
+  useHaptics: jest.fn().mockReturnValue({
+    light: jest.fn(),
+    medium: jest.fn(),
+    heavy: jest.fn(),
+    warning: jest.fn(),
+    focusComplete: jest.fn(),
+  }),
 }));
 
 describe('useFocusTimer', () => {
@@ -33,9 +39,9 @@ describe('useFocusTimer', () => {
       if (typeof selector === 'function') return selector(mockStore);
       return mockStore;
     });
-    
+
     const { result } = renderHook(() => useFocusTimer());
-    
+
     expect(result.current.isIdle).toBe(true);
     expect(result.current.todayFocusMinutes).toBe(0);
   });
@@ -51,13 +57,13 @@ describe('useFocusTimer', () => {
       if (typeof selector === 'function') return selector(mockStore);
       return mockStore;
     });
-    
+
     const { result } = renderHook(() => useFocusTimer());
-    
+
     act(() => {
       result.current.handleStart();
     });
-    
+
     expect(startFocus).toHaveBeenCalled();
   });
 
@@ -73,19 +79,19 @@ describe('useFocusTimer', () => {
       if (typeof selector === 'function') return selector(mockStore);
       return mockStore;
     });
-    
+
     const { result } = renderHook(() => useFocusTimer());
-    
+
     act(() => {
       result.current.handleAbandon();
     });
-    
+
     expect(spy).toHaveBeenCalled();
-    
+
     // Simulate pressing 'End Session'
     const buttons = spy.mock.calls[0][2];
     if (buttons) {
-      buttons[1].onPress();
+      buttons[1].onPress?.();
       expect(abandonFocus).toHaveBeenCalled();
     }
   });
@@ -103,21 +109,27 @@ describe('useFocusTimer', () => {
       if (typeof selector === 'function') return selector(mockStore);
       return mockStore;
     });
-    
+
     // Mock active focus as running
-    (useAppStore as unknown as jest.Mock).mockReturnValueOnce({ status: 'running', presetId: 'pomodoro' });
-    
+    (useAppStore as unknown as jest.Mock).mockReturnValueOnce({
+      status: 'running',
+      presetId: 'pomodoro',
+    });
+
     const { result, rerender } = renderHook(() => useFocusTimer());
-    
+
     act(() => {
       result.current.handlePauseResume();
     });
     expect(pauseFocus).toHaveBeenCalled();
-    
+
     // Mock active focus as paused
-    (useAppStore as unknown as jest.Mock).mockReturnValueOnce({ status: 'paused', presetId: 'pomodoro' });
+    (useAppStore as unknown as jest.Mock).mockReturnValueOnce({
+      status: 'paused',
+      presetId: 'pomodoro',
+    });
     rerender();
-    
+
     act(() => {
       result.current.handlePauseResume();
     });
@@ -133,13 +145,13 @@ describe('useFocusTimer', () => {
       if (typeof selector === 'function') return selector(mockStore);
       return mockStore;
     });
-    
+
     const { result } = renderHook(() => useFocusTimer());
-    
+
     act(() => {
       result.current.handleSelectPreset('short_break');
     });
-    
+
     expect(result.current.selectedPreset).toBe('short_break');
   });
 

@@ -1,10 +1,7 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
 
-import {
-  SegmentedFilterBar,
-  type SegmentedFilterOption,
-} from '../SegmentedFilterBar';
+import { SegmentedFilterBar, type SegmentedFilterOption } from '../SegmentedFilterBar';
 
 jest.mock('../../../hooks/useAppTheme', () => ({
   useAppTheme: () => ({
@@ -39,11 +36,7 @@ const HABIT_OPTIONS: readonly SegmentedFilterOption<HabitKey>[] = [
 describe('SegmentedFilterBar', () => {
   it('renders every option as a labelled segment', () => {
     const { getByText } = render(
-      <SegmentedFilterBar
-        options={TASK_OPTIONS}
-        selected="all"
-        onSelect={jest.fn()}
-      />
+      <SegmentedFilterBar options={TASK_OPTIONS} selected="all" onSelect={jest.fn()} />
     );
     expect(getByText('All')).toBeTruthy();
     expect(getByText('Today')).toBeTruthy();
@@ -52,31 +45,21 @@ describe('SegmentedFilterBar', () => {
 
   it('marks only the active segment with accessibilityState.selected', () => {
     const { getByLabelText } = render(
-      <SegmentedFilterBar
-        options={TASK_OPTIONS}
-        selected="today"
-        onSelect={jest.fn()}
-      />
+      <SegmentedFilterBar options={TASK_OPTIONS} selected="today" onSelect={jest.fn()} />
     );
-    expect(
-      getByLabelText("Show today's tasks").props.accessibilityState
-    ).toEqual({ selected: true });
-    expect(
-      getByLabelText('Show all tasks').props.accessibilityState
-    ).toEqual({ selected: false });
-    expect(
-      getByLabelText('Show completed tasks').props.accessibilityState
-    ).toEqual({ selected: false });
+    expect(getByLabelText("Show today's tasks").props.accessibilityState).toEqual({
+      selected: true,
+    });
+    expect(getByLabelText('Show all tasks').props.accessibilityState).toEqual({ selected: false });
+    expect(getByLabelText('Show completed tasks').props.accessibilityState).toEqual({
+      selected: false,
+    });
   });
 
   it('invokes onSelect with the tapped key', () => {
     const onSelect = jest.fn<void, [TaskKey]>();
     const { getByLabelText } = render(
-      <SegmentedFilterBar
-        options={TASK_OPTIONS}
-        selected="all"
-        onSelect={onSelect}
-      />
+      <SegmentedFilterBar options={TASK_OPTIONS} selected="all" onSelect={onSelect} />
     );
     fireEvent.press(getByLabelText('Show completed tasks'));
     expect(onSelect).toHaveBeenCalledWith('completed');
@@ -84,11 +67,7 @@ describe('SegmentedFilterBar', () => {
 
   it('exposes the tablist accessibility role on the container', () => {
     const { getByRole } = render(
-      <SegmentedFilterBar
-        options={TASK_OPTIONS}
-        selected="all"
-        onSelect={jest.fn()}
-      />
+      <SegmentedFilterBar options={TASK_OPTIONS} selected="all" onSelect={jest.fn()} />
     );
     expect(getByRole('tablist')).toBeTruthy();
   });
@@ -99,11 +78,7 @@ describe('SegmentedFilterBar', () => {
   describe('with a different filter shape (habits)', () => {
     it('renders all habit segments', () => {
       const { getByText } = render(
-        <SegmentedFilterBar
-          options={HABIT_OPTIONS}
-          selected="all"
-          onSelect={jest.fn()}
-        />
+        <SegmentedFilterBar options={HABIT_OPTIONS} selected="all" onSelect={jest.fn()} />
       );
       expect(getByText('All')).toBeTruthy();
       expect(getByText('To do')).toBeTruthy();
@@ -112,28 +87,20 @@ describe('SegmentedFilterBar', () => {
 
     it('reports the right accessibility labels and selected state', () => {
       const { getByLabelText } = render(
-        <SegmentedFilterBar
-          options={HABIT_OPTIONS}
-          selected="pending"
-          onSelect={jest.fn()}
-        />
+        <SegmentedFilterBar options={HABIT_OPTIONS} selected="pending" onSelect={jest.fn()} />
       );
-      expect(
-        getByLabelText('Show pending habits').props.accessibilityState
-      ).toEqual({ selected: true });
-      expect(
-        getByLabelText("Show today's habits").props.accessibilityState
-      ).toEqual({ selected: false });
+      expect(getByLabelText('Show pending habits').props.accessibilityState).toEqual({
+        selected: true,
+      });
+      expect(getByLabelText("Show today's habits").props.accessibilityState).toEqual({
+        selected: false,
+      });
     });
 
     it('passes the habit filter key on press', () => {
       const onSelect = jest.fn<void, [HabitKey]>();
       const { getByLabelText } = render(
-        <SegmentedFilterBar
-          options={HABIT_OPTIONS}
-          selected="all"
-          onSelect={onSelect}
-        />
+        <SegmentedFilterBar options={HABIT_OPTIONS} selected="all" onSelect={onSelect} />
       );
       fireEvent.press(getByLabelText('Show completed habits'));
       expect(onSelect).toHaveBeenCalledWith('done');

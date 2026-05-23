@@ -56,9 +56,7 @@ describe('store/index', () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(storage.set).toHaveBeenCalled();
-    const writes = (storage.set as jest.Mock).mock.calls.filter(
-      (c) => c[0] === 'neuropilot-store'
-    );
+    const writes = (storage.set as jest.Mock).mock.calls.filter((c) => c[0] === 'neuropilot-store');
     expect(writes.length).toBeGreaterThan(0);
     const persisted = JSON.parse(writes.at(-1)![1]);
     expect(persisted.state).toEqual(

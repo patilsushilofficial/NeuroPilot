@@ -5,19 +5,11 @@ import Animated from 'react-native-reanimated';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useFocusShieldActions } from '../../hooks/useFocusShieldActions';
 import { useFocusShieldAnimation } from '../../hooks/useFocusShieldAnimation';
-import {
-  FOCUS_SHIELD_ACTIVE_COLOR,
-  FOCUS_SHIELD_BG_ACTIVE,
-} from '../../constants/focusShield';
+import { FOCUS_SHIELD_ACTIVE_COLOR, FOCUS_SHIELD_BG_ACTIVE } from '../../constants/focusShield';
 import { Theme } from '../../theme';
 import { spacing, borderRadius } from '../../theme/spacing';
-import {
-  borderWidths,
-  controlSizes,
-  iconSizes,
-  opacity,
-} from '../../theme/tokens';
-import { fontSizes, fontWeights, letterSpacings } from '../../theme/typography';
+import { borderWidths, controlSizes, iconSizes, opacity } from '../../theme/tokens';
+import { fontSizes, fontWeights } from '../../theme/typography';
 
 interface FocusShieldProps {
   isActive: boolean;
@@ -28,8 +20,9 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
   const theme = useAppTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { requestToggle, openDNDSettings } = useFocusShieldActions({ isActive, onToggle });
-  const { glowAnimStyle, shieldAnimStyle, thumbAnimStyle, pressShield } =
-    useFocusShieldAnimation({ isActive });
+  const { glowAnimStyle, shieldAnimStyle, thumbAnimStyle, pressShield } = useFocusShieldAnimation({
+    isActive,
+  });
 
   const handlePress = () => {
     pressShield();
@@ -37,9 +30,7 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>FOCUS SHIELD</Text>
-
+    <View>
       <TouchableOpacity
         onPress={handlePress}
         activeOpacity={opacity.hover}
@@ -59,9 +50,7 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
 
           {/* Text content */}
           <View style={styles.textBlock}>
-            <Text style={styles.title}>
-              {isActive ? 'Shield Active' : 'Focus Shield'}
-            </Text>
+            <Text style={styles.title}>{isActive ? 'Shield Active' : 'Focus Shield'}</Text>
             <Text style={styles.description}>
               {isActive
                 ? 'All notifications silenced. Stay in the zone.'
@@ -70,9 +59,7 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
           </View>
 
           {/* Toggle pill */}
-          <View
-            style={[styles.togglePill, isActive ? styles.togglePillOn : styles.togglePillOff]}
-          >
+          <View style={[styles.togglePill, isActive ? styles.togglePillOn : styles.togglePillOff]}>
             <Animated.View style={[styles.toggleThumb, thumbAnimStyle]} />
           </View>
         </View>
@@ -97,16 +84,6 @@ export const FocusShield: React.FC<FocusShieldProps> = ({ isActive, onToggle }) 
 
 const makeStyles = (theme: Theme) =>
   StyleSheet.create({
-    container: {
-      gap: spacing['2xs'],
-    },
-    label: {
-      fontSize: fontSizes.xs,
-      fontWeight: fontWeights.bold,
-      letterSpacing: letterSpacings.widest,
-      paddingHorizontal: spacing['2xs'],
-      color: theme.colors.textTertiary,
-    },
     card: {
       flexDirection: 'row',
       alignItems: 'center',

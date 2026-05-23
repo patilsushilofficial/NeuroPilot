@@ -46,8 +46,7 @@ export const HomeScreen: React.FC = () => {
     handleViewProgress,
   } = useHome();
 
-  const focusActive =
-    activeFocus.status === 'running' || activeFocus.status === 'paused';
+  const focusActive = activeFocus.status === 'running' || activeFocus.status === 'paused';
 
   // Stagger entrance animations so the eye lands on the hero first, then
   // each section settles in. Index increases as we go down the page.
@@ -60,10 +59,7 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.duration(durations.base).delay(nextDelay())}>
           <HomeHero
             profileName={profile?.name}
@@ -81,10 +77,7 @@ export const HomeScreen: React.FC = () => {
 
         {focusActive && (
           <Animated.View entering={FadeInDown.duration(durations.base).delay(nextDelay())}>
-            <FocusActiveBanner
-              active={activeFocus}
-              onPress={() => navigation.navigate('Focus')}
-            />
+            <FocusActiveBanner active={activeFocus} onPress={() => navigation.navigate('Focus')} />
           </Animated.View>
         )}
 
@@ -125,11 +118,7 @@ export const HomeScreen: React.FC = () => {
 
         {settings.showMotivationalQuotes && (
           <Animated.View entering={FadeInDown.duration(durations.base).delay(nextDelay())}>
-            <QuoteCard
-              text={todayQuote.text}
-              author={todayQuote.author}
-              onRefresh={refreshQuote}
-            />
+            <QuoteCard text={todayQuote.text} author={todayQuote.author} onRefresh={refreshQuote} />
           </Animated.View>
         )}
 
